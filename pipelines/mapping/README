@@ -1,0 +1,33 @@
+Use this pipeline to compute aligments for illumina PE/MP data.
+
+The steps are:
+  1. sais
+  2. sampe
+  3. sam->bam + sorting
+  4. coordinate sorting
+  5. remove temporary files
+
+The entry point is jobs_for_mapping.sh. That script will generate the jobs files
+including the necessary dependencies.
+
+Here you have an example when running the pipeline in a single machine:
+
+  $ export PATH=$PATH:/path/to/jobs_for_mapping_dir
+  $ jobs_for_mapping.sh /Users/drio/dev/bam.examples/phix.bam /Users/drio/dev/genomes/phix.fa FOOOOO 1G /tmp 4 | awk -F\t '{print $5}' | bash
+
+If you have computed part of the jobs, you can drop some of them with some unix magic.
+Let's say you don't want to recompute the sais:
+
+  $ jobs_for_mapping.sh /Users/drio/dev/bam.examples/phix.bam /Users/drio/dev/genomes/phix.fa FOOOOO 1G /tmp 4 | grep -vP ".sai$" | ruby -ne 'puts $_.sub(/\d+,\d+/, "-")' | cmds2submit.py -
+
+The regex part of the pipeline is necessary because the id of the jobs are
+pseudo-randomly generated.
+
+If you are planning to run this in a cluster (pbs), use cmds2submit.py to generate
+the actual submit commands:
+
+/Users/drio/dev/py.analysis/pipelines/mapping/jobs_for_mapping.sh /Users/drio/dev/bam.examples/phix.bam /Users/drio/dev/genomes/phix.fa FOOOOO 1G /tmp 4  | ./cmds2submit.py -
+
+
+
+

@@ -1,0 +1,152 @@
+#!/usr/bin/env python
+
+import sys, os
+from optparse import OptionParser
+import pandas as pd
+__lib_dir = os.path.dirname( os.path.realpath(__file__) ) + "/../drio.py"
+sys.path.append(__lib_dir)
+import drdcommon as common
+import ngsproject as np
+
+TOOL_NAME = "ngs_py"
+MAIN_HELP = """Usage: %s <action> [options]
+
+list of ACTIONS:
+
+  boilerplate   Generate boilerplate py code.
+  enumerate     List the bams in stdin in a project.
+  qc            Generate jobs to generate qc data on project data.
+
+""" % (TOOL_NAME)
+
+def main_help(msg=None, main_help=False):
+  if msg: sys.stderr.write('ERROR: ' + msg + "\n")
+  if main_help: sys.stderr.write(MAIN_HELP)
+
+def boilerplate():
+  action = "boilerplate"
+  help_string = """Usage: %s %s -f <tsv_filename>\n""" %(TOOL_NAME, action)
+
+  def help(msg=None):
+    if msg: main_help(msg)
+    sys.stderr.write(help_string)
+    sys.exit(1)
+
+  def parse():
+    parser = OptionParser()
+    parser.add_option("-f", "--file", dest="fn",
+      help="tsv file name that contains the project details.", metavar="FILE")
+    (options, args) = parser.parse_args()
+
+    if len(args) != 0:
+      help('Wrong number of arguments for <%s> action.' % action)
+    if not options.fn:
+      help('Need tsv file name for projects.')
+    return options, args
+
+  def compute(options):
+    print """#!/usr/bin/env python
+
+import sys, os
+#import pandas as pd
+sys.path.append("%s")
+import drdcommon as common
+import ngsproject as np
+
+def main():
+  Prj = np.NgsPrj("%s")
+  for i, b in enumerate(Prj.seq_events()):
+    if i == 0: next
+    print "bam path: " + b.path
+    print "bam id:   " + b.id
+
+if __name__ == "__main__":
+  main()
+""" % (__lib_dir, options.fn)
+
+  compute(parse()[0])
+
+
+def qc():
+  action = "qc"
+  help_string = """Usage: %s %s -f <tsv_filename>\n""" %(TOOL_NAME, action)
+
+  def help(msg=None):
+    if msg: main_help(msg)
+    sys.stderr.write(help_string)
+    sys.exit(1)
+
+  def parse():
+    parser = OptionParser()
+    parser.add_option("-f", "--file", dest="fn",
+      help="tsv file name that contains the project details.", metavar="FILE")
+    (options, args) = parser.parse_args()
+
+    if len(args) != 0:
+      help('Wrong number of arguments for <%s> action.' % action)
+    if not options.fn:
+      help('Need tsv file name for projects.')
+    return options, args
+
+  def compute(options):
+    root_dir = "qc"
+    try:    os.mkdir(root_dir)
+    except: sys.stderr.write('output dir already there, skipping mkdir.\n')
+
+    Prj = np.NgsPrj(options.fn)
+    for i, b in enumerate(Prj.seq_events()):
+      if i == 0: next
+      common.cmd(root_dir, "flagstat", "mkdir -p %s; samtools flagstat %s > %s", b)
+      common.cmd(root_dir, "md5", "mkdir -p %s; md5sum %s > %s", b)
+
+  compute(parse()[0])
+
+def enum():
+  action = "enumerate"
+  help_string = """Usage: %s %s -f <tsv_filename> [-i]\n
+With -i we will dump a tsv where the first col will be the id of the sample.
+""" % (TOOL_NAME, action)
+
+  def help(msg=None):
+    if msg: main_help(msg)
+    sys.stderr.write(help_string)
+    sys.exit(1)
+
+  def parse():
+    parser = OptionParser()
+    parser.add_option("-f", "--file", dest="fn",
+      help="tsv file name that contains the project details.", metavar="FILE")
+    parser.add_option("-i", "--id", action="store_true", dest="id", default=False,
+      help="tsv file name that contains the project details.", metavar="FILE")
+    (options, args) = parser.parse_args()
+
+    if len(args) != 0:
+      help('Wrong number of arguments for <%s> action.', action)
+    if not options.fn:
+      help('Need tsv file name for projects.')
+    return options, args
+
+  def compute(options):
+    Prj = np.NgsPrj(options.fn)
+    for b in Prj.seq_events():
+      if options.id:
+        print b.id + "\t" + b.path
+      else:
+        print b.path
+
+  compute(parse()[0])
+
+def main():
+  ACTIONS = {'enumerate': enum, 'qc': qc, 'boilerplate': boilerplate}
+
+  if len(sys.argv) == 1:
+    main_help('No option specified', main_help=True)
+  elif sys.argv[1] not in ACTIONS:
+    main_help('Invalid action.', main_help=True)
+  else:
+    action = sys.argv[1]
+    sys.argv.remove(action)
+    ACTIONS[action]()
+
+if __name__ == "__main__":
+  main()

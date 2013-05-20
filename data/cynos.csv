@@ -1,0 +1,22 @@
+library_name,DNAid,merge,bam_path,project,colony,comments,controller_or_progressor,MHC_haplotype 
+,11433-01b,merged,/stornext/snfs5/next-gen/solid/p-merge-work/merges/CIP_CYNO_WG_ILM/11433-01b/11433-01b.dups.bam,CIP: Catalogue of Rhesus Variation - Macaca-fascicularis-Wisconsin-PI J Rogers,Wisconsin,,progressor,N/A
+,11440-05b,merged,/stornext/snfs5/next-gen/solid/p-merge-work/merges/CIP_CYNO_WG_ILM/11440-05b/11440-05b.dups.bam,CIP: Catalogue of Rhesus Variation - Macaca-fascicularis-Wisconsin-PI J Rogers,Wisconsin,,controller ,N/A
+,11271-01,merged,/stornext/snfs5/next-gen/solid/p-merge-work/merges/CIP_CYNO_WG_ILM/11271-01/11271-01.dups.bam,CIP: Catalogue of Rhesus Variation - Macaca-fascicularis-Wisconsin-PI J Rogers,Wisconsin,,controller ,N/A
+,11440-1b,merged,/stornext/snfs5/next-gen/solid/p-merge-work/merges/CIP_CYNO_WG_ILM/11440-1b/11440-1b.dups.bam,CIP: Catalogue of Rhesus Variation - Macaca-fascicularis-Wisconsin-PI J Rogers,Wisconsin,,controller ,N/A
+,11364-02,merged,/stornext/snfs5/next-gen/solid/p-merge-work/merges/CIP_CYNO_WG_ILM/11364-02/11364-02.dups.bam,CIP: Catalogue of Rhesus Variation - Macaca-fascicularis-Wisconsin-PI J Rogers,Wisconsin,,progressor,N/A
+,11200-03,merged,/stornext/snfs5/next-gen/solid/p-merge-work/merges/CIP_CYNO_WG_ILM/11200-03/11200-03.dups.bam,CIP: Catalogue of Rhesus Variation - Macaca-fascicularis-Wisconsin-PI J Rogers,Wisconsin,,progressor,N/A
+,11271-02,merged,"/stornext/snfs5/next-gen/solid/p-merge-work/merges/CIP_CYNO_WG_ILM/11271-02/11271-02.dups.bam
+",CIP: Catalogue of Rhesus Variation - Macaca-fascicularis-Wisconsin-PI J Rogers,Wisconsin,,controller ,N/A
+,11271-03,merged,/stornext/snfs5/next-gen/solid/p-merge-work/merges/CIP_CYNO_WG_ILM/11271-03/11271-03.dups.bam,CIP: Catalogue of Rhesus Variation - Macaca-fascicularis-Wisconsin-PI J Rogers,Wisconsin,,controller ,N/A
+,11433-02b,merged,/stornext/snfs5/next-gen/solid/p-merge-work/merges/CIP_CYNO_WG_ILM/11433-02b/11433-02b.dups.bam,CIP: Catalogue of Rhesus Variation - Macaca-fascicularis-Wisconsin-PI J Rogers,Wisconsin,,progressor,N/A
+,11433-03b,merged,/stornext/snfs5/next-gen/solid/p-merge-work/merges/CIP_CYNO_WG_ILM/11433-03b/11433-03b.dups.bam,CIP: Catalogue of Rhesus Variation - Macaca-fascicularis-Wisconsin-PI J Rogers,Wisconsin,,progressor,N/A
+,11200-06,merged,/stornext/snfs5/next-gen/solid/p-merge-work/merges/CIP_CYNO_WG_ILM/11200-06/11200-06.dups.bam,CIP: Catalogue of Rhesus Variation - Macaca-fascicularis-Wisconsin-PI J Rogers,Wisconsin,,controller ,N/A
+,11440-02b,merged,/stornext/snfs5/next-gen/solid/p-merge-work/merges/CIP_CYNO_WG_ILM/11440-02b/11440-02b.dups.bam,CIP: Catalogue of Rhesus Variation - Macaca-fascicularis-Wisconsin-PI J Rogers,Wisconsin,,progressor,N/A
+,11433-04b,merged,/stornext/snfs5/next-gen/solid/p-merge-work/merges/CIP_CYNO_WG_ILM/11433-04b/11433-04b.dups.bam,CIP: Catalogue of Rhesus Variation - Macaca-fascicularis-Wisconsin-PI J Rogers,Wisconsin,,progressor,N/A
+,11433-05b,merged,/stornext/snfs5/next-gen/solid/p-merge-work/merges/CIP_CYNO_WG_ILM/11433-05b/11433-05b.dups.bam,CIP: Catalogue of Rhesus Variation - Macaca-fascicularis-Wisconsin-PI J Rogers,Wisconsin,,progressor,N/A
+, 11433-06b,merged,/stornext/snfs5/next-gen/solid/p-merge-work/merges/CIP_CYNO_WG_ILM/11433-06b/11433-06b.dups.bam,CIP: Catalogue of Rhesus Variation - Macaca-fascicularis-Wisconsin-PI J Rogers,Wisconsin,,progressor,N/A
+,11440-03b,merged,/stornext/snfs5/next-gen/solid/p-merge-work/merges/CIP_CYNO_WG_ILM/11440-03b/11440-03b.dups.bam,CIP: Catalogue of Rhesus Variation - Macaca-fascicularis-Wisconsin-PI J Rogers,Wisconsin,,progressor,N/A
+,11476-01b,merged,/stornext/snfs5/next-gen/solid/p-merge-work/merges/CIP_CYNO_WG_ILM/11476-01b/11476-01b.dups.bam,CIP: Catalogue of Rhesus Variation - Macaca-fascicularis-Wisconsin-PI J Rogers,Wisconsin,,progressor,N/A
+,11440-04b,merged,/stornext/snfs5/next-gen/solid/p-merge-work/merges/CIP_CYNO_WG_ILM/11440-04b/11440-04b.dups.bam,CIP: Catalogue of Rhesus Variation - Macaca-fascicularis-Wisconsin-PI J Rogers,Wisconsin,,progressor,N/A
+,9498-01A,merged,/stornext/snfs6/rogers/drio_scratch/bio.node/david_oconnor/one/9498-01A.control.merged.dups.bam,CIP: Catalogue of Rhesus Variation - Macaca-fascicularis-Wisconsin-PI J Rogers,Wisconsin,,controller ,N/A
+,9498-02A,merged,/stornext/snfs6/rogers/drio_scratch/bio.node/david_oconnor/two/9498-02A.progressor.merged.dups.bam,CIP: Catalogue of Rhesus Variation - Macaca-fascicularis-Wisconsin-PI J Rogers,Wisconsin,,progressor,N/A
