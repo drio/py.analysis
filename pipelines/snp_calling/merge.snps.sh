@@ -8,7 +8,7 @@ do
   input="$input $f"
 done
 
-snp_eff_dir=/stornext/snfs6/rogers/drio_scratch/local/snpeff/snpEff_3_0a
+snp_eff_dir=/stornext/snfs6/rogers/drio_scratch/local/snpeff/latest
 #out=merged.anno.rdp.vcf.gz
 out=merged.vcf.gz
 #anno="java -Xmx4G -jar $snp_eff_dir/snpEff.jar eff -c $snp_eff_dir/snpEff.config -v MMUL_1.66 -noStats"
