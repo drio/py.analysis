@@ -140,7 +140,7 @@ class VcfSnp:
     return len(self.rdp) > 0
 
   def gtypes(self):
-    """return an array with the genotypes per each sample
+    """return a hash with the genotypes per each sample
        gts[column_number] = (0,1)
        column_number of the sample
     """
@@ -154,6 +154,18 @@ class VcfSnp:
         if cv != '.':
           raise Exception('VcfSnp.gtypes(): Unexpected entry in sample genotype: [%s]' % cv)
     return gts
+
+  def all_gtypes_the_same(snp):
+    """ Are all the gtypes the same ?"""
+    empty = (-1, -1)
+    prev = empty
+    for col, gts in snp.gtypes().items():
+      if prev == empty:
+        prev = gts
+      else:
+        if prev != gts:
+          return False
+    return True
 
   def set_anno_info(self):
     self.annotated, self.func_cons, self.gene, self.impact = [ False, "", "", "" ]

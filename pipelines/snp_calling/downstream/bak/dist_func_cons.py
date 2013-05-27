@@ -2,9 +2,10 @@
 #
 # show how many snps we have per each func cons type
 #
+
 import sys, re
 
-EFF_RE   = re.compile(r"EFF=([\w_]+)\(")
+EFF_RE = re.compile(r"EFF=([\w_]+)\(")
 
 def func_cons(line):
   match = EFF_RE.search(line)
