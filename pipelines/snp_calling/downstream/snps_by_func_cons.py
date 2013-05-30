@@ -12,19 +12,21 @@ tool = snp_by_func_cons.py
 Given an annotated vcf file report how many snps we have
 per each func consequence.
 
+min: minimum number of samples to consider before dropping
+a snp because all the genotypes are the same
+
 Usage:
-  $ cat vcf | tool > stats.tsv
+  $ cat vcf | tool <min> > stats.tsv
 """
 
-def process_snps(vcf):
+def process_snps(vcf, min_num_samples):
   skipped, total = 0, 0
   hc = defaultdict(lambda: 0) # fc -> count
   for l in vcf.each_snp():
     snp = VcfSnp(l)
     if snp.annotated == False:
       raise(Exception('Found a snp that is not annotated: %s' % l))
-    calls_for_all_samples = vcf.num_of_samples == len(snp.gtypes())
-    if calls_for_all_samples and snp.all_gtypes_the_same():
+    if len(snp.gtypes()) >= min_num_samples and snp.all_gtypes_the_same():
       skipped += 1
     else:
       hc[snp.func_cons] += 1
@@ -38,19 +40,20 @@ def report(h_fc_counts):
   for fc in h_fc_counts:
     print "%s\t%s" % (fc, h_fc_counts[fc])
 
-def do_work(fd_vcf):
+def do_work(fd_vcf, min_num_samples):
   vcf = Vcf(fd_vcf)
   vcf.load_meta_header()
-  report(process_snps(vcf))
+  report(process_snps(vcf, min_num_samples))
 
 def main():
-  if len(sys.argv) == 2:
+  if len(sys.argv) != 2:
     drdcommon.error("Wrong # of args", usage)
   if drdcommon.data_in_stdin() == False:
     drdcommon.error("Need data in stdin.", usage)
 
+  min_num_samples = int(sys.argv[1])
   fd_vcf = drdcommon.xopen("-")
-  do_work(fd_vcf)
+  do_work(fd_vcf, min_num_samples)
   fd_vcf.close()
 
 if __name__ == "__main__":
