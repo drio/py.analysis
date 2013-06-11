@@ -37,7 +37,7 @@ class CnvStateMachine(object):
     return log_ratio < -self.threshold
 
   def report_strech(self):
-    if self.num_bins > 0:
+    if self.num_bins > 0 and self.event_type:
       print "%s %s %s %s" % (self.locus[0], self.locus[1], self.event_type , self.num_bins)
 
   def entering_strech(self, curr_type):
