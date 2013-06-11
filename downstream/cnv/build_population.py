@@ -15,7 +15,7 @@ Look for files matching the pattern in the current directory, load them
 and dump the population level cnv calls.
 
 Usage:
-  $ %s <pattern>
+  $ %s <pattern> <regex_for_id>
 """ % (tool, tool)
 
 def load_data(sid, fn, h):
@@ -43,10 +43,15 @@ def main():
       raise(Exception('Problems extracting id using regular expression.'))
     load_data(sid, fn, h)
 
+  # print header
+  sys.stdout.write("chrm coor type num_over_zero ")
+  for _id in l_ids:
+    sys.stdout.write("%s " % _id)
+  print ""
+
   for t, one in h.items():
     for chrm, two in one.items():
       for coor, three in two.items():
-        # TODO print ids
         sys.stdout.write("%s %s %s %s " % (str(chrm), str(coor), t, len(three)))
         for sid in l_ids:
           if sid in three:
