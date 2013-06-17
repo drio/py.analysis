@@ -12,7 +12,7 @@ def log(msg, output_to=sys.stderr):
 
 def files_in_dir(directory, pattern='*'):
   """ return a list of all files in directory that match pattern """
-  files = [f for f in os.listdir(directory) if os.path.isfile(f)]
+  files = [directory + "/" + f for f in os.listdir(directory) if os.path.isfile(directory + "/" + f)]
   return fnmatch.filter(files, pattern)
 
 def rec_find_files(directory, pattern):
