@@ -20,7 +20,13 @@ def load_data(sid, fn, h):
     # chrm start end n_reads n_reads_ref log2ratio
     chrm, start, end, nref, nr, log = l.split()
     chrm = re.sub(r'(^[cC]hrm?)', '', chrm)
-    h[chrm][int(start)][sid] = int(nr)
+    h[chrm][int(start)][sid] = (int(nr), float(log))
+
+def out(l, to="both"):
+  if to == "stderr" or to == "both":
+    sys.stderr.write(l)
+  if to == "stdout" or to == "both":
+    sys.stdout.write(l)
 
 def main():
   if len(sys.argv) != 4:
@@ -42,17 +48,18 @@ def main():
     load_data(sid, fn, h)
 
   # print header
-  sys.stdout.write("chrm start ")
+  out("chrm start ")
   for _id in l_ids:
-    sys.stdout.write("%s " % _id)
-  print ""
+    out("%s " % _id)
+  out("\n")
 
   for chrm, one in h.items():
     for start, two in one.items():
-      sys.stdout.write("%s %s " % (str(chrm), str(start)))
+      out("%s %s " % (str(chrm), str(start)))
       for sid, nr in two.items():
-        sys.stdout.write(str(nr) + " ")
-      print ""
+        out(str(nr[0]) + " ", "stdout")
+        out(str(nr[1]) + " ", "stderr")
+      out("\n")
 
 if __name__ == "__main__":
   main()
