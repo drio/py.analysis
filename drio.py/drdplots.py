@@ -1,4 +1,5 @@
 import matplotlib
+import numpy as np
 matplotlib.use('Agg') # hack to avoid DISPLAY error when in the console
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -15,24 +16,26 @@ def boxplot(data, title="title here", ofn="boxplot.png", y_limit=None):
   ax.boxplot(data)
   plt.savefig(ofn, dpi=150)
 
-def barplot(y, labels, title="title_here", ofn="output.png"):
+def barplot(y, labels, title="title_here", ofn="output.png", x_inches=10, y_inches=5, rota=45, s_xticks=1):
   fig = plt.figure()
-  fig.set_size_inches(12,8)
-  ax  = fig.add_subplot(1,1,1)
+  fig.set_size_inches(x_inches, y_inches)
+  ax = fig.add_subplot(1,1,1)
 
   N   = len(y)
-  ind = range(N)
+  ind = np.arange(N)
 
   #ax.set_yscale('log')
+  #ax.bar(ind, y,  align='center')
   ax.bar(ind, y,  align='center')
   ax.set_ylabel('Counts')
   ax.set_title(title, fontstyle='italic')
+  #ax.set_xticks(ind + s_xticks)
   ax.set_xticks(ind)
-  ax.set_xticklabels(labels, rotation=45)
+  ax.set_xticklabels(labels, rotation=rota)
   #fig.autofmt_xdate()
   #p.show()
-  #plt.savefig(ofn, dpi=150, bbox_inches='tight')
-  plt.savefig(ofn, dpi=150)
+  plt.savefig(ofn, dpi=150, bbox_inches='tight')
+  #plt.savefig(ofn, dpi=150)
 
 def scatter_plot(ofn, x, y, title="title here", xlabel="xlabel", ylabel="ylabel", dot_size=10):
   fig = plt.figure()
