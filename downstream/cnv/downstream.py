@@ -198,5 +198,6 @@ def run(fn):
   df.to_csv("counts.txt", sep="\t")
   """
 
-run("joined.35087.1k.300.depth.csv")
+run(sys.argv[1])
+#run("joined.35087.1k.300.depth.csv")
 #run("small.join.csv")
