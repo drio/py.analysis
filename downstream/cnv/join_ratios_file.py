@@ -22,11 +22,8 @@ def load_data(sid, fn, h):
     chrm = re.sub(r'(^[cC]hrm?)', '', chrm)
     h[chrm][int(start)][sid] = (int(nr), float(log))
 
-def out(l, to="both"):
-  if to == "stderr" or to == "both":
-    sys.stderr.write(l)
-  if to == "stdout" or to == "both":
-    sys.stdout.write(l)
+def out(s):
+  sys.stdout.write(s)
 
 def main():
   if len(sys.argv) != 4:
@@ -39,7 +36,9 @@ def main():
   l        = lambda:defaultdict(l)
   h        = l() # hold all data in mem
 
-  for fn in drdcommon.files_in_dir(f_dir, pattern):
+  files_to_iterate = drdcommon.files_in_dir(f_dir, pattern)
+  sys.stderr.write("# of files to process: " + str(len(files_to_iterate)) + "\n")
+  for fn in files_to_iterate:
     try:
       sid = re.search(re_id, fn).group(1)
       l_ids.append(sid)
@@ -57,8 +56,7 @@ def main():
     for start, two in one.items():
       out("%s %s " % (str(chrm), str(start)))
       for sid, nr in two.items():
-        out(str(nr[0]) + " ", "stdout")
-        out(str(nr[1]) + " ", "stderr")
+        out(str(nr[0]) + " ")
       out("\n")
 
 if __name__ == "__main__":
