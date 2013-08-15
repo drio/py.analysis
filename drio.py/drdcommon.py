@@ -1,6 +1,6 @@
 import sys, gzip, bz2
 import os, errno
-import fnmatch
+import glob
 from time import gmtime, strftime
 
 def setup_logging(logging):
@@ -12,8 +12,9 @@ def log(msg, output_to=sys.stderr):
 
 def files_in_dir(directory, pattern='*'):
   """ return a list of all files in directory that match pattern """
-  files = [directory + "/" + f for f in os.listdir(directory) if os.path.isfile(directory + "/" + f)]
-  return fnmatch.filter(files, pattern)
+  #files = [directory + "/" + f for f in os.listdir(directory) if os.path.isfile(directory + "/" + f)]
+  return glob.glob(directory + "/" + pattern)
+  #return fnmatch.filter(files, pattern)
 
 def rec_find_files(directory, pattern):
   """ Find recursively all files that match pattern in directory """
