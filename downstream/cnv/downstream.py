@@ -6,6 +6,7 @@ from pandas import DataFrame, read_table
 #import matplotlib.pyplot as plt
 #from pylab import *
 from collections import defaultdict
+from drdcommon import xopen
 import argparse
 
 def two_dec_points(v):
@@ -130,7 +131,6 @@ def normalize(df, rd_ref):
 
   return new_df.applymap(logic)
 
-
 def adjust_resolution(df, n_win=10):
   samples = defaultdict(lambda: [])
 
@@ -229,7 +229,9 @@ def parse_args():
                         dest='threshold', action='store', type=int,
                         help='read depth threashold for calling an event')
 
-  return parser.parse_args()
+  args = parser.parse_args()
+  args.input_fn = xopen(args.input_fn)
+  return args
 
 def run():
   args = parse_args()
@@ -250,7 +252,6 @@ def run():
   #print "# bins after dropping bins where all samples have same call: %d" % len(df.columns)
   #plot_hm(df, 'headmap.png')
   #df.transpose().to_csv(output_fn, sep="\t")
-
 
   # generate the differences of read depth compared to the reference.
   diff_with_ref_rd = lambda(v): v - args.n_reads_ref_bin
