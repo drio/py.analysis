@@ -8,6 +8,7 @@ from pandas import DataFrame, read_table
 from collections import defaultdict
 from drdcommon import xopen
 import argparse
+import sys
 
 def two_dec_points(v):
   return "{0:.2f}".format(v)
@@ -213,7 +214,7 @@ def parse_args():
                         dest='input_fn', action='store',
                         help='input data file')
 
-  parser.add_argument('-o', '--output_fn', metavar='output_fn', required=True,
+  parser.add_argument('-o', '--output_fn', metavar='output_fn', required=False,
                         dest='output_fn', action='store',
                         help='output data file')
 
@@ -231,6 +232,8 @@ def parse_args():
 
   args = parser.parse_args()
   args.input_fn = xopen(args.input_fn)
+  if not args.output_fn:
+    args.output_fn = sys.stdout
   return args
 
 def run():
