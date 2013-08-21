@@ -77,9 +77,6 @@ class Truth(object):
 
   def query(self, chrm, start, end):
     """ Is there any event in the truth that is being hit? """
-    if chrm not in self.ds:
-      raise Exception("Truth.query: Unexpected chrm. ")
-
     for coor in range(start, end+1):
       coor_hits_event = chrm in self.ds and coor in self.ds[chrm]
       if coor_hits_event:
