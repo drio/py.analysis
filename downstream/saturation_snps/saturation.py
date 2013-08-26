@@ -2,8 +2,7 @@
 #
 from __future__ import division
 from collections import defaultdict
-import sys
-import os.path
+import sys, os.path, argparse
 import pysam
 #
 import drdcommon
@@ -16,8 +15,12 @@ tool = %s
 Given a stream of vcf files (stdin) computes the increment of snps as a function
 of the samples processed.
 
+-g: compute how many new genes we are discovering when more samples are added.
+
 Usage:
   $ gzip -cd *.vcf.gz | %s > staturation.txt
+
+NOTE: We are only counting events seen in at least 2 animals.
 
 """ % (tool, tool)
 
@@ -89,12 +92,21 @@ class Saturation(object):
   def __in_header(self, l):
     return l[0] == '#'
 
+def parse_args():
+  parser = argparse.ArgumentParser(description='staturation capture stats')
+
+  parser.add_argument('-g', '--genes', metavar='genes', required=False,
+                        dest='calls_chrm', action='store', default=False,
+                        help='Report genes discovered instead of snps.')
+
+  args = parser.parse_args()
+  return args
+
 def main():
-  if len(sys.argv) != 1:
-    drdcommon.error("Wrong # of args", usage)
-  if not drdcommon.data_in_stdin():
-    drdcommon.error("No data in stdin.", usage)
+  args = parse_args()
   stream = drdcommon.xopen("-")
+  if not drdcommon.data_in_stdin():
+    drdcommon.error(usage)
   print Saturation(stream).csv("\t")
   stream.close()
 
