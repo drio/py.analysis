@@ -33,15 +33,20 @@ class Saturation(object):
     self.n_samples = 1
     self.subs      = defaultdict(lambda : 0)
     self.indels    = defaultdict(lambda : 0)
+    self.genes     = defaultdict(lambda : 0)
+    self.genes_partial = {}
     self.counts    = {}
     self.more_samples_to_process = True
     self.__doWork()
 
   def csv(self, sep=","):
-    csv = "num_samples" + sep + "substitutions" + sep + "indels" + "\n"
-    index_subs, index_indels = 0, 1
+    csv = "num_samples" + sep + "substitutions" + sep + "indels" + sep + "genes" + "\n"
+    index_subs, index_indels, index_genes = 0, 1, 2
     for n_samples, counts in self.counts.items():
-      csv += "%s%s%s%s%s\n" % (n_samples, sep, str(counts[index_subs]), sep, str(counts[index_indels]))
+      csv += "%s%s%s%s%s%s%s\n" % (n_samples, sep,
+                               str(counts[index_subs]), sep,
+                               str(counts[index_indels]), sep,
+                               str(counts[index_genes]))
     return csv
 
   def __doWork(self):
@@ -55,10 +60,10 @@ class Saturation(object):
   def __update_counts(self):
     n_subs   = self.__seen_in_more_than_n_samples(self.subs, AT_LEAST_SEEN)
     n_indels = self.__seen_in_more_than_n_samples(self.indels, AT_LEAST_SEEN)
-    #self.counts[self.n_samples] = (len(self.subs), len(self.indels))
-    self.counts[self.n_samples] = (n_subs, n_indels)
-    sys.stderr.write(">> #:%s SUBS:%s INDELS:%s MEM(Mbytes):%s\n" % \
-      (self.n_samples, n_subs, n_indels, drdcommon.memory_usage()))
+    n_genes  = self.__seen_in_more_than_n_samples_for_genes(self.genes_partial, AT_LEAST_SEEN)
+    self.counts[self.n_samples] = (n_subs, n_indels, n_genes)
+    sys.stderr.write(">> #:%s SUBS:%s INDELS:%s GENES:%s MEM(Mbytes):%s\n" % \
+      (self.n_samples, n_subs, n_indels, n_genes, drdcommon.memory_usage()))
 
   def __seen_in_more_than_n_samples(self, d, n):
     num_snps = 0
@@ -66,6 +71,12 @@ class Saturation(object):
       if n_samples_with_snp >= n:
         num_snps += 1
     return num_snps
+
+  def __seen_in_more_than_n_samples_for_genes(self, d, n):
+    for g_name, _ in d.items():
+      self.genes[g_name] += 1
+    self.genes_partial = {} # Start empty for the next sample.
+    return len([gn for gn, count in self.genes.items() if count >= n])
 
   def __jump_header(self):
     for l in self.stream:
@@ -87,6 +98,9 @@ class Saturation(object):
             self.subs[snp.coordinate()] += 1
           else:
             self.indels[snp.coordinate()] += 1
+          if snp.annotated:
+            self.genes_partial[snp.gene] = True
+
     self.more_samples_to_process = False
 
   def __in_header(self, l):
@@ -96,7 +110,7 @@ def parse_args():
   parser = argparse.ArgumentParser(description='staturation capture stats')
 
   parser.add_argument('-g', '--genes', metavar='genes', required=False,
-                        dest='calls_chrm', action='store', default=False,
+                        dest='genes', action='store', default=False,
                         help='Report genes discovered instead of snps.')
 
   args = parser.parse_args()
