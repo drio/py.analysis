@@ -133,7 +133,6 @@ def parse_args():
 
 def run():
   args = parse_args()
-  print args
   sys.stderr.write(">> Loading the truth" + "\n")
   ds_t = Truth(args.buffer_size).load(args.truth_f, args.min_size, args.calls_chrm)
 
