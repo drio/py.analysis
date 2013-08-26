@@ -5,7 +5,7 @@
 You can compute a hash value for each file and send that information along with your files
 so people at the other end can confirm the data integrity.
 
-In a Unix/Linux enviroment you can use the md5sum command. Here is an example:
+In a Unix/Linux environment you can use the md5sum command. Here is an example:
 
 ```sh
 $ md5sum *.gz > checksums.txt
