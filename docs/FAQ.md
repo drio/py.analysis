@@ -1,6 +1,6 @@
 # FAQ
 
-### How can I ensure that the my files have not been corrupted when being transferred ?
+### How can I ensure that my files have not been corrupted while being transferred ?
 
 You can compute a hash value for each file and send that information along with your files
 so people at the other end can confirm the data integrity.
