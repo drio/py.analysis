@@ -30,7 +30,7 @@ def plot(x, y, title, xlabel, ylabel):
   plt.ylabel(ylabel)
   plt.grid(True)
   plt.title(title)
-  plt.savefig(sys.stdout, dpi=400, bbox_inches='tight')
+  plt.savefig(sys.stdout, bbox_inches='tight')
 
 def process_data(fd):
   x, y = [], []
