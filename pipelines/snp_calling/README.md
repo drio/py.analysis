@@ -1,5 +1,8 @@
 ## Snp calling pipeline (Beta)
 
+NOTE: Please, create a new [issue](https://github.com/drio/py.analysis/issues) if you have
+feature requests or find a bug.
+
 ### Introduction
 
 This document describes how to use the snp calling pipeline to generate population level snps
