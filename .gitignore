@@ -1,4 +1,5 @@
 add_on_target/rhemac.lifted_over.human.vchrome.targets.bed.gz
+downstream/cnv/data/
 data/merged.wes.500k.vcf.gz
 dist_var_allele_ratios/
 more_than_one_variant/more.wes.vcf.gz
