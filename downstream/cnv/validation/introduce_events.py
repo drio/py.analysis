@@ -61,6 +61,8 @@ def load_events(stream):
   sys.stderr.write(">> %d events loaded\n" % count)
   return events
 
+# TODO: This function requires heavy refactoring. Probably creating a class
+#       and grouping logic in methods.
 def gen_new_reference(events, ref_stream):
   first_chrm = True
   in_del = 0
