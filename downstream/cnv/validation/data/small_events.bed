@@ -1,0 +1,4 @@
+# deletions: chrm start end 0
+chrm1 10 20 0
+# duplications: chrm start start dup_size times
+chrm1 100 100 10 1
