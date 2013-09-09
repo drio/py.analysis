@@ -5,20 +5,25 @@ REF=data/phix.fa
 N_READ_PAIRS=1000
 READ_LENGTH=100
 
-reads.fq.bam: reads.fq.sam
+all: mutated.reads.fq.bam normal.reads.fq.bam
+
+%.reads.fq.bam: %.reads.fq.sam
 	samtools view -bS $< > $@
 
-reads.fq.sam: reads.fq mutated_ref.fa.sa
-	bwa mem mutated_ref.fa $< > $@
+%.reads.fq.sam: %.fa.sa %.reads.fq
+	bwa mem $(basename $<) $*.reads.fq > $@
 
-mutated_ref.fa.sa: mutated_ref.fa
+%.fa.sa: %.fa
 	bwa index $<
 
-reads.fq: wgsim mutated_ref.fa
-	wgsim -N $(N_READ_PAIRS) -1$(READ_LENGTH) -d0 -S11 -e0.050 -r0.0020 mutated_ref.fa $@ /dev/null
+%.reads.fq: %.fa
+	wgsim -N $(N_READ_PAIRS) -1$(READ_LENGTH) -d0 -S11 -e0.050 -r0.0020 $< $@ /dev/null
 
-mutated_ref.fa: $(BED_EVENTS) $(REF)
-	$(SRC)/introduce_events.py -e $(BED_EVENTS) -r $(REF) | ./$(SRC)/normalize_ref.py > $@
+mutated.fa: $(BED_EVENTS) normal.fa
+	$(SRC)/introduce_events.py -e $(BED_EVENTS) -r normal.fa | ./$(SRC)/normalize_ref.py > $@
+
+normal.fa:
+	ln -s $(REF) $@
 
 wgsim:
 	git clone https://github.com/lh3/wgsim.git
@@ -28,6 +33,9 @@ wgsim:
 	mv w wgsim
 
 clean:
-	rm -f wgsim mutated* reads*
+	rm -f wgsim mutated* reads* normal*
 
 .PHONY: clean $(BIN_DEPS)
+.PRECIOUS: %.sa
+
+
