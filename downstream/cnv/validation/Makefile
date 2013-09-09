@@ -1,6 +1,6 @@
 #
 SRC=src
-BED_EVENTS=data/small_events.bed
+BED_EVENTS=data/test.bed
 REF=data/phix.fa
 N_READ_PAIRS=1000
 READ_LENGTH=100
@@ -32,10 +32,19 @@ wgsim:
 	rm -rf wgsim
 	mv w wgsim
 
+test:
+	$(SRC)/introduce_events.py -e data/test.bed -r data/test.fa | ./$(SRC)/normalize_ref.py > _tmp
+	@diff _tmp data/test.ok.fa && echo "test ok" || echo "test FAILED!"
+	rm _tmp
+
+rebuild_test:
+	$(SRC)/introduce_events.py -e data/test.bed -r data/test.fa | ./$(SRC)/normalize_ref.py > data/test.ok.fa
+	make test
+
 clean:
 	rm -f wgsim mutated* reads* normal*
 
-.PHONY: clean $(BIN_DEPS)
+.PHONY: clean test rebuild_test
 .PRECIOUS: %.sa
 
 
