@@ -1,7 +1,8 @@
 #
 # (*) Change for your purposes
 SRC=src
-CNV_PIPE=../
+PICARD:=$(shell echo $$PICARD)
+CNV_PIPE=..
 BED_EVENTS=data/test.bed
 REF=data/phix.fa.gz
 X_COV=30
@@ -19,17 +20,20 @@ all: mutated.reads.fq.bam normal.reads.fq.bam
 
 # Call CNV events with our pipeline (3)
 %.calls.txt: %.ratios.txt
-	cat $< | $(CNV_PIPE)/downstream.py -i - -n $(READS_WIN) -t $(THRESHOLD) > $@
+	#$(CNV_PIPE)/join_ratios_file.py $< "_vs_([a-z]+)_chr" . | sort -k2,2n | ruby -ne 'puts $$_.gsub(/\s$$/, "")'
+	$(CNV_PIPE)/join_ratios_file.py $< "([a-z]+).ratios.txt" . | sort -k2,2n | ruby -ne 'puts $$_.gsub(/\s$$/, "")' |\
+		$(CNV_PIPE)/downstream.py -i - -n $(READS_WIN) -t $(THRESHOLD) > $@
 
 %.ratios.txt: %.bins.txt
 	cat $< | $(CNV_PIPE)/compute_log_ratio.py $*.reads.fq.bam > $@
 
 %.bins.txt: %.reads.fq.bam
-	 $(CNV_PIPE)/binner.py $(READS_WIN) $< $(CHRM) | sed 's/chr//g' > $@
+	samtools index $<
+	$(CNV_PIPE)/binner.py $(READS_WIN) $< $(CHRM) > $@
 
 # Generate mutated ref, generate reads, align reads
 %.reads.fq.bam: %.reads.fq.sam
-	samtools view -bS $< > $@
+	java -jar $(PICARD)/SortSam.jar SORT_ORDER=coordinate INPUT=$< OUTPUT=$@
 
 %.reads.fq.sam: %.fa.sa %.reads.fq
 	bwa mem $(basename $<) $*.reads.fq > $@
