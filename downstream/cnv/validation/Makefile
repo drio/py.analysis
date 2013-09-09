@@ -16,11 +16,10 @@ G_SIZE:=$(shell $(CMD_DEC_REF) | grep -v "^>" | wc -c)
 N_READ_PAIRS:=$(shell echo "($(X_COV)*$(G_SIZE))/$(READ_LENGTH)" | bc)
 READS_WIN:=$(shell echo "$(X_COV) * ($(WIN_SIZE)/$(READ_LENGTH))" | bc)
 
-all: mutated.reads.fq.bam normal.reads.fq.bam
+all: mutated.reads.fq.bam normal.reads.fq.bam mutated.calls.txt
 
 # Call CNV events with our pipeline (3)
 %.calls.txt: %.ratios.txt
-	#$(CNV_PIPE)/join_ratios_file.py $< "_vs_([a-z]+)_chr" . | sort -k2,2n | ruby -ne 'puts $$_.gsub(/\s$$/, "")'
 	$(CNV_PIPE)/join_ratios_file.py $< "([a-z]+).ratios.txt" . | sort -k2,2n | ruby -ne 'puts $$_.gsub(/\s$$/, "")' |\
 		$(CNV_PIPE)/downstream.py -i - -n $(READS_WIN) -t $(THRESHOLD) > $@
 
