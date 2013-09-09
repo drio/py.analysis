@@ -1,14 +1,15 @@
 #
 # (*) Change for your purposes
+SHELL=/bin/bash
 SRC=src
 PICARD:=$(shell echo $$PICARD)
 CNV_PIPE=..
 BED_EVENTS=data/test.bed
-REF=data/phix.fa.gz
+REF=data/chr21.small.fa.gz
 X_COV=30
 READ_LENGTH=100
-CHRM=chr1
-WIN_SIZE=500
+CHRM=chr21
+WIN_SIZE=1000
 THRESHOLD=20
 #
 CMD_DEC_REF=gzip -cd $(REF)
@@ -32,27 +33,27 @@ all: mutated.reads.fq.bam normal.reads.fq.bam mutated.calls.txt
 
 # Generate mutated ref, generate reads, align reads
 %.reads.fq.bam: %.reads.fq.sam
-	java -jar $(PICARD)/SortSam.jar SORT_ORDER=coordinate INPUT=$< OUTPUT=$@
+	java -Xmx512m -jar $(PICARD)/SortSam.jar SORT_ORDER=coordinate INPUT=$< OUTPUT=$@
 
 %.reads.fq.sam: %.fa.sa %.reads.fq
-	bwa mem $(basename $<) $*.reads.fq > $@
+	bwa mem -t4 $(basename $<) $*.reads.fq > $@
 
 %.fa.sa: %.fa
 	bwa index $<
 
 %.reads.fq: %.fa
-	wgsim -N $(N_READ_PAIRS) -1$(READ_LENGTH) -d0 -S11 -e0.050 -r0.0020 $< $@ /dev/null
-
-mutated.fa: $(BED_EVENTS) normal.fa
-	$(SRC)/introduce_events.py -e $(BED_EVENTS) -r normal.fa | ./$(SRC)/normalize_ref.py > $@
-
-normal.fa:
-	([[ $(REF) == *.gz ]] && gzip -cd $(REF) > $@ || ln -s $(REF) $@)
-
-vars:
 	@echo "G_SIZE       $(G_SIZE)"
 	@echo "N_READ_PAIRS $(N_READ_PAIRS)"
 	@echo "READS_WIN    $(READS_WIN)"
+	wgsim -N $(N_READ_PAIRS) -1$(READ_LENGTH) -d0 -S11 -e0.050 -r0.0020 $< $@ /dev/null > /dev/null
+
+mutated.fa: $(BED_EVENTS) normal.fa
+	@echo ">> Creating new mutated reference"
+	$(SRC)/introduce_events.py -e $(BED_EVENTS) -r normal.fa | ./$(SRC)/normalize_ref.py > $@
+
+normal.fa:
+	@echo ">> Preparing normal reference."
+	([[ $(REF) == *.gz ]] && gzip -cd $(REF) > $@ || ln -s $(REF) $@)
 
 wgsim:
 	git clone https://github.com/lh3/wgsim.git
@@ -73,5 +74,5 @@ rebuild_test:
 clean:
 	rm -f wgsim mutated* reads* normal*
 
-.PHONY: clean test rebuild_test vars
+.PHONY: clean test rebuild_test
 .PRECIOUS: %.sa
