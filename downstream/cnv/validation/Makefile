@@ -1,12 +1,33 @@
 #
+# (*) Change for your purposes
 SRC=src
+CNV_PIPE=../
 BED_EVENTS=data/test.bed
-REF=data/phix.fa
-N_READ_PAIRS=1000
+REF=data/phix.fa.gz
+X_COV=30
 READ_LENGTH=100
+CHRM=chr1
+WIN_SIZE=500
+THRESHOLD=20
+#
+CMD_DEC_REF=gzip -cd $(REF)
+G_SIZE:=$(shell $(CMD_DEC_REF) | grep -v "^>" | wc -c)
+N_READ_PAIRS:=$(shell echo "($(X_COV)*$(G_SIZE))/$(READ_LENGTH)" | bc)
+READS_WIN:=$(shell echo "$(X_COV) * ($(WIN_SIZE)/$(READ_LENGTH))" | bc)
 
 all: mutated.reads.fq.bam normal.reads.fq.bam
 
+# Call CNV events with our pipeline (3)
+%.calls.txt: %.ratios.txt
+	cat $< | $(CNV_PIPE)/downstream.py -i - -n $(READS_WIN) -t $(THRESHOLD) > $@
+
+%.ratios.txt: %.bins.txt
+	cat $< | $(CNV_PIPE)/compute_log_ratio.py $*.reads.fq.bam > $@
+
+%.bins.txt: %.reads.fq.bam
+	 $(CNV_PIPE)/binner.py $(READS_WIN) $< $(CHRM) | sed 's/chr//g' > $@
+
+# Generate mutated ref, generate reads, align reads
 %.reads.fq.bam: %.reads.fq.sam
 	samtools view -bS $< > $@
 
@@ -23,7 +44,12 @@ mutated.fa: $(BED_EVENTS) normal.fa
 	$(SRC)/introduce_events.py -e $(BED_EVENTS) -r normal.fa | ./$(SRC)/normalize_ref.py > $@
 
 normal.fa:
-	ln -s $(REF) $@
+	([[ $(REF) == *.gz ]] && gzip -cd $(REF) > $@ || ln -s $(REF) $@)
+
+vars:
+	@echo "G_SIZE       $(G_SIZE)"
+	@echo "N_READ_PAIRS $(N_READ_PAIRS)"
+	@echo "READS_WIN    $(READS_WIN)"
 
 wgsim:
 	git clone https://github.com/lh3/wgsim.git
@@ -44,7 +70,5 @@ rebuild_test:
 clean:
 	rm -f wgsim mutated* reads* normal*
 
-.PHONY: clean test rebuild_test
+.PHONY: clean test rebuild_test vars
 .PRECIOUS: %.sa
-
-
