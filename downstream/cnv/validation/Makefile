@@ -1,10 +1,10 @@
 #
-# (*) Change for your purposes
+# Change for your purposes
 SHELL=/bin/bash
 SRC=src
 PICARD:=$(shell echo $$PICARD)
 CNV_PIPE=..
-BED_EVENTS=data/test.bed
+BED_EVENTS=data/chr21.bed
 REF=data/chr21.small.fa.gz
 X_COV=30
 READ_LENGTH=100
@@ -17,50 +17,84 @@ G_SIZE:=$(shell $(CMD_DEC_REF) | grep -v "^>" | wc -c)
 N_READ_PAIRS:=$(shell echo "($(X_COV)*$(G_SIZE))/$(READ_LENGTH)" | bc)
 READS_WIN:=$(shell echo "$(X_COV) * ($(WIN_SIZE)/$(READ_LENGTH))" | bc)
 
-all: mutated.reads.fq.bam normal.reads.fq.bam mutated.calls.txt
+NORMAL=tput sgr0
+GREEN=tput setaf 2
+YELLOW=tput setaf 3
+PURPLE=tput setaf 5
+RED=tput setaf 1
+OK=$(GREEN); echo ">> [ok]"; $(NORMAL)
+FAILURE=($(RED); echo ">> [FAILURE]"; $(NORMAL); exit 1)
+
+define LOG
+@$(PURPLE); echo ">>$1"; $(NORMAL)
+endef
+
+all: normal.reads.fq.bam  mutated.reads.fq.bam calls.txt
+
+# ROC
 
 # Call CNV events with our pipeline (3)
-%.calls.txt: %.ratios.txt
+calls.txt: mutated.ratios.txt
+	$(call LOG, "Calling events")
 	$(CNV_PIPE)/join_ratios_file.py $< "([a-z]+).ratios.txt" . | sort -k2,2n | ruby -ne 'puts $$_.gsub(/\s$$/, "")' |\
 		$(CNV_PIPE)/downstream.py -i - -n $(READS_WIN) -t $(THRESHOLD) > $@
+	@$(OK)
 
-%.ratios.txt: %.bins.txt
-	cat $< | $(CNV_PIPE)/compute_log_ratio.py $*.reads.fq.bam > $@
+mutated.ratios.txt: bins.txt
+	$(call LOG, "Computing Ratios")
+	samtools index mutated.reads.fq.bam
+	cat $< | $(CNV_PIPE)/compute_log_ratio.py mutated.reads.fq.bam > $@
+	@$(OK)
 
-%.bins.txt: %.reads.fq.bam
+bins.txt: normal.reads.fq.bam
+	$(call LOG, "Binning")
 	samtools index $<
 	$(CNV_PIPE)/binner.py $(READS_WIN) $< $(CHRM) > $@
+	@$(OK)
 
 # Generate mutated ref, generate reads, align reads
 %.reads.fq.bam: %.reads.fq.sam
+	$(call LOG, "Sorting $*")
 	java -Xmx512m -jar $(PICARD)/SortSam.jar SORT_ORDER=coordinate INPUT=$< OUTPUT=$@
+	@$(OK)
 
 %.reads.fq.sam: %.fa.sa %.reads.fq
-	bwa mem -t4 $(basename $<) $*.reads.fq > $@
+	$(call LOG, "Mapping $*")
+	bwa mem -t4 normal.fa $*.reads.fq > $@ || $(FAILURE)
+	@$(OK)
 
 %.fa.sa: %.fa
+	$(call LOG, "Indexing $*")
 	bwa index $<
 
 %.reads.fq: %.fa
+	$(call LOG, "Generating reads for $*")
+	@$(YELLOW)
 	@echo "G_SIZE       $(G_SIZE)"
 	@echo "N_READ_PAIRS $(N_READ_PAIRS)"
 	@echo "READS_WIN    $(READS_WIN)"
+	@$(NORMAL)
 	wgsim -N $(N_READ_PAIRS) -1$(READ_LENGTH) -d0 -S11 -e0.050 -r0.0020 $< $@ /dev/null > /dev/null
+	@$(OK)
 
 mutated.fa: $(BED_EVENTS) normal.fa
-	@echo ">> Creating new mutated reference"
-	$(SRC)/introduce_events.py -e $(BED_EVENTS) -r normal.fa | ./$(SRC)/normalize_ref.py > $@
+	$(call LOG, "Creating new mutated reference")
+	@$(SRC)/introduce_events.py -e $(BED_EVENTS) -r normal.fa | ./$(SRC)/normalize_ref.py > $@
+	@$(OK)
 
 normal.fa:
-	@echo ">> Preparing normal reference."
-	([[ $(REF) == *.gz ]] && gzip -cd $(REF) > $@ || ln -s $(REF) $@)
+	$(call LOG, "Preparing normal reference.")
+	@([[ $(REF) == *.gz ]] && gzip -cd $(REF) | ./$(SRC)/normalize_ref.py > $@ || cat $(REF) | ./$(SRC)/normalize_ref.py > $@)
+	@$(OK)
 
 wgsim:
+	$(call LOG, "Cloning dwsim ...")
 	git clone https://github.com/lh3/wgsim.git
 	cd wgsim; gcc -g -O2 -Wall -o wgsim wgsim.c -lz -lm
 	mv wgsim/wgsim ./w
 	rm -rf wgsim
 	mv w wgsim
+	@$(OK)
 
 test:
 	$(SRC)/introduce_events.py -e data/test.bed -r data/test.fa | ./$(SRC)/normalize_ref.py > _tmp
@@ -72,7 +106,9 @@ rebuild_test:
 	make test
 
 clean:
-	rm -f wgsim mutated* reads* normal*
+	$(call LOG, "Cleaning up.")
+	@rm -f wgsim mutated* reads* normal*
+	@$(OK)
 
 .PHONY: clean test rebuild_test
-.PRECIOUS: %.sa
+.PRECIOUS: %.sa ratios.txt
