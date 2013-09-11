@@ -10,7 +10,10 @@ X_COV=30
 READ_LENGTH=100
 CHRM=chr21
 WIN_SIZE=1000
-THRESHOLD=20
+THRESHOLD=50
+MIN_EVENT_SIZE=100
+PADDING=1000
+SEED=$(CHRM)_$(WIN_SIZE)_$(THRESHOLD)_$(MIN_EVENT_SIZE)
 #
 CMD_DEC_REF=gzip -cd $(REF)
 G_SIZE:=$(shell $(CMD_DEC_REF) | grep -v "^>" | wc -c)
@@ -29,11 +32,24 @@ define LOG
 @$(PURPLE); echo ">>$1"; $(NORMAL)
 endef
 
-all: normal.reads.fq.bam  mutated.reads.fq.bam calls.txt
+define HELP_MSG
+make clean
+make BED_EVENTS=data/chr21.bed REF=data/chr21.small.fa.gz X_COV=30 CHRM=chrm21 WIN_SIZE=1000 THRESHOLD=50 MIN_EVENT_SIZE=100 PADDING=1000
+endef
+
+export HELP_MSG
+
+all: normal.reads.fq.bam  mutated.reads.fq.bam calls.txt roc.data.$(SEED).txt
 
 # ROC
+# min_event_size threshold sensitivity fdr
+roc.data.%.txt: calls.txt
+	@(echo -ne "$(MIN_EVENT_SIZE) $(THRESHOLD) " ;\
+		cat $< | grep -v coor | sort -k2,2n | awk -v c=$(CHRM) '{print c" "$$2" "$$2+$$3" "$$1" "$$4}' | \
+		$(SRC)/roc.py -c - -t $(BED_EVENTS) -m $(MIN_EVENT_SIZE) -w $(PADDING) | tail -1 ) > $@
 
 # Call CNV events with our pipeline (3)
+# chrm start end size type
 calls.txt: mutated.ratios.txt
 	$(call LOG, "Calling events")
 	$(CNV_PIPE)/join_ratios_file.py $< "([a-z]+).ratios.txt" . | sort -k2,2n | ruby -ne 'puts $$_.gsub(/\s$$/, "")' |\
@@ -107,8 +123,11 @@ rebuild_test:
 
 clean:
 	$(call LOG, "Cleaning up.")
-	@rm -f wgsim mutated* reads* normal*
+	@rm -f wgsim mutated* reads* normal* *.txt
 	@$(OK)
 
-.PHONY: clean test rebuild_test
+help:
+	@echo "$$HELP_MSG"
+
+.PHONY: clean test rebuild_test help
 .PRECIOUS: %.sa ratios.txt
