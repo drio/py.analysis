@@ -43,7 +43,7 @@ endef
 
 export HELP_MSG
 
-all: normal.reads.fq.bam  mutated.reads.fq.bam calls.txt roc.data.$(SEED).txt
+all: wgsim normal.reads.fq.bam  mutated.reads.fq.bam calls.txt roc.data.$(SEED).txt
 
 # ROC
 # min_event_size threshold sensitivity fdr
@@ -94,7 +94,7 @@ bins.txt: normal.reads.fq.bam
 	@echo "N_READ_PAIRS $(N_READ_PAIRS)"
 	@echo "READS_WIN    $(READS_WIN)"
 	@$(NORMAL)
-	wgsim -N $(N_READ_PAIRS) -1$(READ_LENGTH) -d0 -S11 -e0.050 -r0.0020 $< $@ /dev/null > /dev/null
+	./wgsim -N $(N_READ_PAIRS) -1$(READ_LENGTH) -d0 -S11 -e0.050 -r0.0020 $< $@ /dev/null > /dev/null
 	@$(OK)
 
 mutated.fa: $(BED_EVENTS) normal.fa
