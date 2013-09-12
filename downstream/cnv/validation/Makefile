@@ -1,9 +1,12 @@
 #
 # Change for your purposes
+THIS_MAKE := $(lastword $(MAKEFILE_LIST))
+MAKE_DIR := $(dir $(THIS_MAKE))
 SHELL=/bin/bash
-SRC=src
+
 PICARD:=$(shell echo $$PICARD)
-CNV_PIPE=..
+CNV_PIPE=$(MAKE_DIR)/..
+SRC=$(MAKE_DIR)/src
 BED_EVENTS=data/chr21.bed
 REF=data/chr21.small.fa.gz
 X_COV=30
@@ -33,8 +36,9 @@ define LOG
 endef
 
 define HELP_MSG
-make clean
-make BED_EVENTS=data/chr21.bed REF=data/chr21.small.fa.gz X_COV=30 CHRM=chrm21 WIN_SIZE=1000 THRESHOLD=50 MIN_EVENT_SIZE=100 PADDING=1000
+HELP:
+	$$ make clean
+	$$ make -f PATH_TO_MAKEFILE BED_EVENTS=data/chr21.bed REF=data/chr21.small.fa.gz X_COV=30 CHRM=chrm21 WIN_SIZE=1000 THRESHOLD=50 MIN_EVENT_SIZE=100 PADDING=1000
 endef
 
 export HELP_MSG
@@ -95,12 +99,12 @@ bins.txt: normal.reads.fq.bam
 
 mutated.fa: $(BED_EVENTS) normal.fa
 	$(call LOG, "Creating new mutated reference")
-	@$(SRC)/introduce_events.py -e $(BED_EVENTS) -r normal.fa | ./$(SRC)/normalize_ref.py > $@
+	@$(SRC)/introduce_events.py -e $(BED_EVENTS) -r normal.fa | $(SRC)/normalize_ref.py > $@
 	@$(OK)
 
 normal.fa:
 	$(call LOG, "Preparing normal reference.")
-	@([[ $(REF) == *.gz ]] && gzip -cd $(REF) | ./$(SRC)/normalize_ref.py > $@ || cat $(REF) | ./$(SRC)/normalize_ref.py > $@)
+	@([[ $(REF) == *.gz ]] && gzip -cd $(REF) | $(SRC)/normalize_ref.py > $@ || cat $(REF) | $(SRC)/normalize_ref.py > $@)
 	@$(OK)
 
 wgsim:
@@ -113,12 +117,12 @@ wgsim:
 	@$(OK)
 
 test:
-	$(SRC)/introduce_events.py -e data/test.bed -r data/test.fa | ./$(SRC)/normalize_ref.py > _tmp
+	$(SRC)/introduce_events.py -e data/test.bed -r data/test.fa | $(SRC)/normalize_ref.py > _tmp
 	@diff _tmp data/test.ok.fa && echo "test ok" || echo "test FAILED!"
 	rm _tmp
 
 rebuild_test:
-	$(SRC)/introduce_events.py -e data/test.bed -r data/test.fa | ./$(SRC)/normalize_ref.py > data/test.ok.fa
+	$(SRC)/introduce_events.py -e data/test.bed -r data/test.fa | $(SRC)/normalize_ref.py > data/test.ok.fa
 	make test
 
 clean:
@@ -127,7 +131,8 @@ clean:
 	@$(OK)
 
 help:
+	@echo "make dir: $(dir $(THIS_MAKE))"
 	@echo "$$HELP_MSG"
 
-.PHONY: clean test rebuild_test help
+.PHONY: clean test rebuild_test help foo
 .PRECIOUS: %.sa ratios.txt
