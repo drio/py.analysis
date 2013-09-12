@@ -39,11 +39,17 @@ define HELP_MSG
 HELP:
 	$$ make clean
 	$$ make -f PATH_TO_MAKEFILE BED_EVENTS=data/chr21.bed REF=data/chr21.small.fa.gz X_COV=30 CHRM=chrm21 WIN_SIZE=1000 THRESHOLD=50 MIN_EVENT_SIZE=100 PADDING=1000
+	$$ make various_th
 endef
 
 export HELP_MSG
 
-all: wgsim normal.reads.fq.bam  mutated.reads.fq.bam calls.txt roc.data.$(SEED).txt
+all: wgsim normal.reads.fq.bam  mutated.reads.fq.bam roc.data.$(SEED).txt
+
+various_th:
+	@for t in `seq 1 10 200`;do \
+		rm -f calls.txt && make THRESHOLD=$$t; \
+	done
 
 # ROC
 # min_event_size threshold sensitivity fdr
@@ -137,5 +143,5 @@ help:
 	@echo "make dir: $(dir $(THIS_MAKE))"
 	@echo "$$HELP_MSG"
 
-.PHONY: clean test rebuild_test help foo
+.PHONY: clean test rebuild_test help various_th
 .PRECIOUS: %.sa ratios.txt
