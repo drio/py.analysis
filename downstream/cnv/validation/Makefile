@@ -47,6 +47,9 @@ all: wgsim normal.reads.fq.bam  mutated.reads.fq.bam calls.txt roc.data.$(SEED).
 
 # ROC
 # min_event_size threshold sensitivity fdr
+roc.png: calls.txt
+	$(SRC)/viz_roc.py
+
 roc.data.%.txt: calls.txt
 	@(echo -ne "$(MIN_EVENT_SIZE) $(THRESHOLD) " ;\
 		cat $< | grep -v coor | sort -k2,2n | awk -v c=$(CHRM) '{print c" "$$2" "$$2+$$3" "$$1" "$$4}' | \
