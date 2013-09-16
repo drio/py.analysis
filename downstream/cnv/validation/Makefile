@@ -5,6 +5,7 @@ MAKE_DIR := $(dir $(THIS_MAKE))
 SHELL=/bin/bash
 
 PICARD:=$(shell echo $$PICARD)
+HEAP_SIZE=512m
 CNV_PIPE=$(MAKE_DIR)/..
 SRC=$(MAKE_DIR)/src
 BED_EVENTS=data/chr21.bed
@@ -38,7 +39,7 @@ endef
 define HELP_MSG
 HELP:
 	$$ make clean
-	$$ make -f PATH_TO_MAKEFILE BED_EVENTS=data/chr21.bed REF=data/chr21.small.fa.gz X_COV=30 CHRM=chrm21 WIN_SIZE=1000 THRESHOLD=50 MIN_EVENT_SIZE=100 PADDING=1000
+	$$ make -f PATH_TO_MAKEFILE HEAP_SIZE=4G BED_EVENTS=data/chr21.bed REF=data/chr21.small.fa.gz X_COV=30 CHRM=chrm21 WIN_SIZE=1000 THRESHOLD=50 MIN_EVENT_SIZE=100 PADDING=1000
 	$$ make various_th
 endef
 
@@ -47,10 +48,9 @@ export HELP_MSG
 all: wgsim normal.reads.fq.bam  mutated.reads.fq.bam roc.data.$(SEED).txt
 
 various_th:
-	@for t in `seq 1 10 200`;do \
+	@for t in `seq 1 5 200`;do \
 		rm -f calls.txt && make THRESHOLD=$$t; \
 	done
-
 # ROC
 # min_event_size threshold sensitivity fdr
 roc.png: calls.txt
@@ -84,7 +84,7 @@ bins.txt: normal.reads.fq.bam
 # Generate mutated ref, generate reads, align reads
 %.reads.fq.bam: %.reads.fq.sam
 	$(call LOG, "Sorting $*")
-	java -Xmx512m -jar $(PICARD)/SortSam.jar SORT_ORDER=coordinate INPUT=$< OUTPUT=$@
+	java -Xmx$(HEAP_SIZE) -jar $(PICARD)/SortSam.jar SORT_ORDER=coordinate INPUT=$< OUTPUT=$@
 	@$(OK)
 
 %.reads.fq.sam: %.fa.sa %.reads.fq
