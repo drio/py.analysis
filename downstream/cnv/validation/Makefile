@@ -6,6 +6,7 @@ SHELL=/bin/bash
 
 PICARD:=$(shell echo $$PICARD)
 HEAP_SIZE=512m
+TMP_DIR=$(shell [ ".$$TMPDIR" == "." ] && echo "tmp" || echo $$TMPDIR)
 CNV_PIPE=$(MAKE_DIR)/..
 SRC=$(MAKE_DIR)/src
 BED_EVENTS=data/chr21.bed
@@ -49,7 +50,7 @@ all: wgsim normal.reads.fq.bam  mutated.reads.fq.bam roc.data.$(SEED).txt
 
 various_th:
 	@for t in `seq 1 5 200`;do \
-		rm -f calls.txt && make THRESHOLD=$$t; \
+		rm -f calls.txt && make -f $(THIS_MAKE) THRESHOLD=$$t; \
 	done
 # ROC
 # min_event_size threshold sensitivity fdr
@@ -84,7 +85,7 @@ bins.txt: normal.reads.fq.bam
 # Generate mutated ref, generate reads, align reads
 %.reads.fq.bam: %.reads.fq.sam
 	$(call LOG, "Sorting $*")
-	java -Xmx$(HEAP_SIZE) -jar $(PICARD)/SortSam.jar SORT_ORDER=coordinate INPUT=$< OUTPUT=$@
+	java -Xmx$(HEAP_SIZE) -jar $(PICARD)/SortSam.jar TMP_DIR=$(TMP_DIR) SORT_ORDER=coordinate INPUT=$< OUTPUT=$@
 	@$(OK)
 
 %.reads.fq.sam: %.fa.sa %.reads.fq
