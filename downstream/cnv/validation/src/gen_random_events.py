@@ -23,11 +23,13 @@ def next_size():
 
 def in_n_region(start, end, ref):
   num_ns, s, e = 0, int(start), int(end)
+  _max = e-s/8
   for i in range(s, e+1):
     if ref.exists(i):
       num_ns += 1
-  print num_ns
-  return True if num_ns > e-s/8 else False
+      if num_ns > _max:
+        return True
+  return False
 
 if len(sys.argv) < 4 or not drdcommon.data_in_stdin():
   sys.stderr.write("cat ref.fa | tool <n_events> <chrm> <chrm_size>" + "\n")
