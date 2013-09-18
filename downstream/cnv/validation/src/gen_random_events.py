@@ -5,21 +5,40 @@ import drdcommon
 import argparse, sys
 import random
 
-if len(sys.argv) < 4:
-  sys.stderr.write("tool <n_events> <chrm> <chrm_size>" + "\n")
-  sys.exit(1)
-
 def next_coor(prev_end):
   return prev_end + random.randint(100, 1000)
 
 def next_size():
   return random.randint(100, 20000)
 
+def in_n_region(start, end, ref):
+  num_ns, s, e = 0, int(start), int(end)
+  for i in range(s, e+1):
+    if ref[i]:
+      num_ns += 1
+  return True if num_ns > e-s/8 else False
+
+if len(sys.argv) < 4 or not drdcommon.data_in_stdin():
+  sys.stderr.write("cat ref.fa | tool <n_events> <chrm> <chrm_size>" + "\n")
+  sys.exit(1)
+
 _ = sys.argv
 n_events, chrm, chrm_size = int(_[1]), _[2], int(_[3])
 
+# Store N locations
+sys.stderr.write("Loading N locations ..." + "\n")
+ref = []
+i = 0
+for l in drdcommon.xopen("-"):
+  if l[0] != '-':
+    for c in l.rstrip():
+      ref.append(True if c.upper() == 'N' else False)
+
+# Generate events
+sys.stderr.write("Generating events ..." + "\n")
 coor = next_coor(100)
-for i in range(0, n_events):
+i = 0
+while (i < n_events):
   # chrm start end 0..n
   s = next_size()
   if coor + s < chrm_size:
@@ -30,6 +49,8 @@ for i in range(0, n_events):
   else:
     break
 
-  coor = next_coor(end)
-  print chrm, start, end, _type
+  if not in_n_region(start, end, ref):
+    i += 1
+    print chrm, start, end, _type
 
+  coor = next_coor(end)
