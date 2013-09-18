@@ -56,7 +56,7 @@ def main():
     for start, two in one.items():
       out("%s %s " % (str(chrm), str(start)))
       for sid, nr in two.items():
-        out(str(nr[0]) + " ")
+        out(str(nr[1]) + " ")
       out("\n")
 
 if __name__ == "__main__":

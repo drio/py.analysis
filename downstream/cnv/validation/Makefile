@@ -15,7 +15,7 @@ X_COV=30
 READ_LENGTH=100
 CHRM=chr21
 WIN_SIZE=1000
-THRESHOLD=50
+THRESHOLD=0.15
 MIN_EVENT_SIZE=100
 PADDING=1000
 SEED=$(CHRM)_$(WIN_SIZE)_$(THRESHOLD)_$(MIN_EVENT_SIZE)
@@ -67,9 +67,10 @@ roc.data.%.txt: calls.txt
 calls.txt: mutated.ratios.txt
 	$(call LOG, "Calling events")
 	$(CNV_PIPE)/join_ratios_file.py $< "([a-z]+).ratios.txt" . | sort -k2,2n | ruby -ne 'puts $$_.gsub(/\s$$/, "")' |\
-		$(CNV_PIPE)/downstream.py -i - -n $(READS_WIN) -t $(THRESHOLD) > $@
+		$(CNV_PIPE)/downstream.py -i - -t $(THRESHOLD) > $@
 	@$(OK)
 
+# chr21 1 946 300 304 0.019
 mutated.ratios.txt: bins.txt
 	$(call LOG, "Computing Ratios")
 	samtools index mutated.reads.fq.bam

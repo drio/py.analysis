@@ -218,16 +218,12 @@ def parse_args():
                         dest='output_fn', action='store',
                         help='output data file')
 
-  parser.add_argument('-n', '--num_reads', metavar='num_reads_per_bin_in_ref', required=True,
-                        dest='n_reads_ref_bin', action='store', type=int,
-                        help='num of reads per bin in reference sample')
-
   parser.add_argument('-r', '--resolution', metavar='resolution', required=False,
                         dest='change resolution to this value', action='store', type=int,
                         help='Change the resolution of the resulting')
 
   parser.add_argument('-t', '--threshold', metavar='threshold', required=True,
-                        dest='threshold', action='store', type=int,
+                        dest='threshold', action='store', type=float,
                         help='read depth threashold for calling an event')
 
   args = parser.parse_args()
@@ -241,46 +237,9 @@ def run():
 
   # chrm, start, n_reads_in_sample1, n_reads_in_sample2, ......
   df = load_data(args.input_fn)
-  # start, n_reads_sample1, n_reads_sample2, .....
-  #df = normalize(df, n_reads_ref_bin)
-  # index(coordinate) norm(n_reads_sample1), norm(2), norm(3), .........
-
-  #df = adjust_resolution(df, resolution)
-  #df = np.log2(df/n_reads_ref_bin)
-  #df = df.applymap(float)
-  #df = map_it(df, th=threshold) # 1,0,-1 ; ins, normal, del
-  #print "# bins after adjusting resolution: %d. " % len(df.columns)
-
-  #df = filter_bins_where_all_samples_have_same_call(df, 50)
-  #print "# bins after dropping bins where all samples have same call: %d" % len(df.columns)
-  #plot_hm(df, 'headmap.png')
-  #df.transpose().to_csv(output_fn, sep="\t")
-
-  # generate the differences of read depth compared to the reference.
-  diff_with_ref_rd = lambda(v): v - args.n_reads_ref_bin
-  df = df.applymap(diff_with_ref_rd)
-
-  """
-  # get rid of non-interesting locations
-  cn = df.columns[0] # column name
-  return df[ (df[cn] <= -threshold) | (df[cn] >= threshold) ]
-  """
 
   df = call_stretches(df, args.threshold)
   df.to_csv(args.output_fn, sep="\t")
-
-  """
-  d_calls = call_it(df)
-  compute_dist_event_freqs(d_calls)
-  """
-
-  """
-  df = count_num_of_events(df)
-  df = df.drop('35084')
-  drdplots.barplot(df['i'], df['i'].index, 'insertions', 'ins.png', x_inches=20, y_inches=5, rota=90)
-  drdplots.barplot(df['d'], df['d'].index, 'deletions', 'del.png', x_inches=20, y_inches=5, rota=90)
-  df.to_csv("counts.txt", sep="\t")
-  """
 
 run()
 
