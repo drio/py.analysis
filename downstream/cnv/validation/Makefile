@@ -49,7 +49,7 @@ export HELP_MSG
 all: wgsim normal.reads.fq.bam  mutated.reads.fq.bam roc.data.$(SEED).txt
 
 various_th:
-	@for t in `seq 1 5 200`;do \
+	@for t in `seq 1 1 200`;do \
 		rm -f calls.txt && make -f $(THIS_MAKE) THRESHOLD=$$t; \
 	done
 # ROC
