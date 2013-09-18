@@ -5,6 +5,16 @@ import drdcommon
 import argparse, sys
 import random
 
+class BitMask(object):
+  def __init__(self):
+    self.mask = 0
+
+  def set(self, pos):
+    self.mask = self.mask | (1 << pos)
+
+  def exists(self, pos):
+    return (self.mask & (1 << pos)) > 0
+
 def next_coor(prev_end):
   return prev_end + random.randint(100, 1000)
 
@@ -14,8 +24,9 @@ def next_size():
 def in_n_region(start, end, ref):
   num_ns, s, e = 0, int(start), int(end)
   for i in range(s, e+1):
-    if ref[i]:
+    if ref.exists(i):
       num_ns += 1
+  print num_ns
   return True if num_ns > e-s/8 else False
 
 if len(sys.argv) < 4 or not drdcommon.data_in_stdin():
@@ -27,12 +38,14 @@ n_events, chrm, chrm_size = int(_[1]), _[2], int(_[3])
 
 # Store N locations
 sys.stderr.write("Loading N locations ..." + "\n")
-ref = []
+ref = BitMask()
 i = 0
 for l in drdcommon.xopen("-"):
   if l[0] != '-':
     for c in l.rstrip():
-      ref.append(True if c.upper() == 'N' else False)
+      if c.upper() == 'N':
+        ref.set(i)
+    i += 1
 
 # Generate events
 sys.stderr.write("Generating events ..." + "\n")
