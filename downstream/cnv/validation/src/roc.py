@@ -19,10 +19,13 @@ def process_calls(ds_t, calls_f, min_event_size):
     chrm, start, end = line[0:3]
     chrm, start, end = drdcommon.canonic_chrm(chrm), int(start), int(end)
     if end-start >= min_event_size:
-      ds_t.query(chrm, start, end)
+      if not ds_t.query(chrm, start, end):
+        sys.stderr.write("FP %s %s %s\n" % (chrm, start, end));
+
+  ds_t.report_false_negatives()
 
   tp, fp, fn = ds_t.compute_metrics(chrm)
-  sys.stderr.write(">> tp: %s fp: %s fn: %s" % (tp, fp, fn) + "\n")
+  #sys.stderr.write("# tp: %s fp: %s fn: %s" % (tp, fp, fn) + "\n")
   # of the total true events, how many we find with our tool
   sensitivity = float(tp) / (tp + fn)
   # of the total our system call, how many are not in the true event set
@@ -39,6 +42,7 @@ class Truth(object):
   def __init__(self, buffer_size): # Use low size for testing
     self.ds            = defaultdict(lambda: {})
     self.event_hits    = []
+    self.raw_events    = []
 
     self.buff_size     = buffer_size
     self.fp            = 0 # false positives
@@ -57,8 +61,10 @@ class Truth(object):
         if calls_chrm:
           if calls_chrm == chrm:
             self.add_event(chrm, start, end)
+            self.raw_events.push([chrm, start, end])
         else:
           self.add_event(chrm, start, end)
+          self.raw_events.append([chrm, start, end])
 
     sys.stderr.write(">> total # of true events loaded: %s\n" % self.n_true_events)
     return self
@@ -88,6 +94,17 @@ class Truth(object):
 
     self.fp += 1
     return False
+
+  def report_false_negatives(self):
+    for l in self.raw_events:
+      chrm, start, end = l
+      hit = False
+      for c in range(start-self.buff_size, end+1+self.buff_size):
+        if self.ds[chrm][c] > 0:
+          hit = True
+          break
+      if not hit:
+        sys.stderr.write("FN %s %s %s\n" % (chrm, start, end))
 
   def compute_metrics(self, chrm):
     return self.tp, self.fp, self.n_true_events - self.tp
