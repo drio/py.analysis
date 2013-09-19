@@ -67,9 +67,10 @@ If you have computed part of the jobs, you can drop some of them with some unix 
 Let's say you don't want to recompute the sais:
 
 ```sh
-  $ jobs_for_mapping.sh /Users/drio/dev/bam.examples/phix.bam \
-      /Users/drio/dev/genomes/phix.fa FOOOOO 1G /tmp 4 | \
-      grep -vP ".sai$" | ruby -ne 'puts $_.sub(/\d+,\d+/, "-")' | cmds2submit.py -
+  $ jobs_for_mapping.sh -b /stornext/snfs6/rogers/drio_scratch/playground/bam.examples/phix.bam \
+    -f /stornext/snfs6/rogers/drio_scratch/genomes/phix.fa -o FOOO -r 1G -m /tmp -s 1111 -t 2 |\
+    awk -F"\t" '{print $5}'  | grep -v cmd |\
+    grep -vP ".sai$" | ruby -ne 'puts $_.sub(/\d+,\d+/, "-")' | bash
 ```
 
 The regex part of the pipeline is necessary because the id of the jobs are
@@ -81,8 +82,11 @@ If you are planning to run this in a cluster (pbs), use ```cmds2submit.py``` to 
 the actual submit commands:
 
 ```sh
-  $ jobs_for_mapping.sh /Users/drio/dev/bam.examples/phix.bam
-    /Users/drio/dev/genomes/phix.fa FOOOOO 1G /tmp 4 | cmds2submit.py -
+  $ jobs_for_mapping.sh -b /stornext/snfs6/rogers/drio_scratch/playground/bam.examples/phix.bam \
+    -f /stornext/snfs6/rogers/drio_scratch/genomes/phix.fa -o FOOO -r 1G -m /tmp -s 1111 -t 2 |\
+    awk -F"\t" '{print $5}'  | grep -v cmd | cmds2submit.py -
 ```
 
+At this point is probably a good idea to run the canonical example (phix) in cluster mode so you 
+are sure things are working properly.
 
