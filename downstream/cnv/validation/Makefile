@@ -11,7 +11,7 @@ CNV_PIPE=$(MAKE_DIR)/..
 SRC=$(MAKE_DIR)/src
 BED_EVENTS=data/chr21.bed
 REF=data/chr21.small.fa.gz
-X_COV=30
+X_COV=10
 READ_LENGTH=100
 CHRM=chr21
 WIN_SIZE=1000
@@ -21,9 +21,9 @@ PADDING=1000
 SEED=$(CHRM)_$(WIN_SIZE)_$(THRESHOLD)_$(MIN_EVENT_SIZE)
 #
 CMD_DEC_REF=gzip -cd $(REF)
-G_SIZE:=$(shell $(CMD_DEC_REF) | grep -v "^>" | wc -c)
-N_READ_PAIRS:=$(shell echo "($(X_COV)*$(G_SIZE))/$(READ_LENGTH)" | bc)
-READS_WIN:=$(shell echo "$(X_COV) * ($(WIN_SIZE)/$(READ_LENGTH))" | bc)
+G_SIZE         := $(shell $(CMD_DEC_REF) | grep -v "^>" | wc -c)
+N_READ_PAIRS   := $(shell echo "($(X_COV)*$(G_SIZE))/$(READ_LENGTH)" | bc)
+READS_WIN      := $(shell echo "$(X_COV) * ($(WIN_SIZE)/$(READ_LENGTH))" | bc)
 
 NORMAL=tput sgr0
 GREEN=tput setaf 2
@@ -49,7 +49,7 @@ export HELP_MSG
 all: wgsim normal.reads.fq.bam  mutated.reads.fq.bam roc.data.$(SEED).txt
 
 various_th:
-	@for t in `seq 0.1 0.1 50`;do \
+	@for t in `seq 0.1 0.1 2`;do \
 		rm -f calls.txt && make -f $(THIS_MAKE) THRESHOLD=$$t; \
 	done
 # ROC
@@ -58,7 +58,7 @@ roc.png: calls.txt
 	$(SRC)/viz_roc.py
 
 roc.data.%.txt: calls.txt
-	@(echo -ne "$(MIN_EVENT_SIZE) $(THRESHOLD) " ;\
+	(echo -ne "$(MIN_EVENT_SIZE) $(THRESHOLD) " ;\
 		cat $< | grep -v coor | sort -k2,2n | awk -v c=$(CHRM) '{print c" "$$2" "$$2+$$3" "$$1" "$$4}' | \
 		$(SRC)/roc.py -c - -t $(BED_EVENTS) -m $(MIN_EVENT_SIZE) -w $(PADDING) | tail -1 ) > $@
 
@@ -105,7 +105,7 @@ bins.txt: normal.reads.fq.bam
 	@echo "N_READ_PAIRS $(N_READ_PAIRS)"
 	@echo "READS_WIN    $(READS_WIN)"
 	@$(NORMAL)
-	./wgsim -N $(N_READ_PAIRS) -1$(READ_LENGTH) -d0 -S11 -e0.050 -r0.0020 $< $@ /dev/null > /dev/null
+	./wgsim -N $(N_READ_PAIRS) -1$(READ_LENGTH) -d0 -S11 -s20 -e0.050 -r0.0020 $< $@ /dev/null > /dev/null
 	@$(OK)
 
 mutated.fa: $(BED_EVENTS) normal.fa
