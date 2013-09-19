@@ -43,7 +43,7 @@ If working in ardmore, Phix bam and reference can be found here:
 
 So, you should run something like this:
 
-```bash
+```sh
 $ export PATH=$PATH:/stornext/snfs6/rogers/drio_scratch/dev/py.analysis/pipelines/mapping
 $ export PATH=$PATH:/stornext/snfs6/rogers/drio_scratch/dev/py.analysis/pipelines
 $ cd somewhere/in/your/directories
