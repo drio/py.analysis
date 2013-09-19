@@ -82,7 +82,7 @@ the actual submit commands:
 
 ```sh
   $ jobs_for_mapping.sh /Users/drio/dev/bam.examples/phix.bam
-    /Users/drio/dev/genomes/phix.fa FOOOOO 1G /tmp 4 | $cmds2submit.py -
+    /Users/drio/dev/genomes/phix.fa FOOOOO 1G /tmp 4 | cmds2submit.py -
 ```
 
 
