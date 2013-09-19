@@ -37,9 +37,13 @@ are probably going to do it in ardmore. Here you have some important locations:
 
 If working in ardmore, Phix bam and reference can be found here:
 
-```/stornext/snfs6/rogers/drio_scratch/playground/bam.examples/phix.bam```
+```sh
+/stornext/snfs6/rogers/drio_scratch/playground/bam.examples/phix.bam
+```
 
-```/stornext/snfs6/rogers/drio_scratch/genomes/phix.fa```
+```sh
+/stornext/snfs6/rogers/drio_scratch/genomes/phix.fa
+```
 
 So, you should run something like this:
 
