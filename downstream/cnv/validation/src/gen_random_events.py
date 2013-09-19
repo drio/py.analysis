@@ -16,7 +16,7 @@ class BitMask(object):
     return (self.mask & (1 << pos)) > 0
 
 def next_coor(prev_end):
-  return prev_end + random.randint(100, 1000)
+  return prev_end + random.randint(10000, 20000)
 
 def next_size():
   return random.randint(100, 20000)
