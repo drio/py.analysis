@@ -24,12 +24,12 @@ def process_calls(ds_t, calls_f, min_event_size):
 
   ds_t.report_false_negatives()
 
-  tp, fp, fn = ds_t.compute_metrics(chrm)
+  tp, fp, fn = ds_t.compute_metrics()
   #sys.stderr.write("# tp: %s fp: %s fn: %s" % (tp, fp, fn) + "\n")
   # of the total true events, how many we find with our tool
   sensitivity = float(tp) / (tp + fn)
   # of the total our system call, how many are not in the true event set
-  fdr         = float(fp) / (fp + tp)
+  fdr = float(fp) / (fp + tp)
 
   return sensitivity, fdr
 
@@ -106,7 +106,7 @@ class Truth(object):
       if not hit:
         sys.stderr.write("FN %s %s %s\n" % (chrm, start, end))
 
-  def compute_metrics(self, chrm):
+  def compute_metrics(self):
     return self.tp, self.fp, self.n_true_events - self.tp
 
 def test_ds_t(ds_t):
