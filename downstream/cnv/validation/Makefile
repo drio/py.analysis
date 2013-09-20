@@ -49,9 +49,12 @@ export HELP_MSG
 all: wgsim normal.reads.fq.bam  mutated.reads.fq.bam roc.data.$(SEED).txt
 
 various_th:
-	@for t in `seq 0.1 0.1 2`;do \
-		rm -f calls.txt && make -f $(THIS_MAKE) THRESHOLD=$$t; \
+	@for min in `seq 1000 1000 5000`;do \
+		for t in `seq 0.1 0.1 1`;do \
+			rm -f calls.txt && make -f $(THIS_MAKE) THRESHOLD=$$t MIN_EVENT_SIZE=$$min ;\
+		done; \
 	done
+
 # ROC
 # min_event_size threshold sensitivity fdr
 roc.png: calls.txt
@@ -60,7 +63,7 @@ roc.png: calls.txt
 roc.data.%.txt: calls.txt
 	(echo -ne "$(MIN_EVENT_SIZE) $(THRESHOLD) " ;\
 		cat $< | grep -v coor | sort -k2,2n | awk -v c=$(CHRM) '{print c" "$$2" "$$2+$$3" "$$1" "$$4}' | \
-		$(SRC)/roc.py -c - -t $(BED_EVENTS) -m $(MIN_EVENT_SIZE) -w $(PADDING) | tail -1 ) > $@
+		$(SRC)/roc.py -c - -t $(BED_EVENTS) -m $(MIN_EVENT_SIZE) -w $(PADDING) 2> fp_fn.locations.$(SEED).txt | tail -1  ) > $@
 
 # Call CNV events with our pipeline (3)
 # chrm start end size type
