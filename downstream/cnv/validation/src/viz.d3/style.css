@@ -1,0 +1,64 @@
+body {
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  /* top right bottom left */
+  margin: 20px auto 20px auto;
+  width:700px;
+  padding:10px;
+  border:0px solid gray;
+  height: 250px;
+  font-size: 16px;
+}
+
+a:not(:hover) {
+  text-decoration: none;
+}
+
+a {
+  color: steelblue;
+}
+
+svg {
+  border: 0px solid red;
+}
+
+g {
+  border: 0px solid green;
+}
+
+#text {
+  padding-bottom: 30px;
+}
+
+.label {
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  font-size: 16px;
+}
+
+aside {
+  padding-bottom: 20px;
+}
+
+.right {
+  position:absolute;
+  left: 150px;
+  width: 220px;
+}
+
+svg circle {
+  fill: red;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: black;
+  shape-rendering: crispEdges;
+}
+.axis text {
+  font-family: sans-serif;
+  font-size: 12px;
+}
+
+svg .title {
+  font-size: 20px;
+}
