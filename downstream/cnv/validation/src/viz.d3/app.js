@@ -20,13 +20,20 @@ var app = function() {
       return a;
     };
 
+    _data.mins = function() {
+      var a = {};
+      for (var i=0; i<rows.length; ++i)
+        a[rows[i].min_size] = true;
+      return d3.keys(a);
+    };
+
     return load();
   };
 
   dotplot = function(data, div_id, h, w, xlabel, ylabel, title) {
     var dp = {},
         svg, g,
-        r = 3, padding_x = 45, padding_y = 20,
+        r = 4, padding_x = 45, padding_y = 20,
         max_x = d3.max(data, function(d) { return d[0]; }),
         max_y = d3.max(data, function(d) { return d[1]; }),
 
@@ -90,21 +97,42 @@ var app = function() {
       return dp;
     }
 
+    dp.update = function(new_data) {
+      g.selectAll("circle")
+          .data(new_data)
+          .transition()
+          .duration(3000)
+          .delay(0)
+          .attr("cx", function (d) { return x(d[0]); })
+          .attr("cy", function (d) { return y(d[1]); })
+          .attr("r", r);
+    };
+
     return create();
   };
 
 
   d3.csv(csv, function(rows) {
-    var x = 0, y = 1, min_size = 1000,
-        d = data(rows),
-        dp, sens;
+    var d = data(rows), m = 1000,
+        h = 200, w = 400,
+        dp_one, dp_two;
 
-    [ "one", "two" ].forEach(function(v) {
-      d3.select("body").append("div").attr("id", v);
+    var select = d3.select("#text").append("select");
+
+    select.selectAll("option")
+      .data(d.mins())
+      .enter()
+      .append("option")
+      .text(function(d) { return d;})
+      .attr("value", function(d) {return d;});
+
+    d3.selectAll("select").on("change", function() {
+      dp_one.update(d.to_Array(this.value, "sensitivity"));
+      dp_two.update(d.to_Array(this.value, "fdr"));
     });
 
-    dotplot(d.to_Array(min_size, "sensitivity"), "#one", 150, 400, "threshold", "sensitivity", "min event size = 1000");
-    dotplot(d.to_Array(min_size, "fdr"), "#two", 150, 400, "threshold", "FDR", "min event size = 1000");
-
+    dp_one = dotplot(d.to_Array(m, "sensitivity"), "#two", h, w, "threshold", "sensitivity", "min event size = " + m);
+    dp_two = dotplot(d.to_Array(m, "fdr"), "#two", h, w, "threshold", "FDR", "min event size = " + m);
   });
+
 }();
