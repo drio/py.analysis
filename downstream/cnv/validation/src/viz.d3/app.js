@@ -32,7 +32,7 @@ var app = function() {
 
   dotplot = function(data, div_id, h, w, xlabel, ylabel, title) {
     var dp = {},
-        svg, g,
+        svg, g, title,
         r = 4, padding_x = 45, padding_y = 20,
         max_x = d3.max(data, function(d) { return d[0]; }),
         max_y = d3.max(data, function(d) { return d[1]; }),
@@ -49,8 +49,7 @@ var app = function() {
                   .attr('heigth', h)
                   .attr('weigth', w);
 
-      svg.append("text")
-          .attr("class", "label")
+      title = svg.append("text")
           .attr("x", (w - (w/2)))
           .attr("y", 0)
           .attr("dy", ".75em")
@@ -97,7 +96,7 @@ var app = function() {
       return dp;
     }
 
-    dp.update = function(new_data) {
+    dp.update = function(new_data, new_min) {
       g.selectAll("circle")
           .data(new_data)
           .transition()
@@ -106,6 +105,8 @@ var app = function() {
           .attr("cx", function (d) { return x(d[0]); })
           .attr("cy", function (d) { return y(d[1]); })
           .attr("r", r);
+
+      title.text(new_min);
     };
 
     return create();
@@ -127,12 +128,13 @@ var app = function() {
       .attr("value", function(d) {return d;});
 
     d3.selectAll("select").on("change", function() {
-      dp_one.update(d.to_Array(this.value, "sensitivity"));
-      dp_two.update(d.to_Array(this.value, "fdr"));
+      var new_min = this.value;
+      dp_one.update(d.to_Array(new_min, "sensitivity"), new_min);
+      dp_two.update(d.to_Array(new_min, "fdr"), new_min);
     });
 
-    dp_one = dotplot(d.to_Array(m, "sensitivity"), "#two", h, w, "threshold", "sensitivity", "min event size = " + m);
-    dp_two = dotplot(d.to_Array(m, "fdr"), "#two", h, w, "threshold", "FDR", "min event size = " + m);
+    dp_one = dotplot(d.to_Array(m, "sensitivity"), "#two", h, w, "threshold", "sensitivity", m);
+    dp_two = dotplot(d.to_Array(m, "fdr"), "#two", h, w, "threshold", "FDR", m);
   });
 
 }();
