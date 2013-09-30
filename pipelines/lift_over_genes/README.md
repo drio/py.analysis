@@ -1,11 +1,11 @@
-== Lifting over genomic regions between genomes ==
+## Lifting over genomic regions between genomes
 
-=== Description ===
+### Description
 
 This pipeline will help you asses how a set of genomic regions are conserved
 between genomes.
 
-=== Usage ===
+### Usage
 
 ```sh
 $ mkdir foo; cd foo
