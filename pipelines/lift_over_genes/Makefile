@@ -1,15 +1,18 @@
-# Given a list of gene names (GDOC), find its locations using a refgene file from
-# uscs (URL_REFGENE) and liftover them to another genome (URL_LO) using a minimun
+# Given a list of gene names (GDOC), find its locations using a gtf file from ensembl
+# (GTF) and liftover them to another genome (CHAIN) using a minimun
 # edit distance of (MIN_MATCH)
 #
+SHELL=/bin/bash
 THIS_MAKE := $(lastword $(MAKEFILE_LIST))
 MAKE_DIR := $(dir $(THIS_MAKE))
 SRC:=$(MAKE_DIR)/src
-LO_BIN:="$(MAKE_DIR)/bin/liftOver"
+URL_LO="http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/liftOver"
+LO_BIN:=$(shell echo $(URL_LO) | awk -F/ '{print $$7}')
 
 GDOC="https://docs.google.com/spreadsheet/pub?key=0AlwwLefqWuS8dGp0REp5eHNlLU1mWUUzbmVfRUJuc0E&single=true&gid=0&output=txt"
-URL_REFGENE="http://hgdownload.cse.ucsc.edu/goldenPath/rheMac3/database/refGene.txt.gz"
-URL_LO="http://hgdownload.cse.ucsc.edu/goldenPath/rheMac3/liftOver/rheMac3ToHg19.over.chain.gz"
+GTF="ftp://ftp.ensembl.org/pub/release-73/gtf/macaca_mulatta/Macaca_mulatta.MMUL_1.73.gtf.gz"
+CHAIN:="http://hgdownload.cse.ucsc.edu/goldenPath/rheMac3/liftOver/rheMac3ToHg19.over.chain.gz"
+CHAIN_BASE:=$(shell echo $(CHAIN) | awk -F/ '{print $$7}')
 MIN_MATCH=0.9
 
 all: stats.txt
@@ -24,18 +27,22 @@ stats.txt: lifted.bed
 		echo -n "$(MIN_MATCH)" ) > $@
 
 # Liftover coordinates
-lifted.bed: genes.coor.txt rheMac3ToHg19.over.chain.gz
-	$(LO_BIN) -minMatch=$(MIN_MATCH) genes.coor.txt rheMac3ToHg19.over.chain.gz $@ unMapped
+lifted.bed: genes.coor.txt $(CHAIN_BASE) $(LO_BIN)
+	./$(LO_BIN) -minMatch=$(MIN_MATCH) genes.coor.txt $(CHAIN_BASE) $@ unMapped
 
 # Get genes coordinates from gene names
-genes.coor.txt: refGene.txt.gz gene_list.txt
-	gzip -cd refGene.txt.gz | $(SRC)/get_coordinates.py gene_list.txt > $@
+genes.coor.txt: gtf.gz gene_list.txt
+	gzip -cd gtf.gz | $(SRC)/get_coordinates.py gene_list.txt > $@
 
-rheMac3ToHg19.over.chain.gz:
-	curl $(URL_LO) > $@
+$(CHAIN_BASE):
+	curl $(CHAIN) > $@
 
-refGene.txt.gz:
-	curl $(URL_REFGENE) > $@
+gtf.gz:
+	curl $(GTF) > $@
 
 gene_list.txt:
 	curl $(GDOC) > $@
+
+$(LO_BIN):
+	curl $(URL_LO) > $@
+	chmod 755 $@

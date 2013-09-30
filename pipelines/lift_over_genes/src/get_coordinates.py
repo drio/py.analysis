@@ -2,10 +2,11 @@
 
 import drdcommon
 import sys
+import re
 
 def help(msg):
   sys.stderr.write("ERROR: " + msg + "\n")
-  sys.stderr.write("Usage: cat refgene.txt | tool list_genes_names.txt > genes.coor.bed\n")
+  sys.stderr.write("Usage: cat gtf.txt | tool list_genes_names.txt > genes.coor.bed\n")
   sys.exit(1)
 
 # Main
@@ -23,10 +24,17 @@ drdcommon.log("%s genes loaded." % len(gene_names))
 
 found = 0
 for l in drdcommon.xopen("-"):
-  s = l.split()
-  chrm, start, end, name = s[2], s[4], s[5], s[12]
-  if name in gene_names:
-    print "%s %s %s %s" % (chrm, start, end, name)
-    found += 1
+  s = l.split("\t")
+  if s[2] == "CDS":
+    chrm, start, end, _list = s[0], s[3], s[4], s[8]
+    name = None
+    for e in _list.split(";"):
+      _ = e.split()
+      if len(_) == 2 and _[0] == "gene_name":
+        name = re.sub('\"', '', _[1])
+        if name in gene_names:
+          print "chr%s %s %s %s" % (chrm, start, end, name)
+          found += 1
+          del gene_names[name]
 
 drdcommon.log("%s genes found." % found)
