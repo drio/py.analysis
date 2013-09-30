@@ -12,20 +12,13 @@ $ mkdir foo; cd foo
 $ makefile -f PATH_TO_MAKEFILE
 ```
 
-LO_BIN:="$(MAKE_DIR)/bin/liftOver"
-
-GDOC="https://docs.google.com/spreadsheet/pub?key=0AlwwLefqWuS8dGp0REp5eHNlLU1mWUUzbmVfRUJuc0E&single=true&gid=0&output=txt"
-URL_REFGENE="http://hgdownload.cse.ucsc.edu/goldenPath/rheMac2/database/refGene.txt.gz"
-URL_LO="http://hgdownload.cse.ucsc.edu/goldenPath/rheMac3/liftOver/rheMac3ToHg19.over.chain.gz"
-MIN_MATCH=0.9
-
 A more realistic example will be:
 
-```bash
-$ makefile -f MAKE GDOC="ttps://docs.google.com/spreadsheet/pub?key=0AlwwL" \
-URL_REFGENE="http://hgdownload.cse.ucsc.edu/goldenPath/rheMac3/database/refGene.txt.gz"
-URL_LO="http://hgdownload.cse.ucsc.edu/goldenPath/rheMac3/liftOver/rheMac3ToHg19.over.chain.gz"
-LO_BIN:="bin/liftOver"
+```sh
+  $ makefile -f MAKE GDOC="ttps://docs.google.com/spreadsheet/pub?key=0AlwwL" \
+  URL_REFGENE="http://hgdownload.cse.ucsc.edu/goldenPath/rheMac3/database/refGene.txt.gz" \
+  URL_LO="http://hgdownload.cse.ucsc.edu/goldenPath/rheMac3/liftOver/rheMac3ToHg19.over.chain.gz" \
+  LO_BIN:="bin/liftOver"
 ```
 
 ```GDOC``` points to the list of genes.
