@@ -82,6 +82,9 @@ Let's say you don't want to recompute the sais:
     grep -vP ".sai$" | ruby -ne 'puts $_.sub(/\d+,\d+/, "-")' | bash
 ```
 
+**NOTE**: Computing the test dataset in the headnodes is fine but if you want to run real datasets you want
+to use the cluster (Read below).
+
 The regex part of the pipeline is necessary because the id of the jobs are
 pseudo-randomly generated.
 
