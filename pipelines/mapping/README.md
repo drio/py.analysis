@@ -19,12 +19,22 @@ including the necessary dependencies to compute the whole mapping process
 
 Here you have an example when running the pipeline in a single machine.
 
-First make some changes to the environment to make sure the pipeline can find the tools:
+First make some changes to the environment to make sure the pipeline can find the tools. Add this to
+the end of your ```$HOME/.bashrc```:
 
 ```sh
-  $ export PATH=$PATH:/stornext/snfs6/rogers/drio_scratch/dev/py.analysis/pipelines/mapping
-  $ export PATH=$PATH:/stornext/snfs6/rogers/drio_scratch/dev/py.analysis/pipelines
-  $ export PATH=$PATH:/stornext/snfs6/rogers/drio_scratch/dev/bb/local/bin
+# For DRD's pipeline
+export PATH=$PATH:/stornext/snfs6/rogers/drio_scratch/dev/py.analysis/pipelines/mapping
+export PATH=$PATH:/stornext/snfs6/rogers/drio_scratch/dev/py.analysis/pipelines
+#
+export PATH=$PATH:/stornext/snfs6/rogers/drio_scratch/dev/bb/local/bin
+export PICARD=/stornext/snfs6/rogers/drio_scratch/bb/local/picard
+#
+export PATH=/stornext/snfs6/rogers/drio_scratch/local/python/drd_py2/bin:$PATH
+export PYTHONPATH=$PYTHONPATH:/stornext/snfs6/rogers/drio_scratch/dev/py.analysis/drio.py:/stornext/snfs6/rogers/drio_scratch/dev/4librato/python-librato
+#
+export LUA_PATH='/stornext/snfs6/rogers/drio_scratch/dev/drd.bio.toolbox/lua/libs/?.lua'
+export PATH=$PATH:/stornext/snfs6/rogers/drio_scratch/dev/drd.bio.toolbox/lua
 ```
 
 After this, we should be able to run the pipeline:
@@ -57,9 +67,6 @@ If working in ardmore, Phix bam and reference can be found here:
 So, you should run something like this:
 
 ```sh
-$ export PATH=$PATH:/stornext/snfs6/rogers/drio_scratch/dev/py.analysis/pipelines/mapping
-$ export PATH=$PATH:/stornext/snfs6/rogers/drio_scratch/dev/py.analysis/pipelines
-$ cd somewhere/in/your/directories
 $ jobs_for_mapping.sh -b /stornext/snfs6/rogers/drio_scratch/playground/bam.examples/phix.bam \
   -f /stornext/snfs6/rogers/drio_scratch/genomes/phix.fa -o FOOO -r 1G -m /tmp -s 1111 -t 2 |\
   awk -F"\t" '{print $5}'  | grep -v cmd | bash
@@ -95,9 +102,9 @@ the actual submit commands:
 
 ```sh
   $ jobs_for_mapping.sh -b /stornext/snfs6/rogers/drio_scratch/playground/bam.examples/phix.bam \
-    -f /stornext/snfs6/rogers/drio_scratch/genomes/phix.fa -o FOOO -r 1G -m /tmp -s 1111 -t 2 |\
-    awk -F"\t" '{print $5}'  | grep -v cmd | cmds2submit.py -
-```
+  -f /stornext/snfs6/rogers/drio_scratch/genomes/phix.fa -o FOOOOO -r 1G -m /tmp -s 11833 -t 4 | \
+  cmds2submit.py - | bash
+  ```
 
 At this point is probably a good idea to run the canonical example (phix) in cluster mode so you 
 are sure things are working properly.
