@@ -19,9 +19,18 @@ including the necessary dependencies to compute the whole mapping process
 
 Here you have an example when running the pipeline in a single machine.
 
+First make some changes to the environment to make sure the pipeline can find the tools:
+
 ```sh
   $ export PATH=$PATH:/stornext/snfs6/rogers/drio_scratch/dev/py.analysis/pipelines/mapping
   $ export PATH=$PATH:/stornext/snfs6/rogers/drio_scratch/dev/py.analysis/pipelines
+  $ export PATH=$PATH:/stornext/snfs6/rogers/drio_scratch/dev/bb/local/bin
+```
+
+After this, we should be able to run the pipeline:
+
+```
+  $ export PICARD=/stornext/snfs6/rogers/drio_scratch/bb/local/picard
   $ jobs_for_mapping.sh -b /Users/drio/dev/bam.examples/phix.bam \
     -f /Users/drio/dev/genomes/phix.fa \
     -o FOOO -r 1G -m /tmp -s 11111 -t 4 | awk -F"\t" '{print $5}'  | grep -v cmd
