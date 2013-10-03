@@ -39,7 +39,7 @@ After this, we should be able to run the pipeline:
 ```jobs_for_mapping.sh``` generates a table with all the cmds and its dependencies necessary to compute the
 mappings.
 
-Run jobs_for_mapping.sh without parameters to get an explanation of what each flag does.
+Run ```jobs_for_mapping.sh``` without parameters to get an explanation of what each flag does.
 
 Before going any further you should run this example to make sure your environment is properly set up. You
 are probably going to do it in ardmore. Here you have some important locations:
