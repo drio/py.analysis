@@ -109,3 +109,36 @@ the actual submit commands:
 At this point is probably a good idea to run the canonical example (phix) in cluster mode so you 
 are sure things are working properly.
 
+### Monitoring the execution of the commands in the cluster
+
+You want to run ```qstat -a``` to check the status of your jobs:
+
+```
+raveendr@sug-esxa-login3 test_mapping]$ qstat -a
+
+sug-moab:
+                                                                         Req'd  Req'd   Elap
+Job ID               Username Queue    Jobname          SessID NDS   TSK Memory Time  S Time
+-------------------- -------- -------- ---------------- ------ ----- --- ------ ----- - -----
+8633204.sug-moab     raveendr analysis sai.1.11833.1674   5994     1   4    5gb 4320: C 00:00
+8633205.sug-moab     raveendr analysis sai.2.11833.1884  16559     1   4    5gb 4320: C 00:00
+8633212.sug-moab     raveendr analysis sai.1.11833.2822   8127     1   4    5gb 4320: C 00:00
+8633213.sug-moab     raveendr analysis sai.2.11833.1523  19171     1   4    5gb 4320: C 00:00
+8633233.sug-moab     raveendr analysis sai.1.11833.4220   4283     1   4    5gb 4320: C 00:00
+8633234.sug-moab     raveendr analysis sai.2.11833.1331  31991     1   4    5gb 4320: C 00:00
+8633270.sug-moab     raveendr analysis sai.1.11833.1369   4710     1   4    5gb 4320: C 00:00
+8633271.sug-moab     raveendr analysis sai.2.11833.1463  32424     1   4    5gb 4320: C 00:00
+```
+
+You want to also look at the error files
+created by the cluster's scheduler:
+
+```
+[raveendr@sug-esxa-login3 test_mapping]$ cat moab_logs/*.e
+bwa: /lib64/libc.so.6: version `GLIBC_2.7' not found (required by bwa)
+bwa: /lib64/libc.so.6: version `GLIBC_2.7' not found (required by bwa)
+```
+
+Here we can see that there was an issue running bwa in the one of the nodes.
+
+
