@@ -27,7 +27,7 @@ the end of your ```$HOME/.bashrc```:
 export PATH=$PATH:/stornext/snfs6/rogers/drio_scratch/dev/py.analysis/pipelines/mapping
 export PATH=$PATH:/stornext/snfs6/rogers/drio_scratch/dev/py.analysis/pipelines
 #
-export PATH=$PATH:/stornext/snfs6/rogers/drio_scratch/dev/bb/local/bin
+export PATH=/stornext/snfs6/rogers/drio_scratch/dev/bb/local/bin:$PATH
 export PICARD=/stornext/snfs6/rogers/drio_scratch/bb/local/picard
 #
 export PATH=/stornext/snfs6/rogers/drio_scratch/local/python/drd_py2/bin:$PATH
