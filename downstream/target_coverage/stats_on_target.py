@@ -57,7 +57,7 @@ for t in drdcommon.xopen(fn_targets):
          l.append(int(depth[chrm][i]))
 
     for i in Series(l).describe():
-        out("\t" + str(round(i, 1)))
+        out("\t" + str(round(i, 2)))
 
     print
 
