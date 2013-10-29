@@ -15,11 +15,15 @@ if len(sys.argv) != 3:
   sys.stderr.write("tool <target/exons bed file> <bed base coverage>" + "\n")
   sys.exit(1)
 
+out = sys.stdout.write
+err = sys.stderr.write
+
 _ = sys.argv
 fn_targets, fn_base_cov = _[1], _[2]
 
-# Load exons (targets)
+err("Loading exons/targets\n")
 depth = {}
+n = 0
 for t in drdcommon.xopen(fn_targets):
     l = t.strip()
     sl = [c for c in l.split()] # splitted line
@@ -30,13 +34,23 @@ for t in drdcommon.xopen(fn_targets):
         raise(Exception('Two exons starting in same location! bailing out: ' + l))
     for i in range(int(start), int(end)+1):
         depth[chrm][i] = 0
+    n += 1
+err("%s\n" % n)
 
-# Fill Read depth per base
+err("Reading read depth bed\n")
+total = n
+hits = 0
 for t in drdcommon.xopen(fn_base_cov):
     chrm, coor, rd = t.strip().split()
-    depth[chrm][int(coor)] = int(rd)
-
-out = sys.stdout.write
+    coor = int(coor)
+    total += 1
+    if chrm in depth and coor in depth[chrm]:
+        rd = int(rd)
+        depth[chrm][coor] = rd
+        if rd > 0:
+            hits += 1
+    if total % 500000 == 0:
+        err("hits: %s total: %s \n" % (hits, total) )
 
 # header
 header = ["chrm", "start", "end", "gene", "exon_number", "transcript_number"]
