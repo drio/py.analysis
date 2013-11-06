@@ -44,3 +44,4 @@ $ submit -s saturation -m12G -c2 "./run.sh"
 ```
 
 Notice that I am requesting quite a lot of memory. Use 16G to play save (for 55 wgs 30x samples).
+The walltime time was around 10 hours.
