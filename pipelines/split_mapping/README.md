@@ -60,6 +60,7 @@ Now that we have made some decisions, let's add some more assumptions: We will h
 
 So, how would the execution of the pipeline look like?
 
+```
 $ sapi 
 Available actions:
     help
@@ -91,11 +92,13 @@ rm -f *.sai
 
 $ sapi merge
 java -jar xxxx -xmx12G .... INPUT OUTPUT:merged.sorted.bam
+```
 
 I hope you get the point.
 
 How do we send this to the cluster?
 
+```
 $ sapi sam | to_cluster 
 sapi merge | \
 qsub 
@@ -105,7 +108,25 @@ qsub
 -o moab_logs/one.o 
 -e moab_logs/one.e 
 -l nodes=1:ppn=1,mem=4Gb -V
+```
 
+This is very flexible but we have to tell ```to_cluster``` a bunch of options that will change per each job:
+
+1. job name
+2. queue
+3. output log
+4. stderr log
+5. resources
+6. others?
+
+In order to avoid coupling between sapi and to_cluster, we could pass those options in the stderr? but what if we have an actual problem ? Ok, it would be better to have text files with the options required per each step. And we could then remove the to_cluste all together:
+
+$ sapi merge -s
+java -jar XXXX .... 
+$ sapi merge -c pbs
+echo 'java -jar XXXXX' | qsub -c XXXX ..... 
+
+Ok.. hacking time... let's build a prototype.
 
 
 
