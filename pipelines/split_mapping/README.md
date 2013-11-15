@@ -128,6 +128,9 @@ $ sapi merge -c pbs
 echo 'java -jar XXXXX' | qsub -c XXXX ..... 
 ```
 
+By default, we generate just the shell command, if you use the -c parameter (and provide the scheduler type as value) you 
+will get the shell command ready to be submitted to your cluster.
+
 Ok.. hacking time... let's build a prototype.
 
 
