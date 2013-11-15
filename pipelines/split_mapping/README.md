@@ -122,7 +122,7 @@ This is very flexible but we have to tell ```to_cluster``` a bunch of options th
 In order to avoid coupling between sapi and to_cluster, we could pass those options in the stderr? but what if we have an actual problem ? Ok, it would be better to have text files with the options required per each step. And we could then remove the to_cluste all together:
 
 ```
-$ sapi merge -s
+$ sapi merge
 java -jar XXXX .... 
 $ sapi merge -c pbs
 echo 'java -jar XXXXX' | qsub -c XXXX ..... 
