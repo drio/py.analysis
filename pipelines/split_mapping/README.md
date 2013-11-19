@@ -9,11 +9,11 @@ The amount of reads generated in a single illumina lane is increasing constantly
 
 NOTE: For hgsc people (Trivial to change for general use)
 
-(1) Setup your environment:
+#### (1) Setup your environment:
 
 ```$ source /stornext/snfs6/rogers/drio_scratch/dev/py.analysis/load_env```
 
-(2) You should be able to run the pipeline now:
+#### (2) Run the pipeline now:
 
 ```
 $ sapi.py
@@ -23,9 +23,10 @@ usage: sapi.py [-h] [-n NUM_READS] [-b BAM] [-f FASTA] [-t N_THREADS]
 sapi.py: error: too few arguments
 ```
 
-(3) Run the pipeline against the test dataset (phix):
+#### (3) Run the pipeline against the test dataset (phix):
 
 ```
+$ mkdir test; cd test
 $ /stornext/snfs6/rogers/drio_scratch/dev/py.analysis/pipelines/split_mapping/test/run.sh
 ```
 
