@@ -123,6 +123,16 @@ class Action(object):
             error("Number of sampe bams does not match number of splits")
         return ["%s/%s.sh" % (sdir, act)]
 
+    def dups(self, sdir, act, **kwargs):
+        if len(glob.glob("./merge/*.bam")) != 1:
+            error("No merge bam found. Run the merge step first")
+        return ["%s/%s.sh" % (sdir, act)]
+
+    def stats(self, sdir, act, **kwargs):
+        if len(glob.glob("./dups/*.bam")) != 1:
+            error("No dups bam found. Run the dups step first")
+        return ["%s/%s.sh" % (sdir, act)]
+
 
 def process_args():
     parser = argparse.ArgumentParser(description='Split mapping pipeline')
