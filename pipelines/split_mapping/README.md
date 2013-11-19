@@ -38,7 +38,7 @@ $ ls
 dups  fastqc  merge  phix  sais  sampe  splits  stats
 ```
 
-You final bam will and some stats will be found here:
+Your final bam some stats will be found here:
 
 ```
 $ ls -aclhd dups/merged.sorted.dups.bam
