@@ -1,0 +1,16 @@
+DRD_PY_ANALYSIS=`dirname ${BASH_SOURCE[0]}`
+
+# expose tools
+export PATH="$DRD_PY_ANALYSIS/pipelines/split_mapping:$PATH"
+
+# Binaries we need (samtools, picard)
+export PATH=/stornext/snfs6/rogers/drio_scratch/dev/bb/local/bin:$PATH
+export PICARD=/stornext/snfs6/rogers/drio_scratch/bb/local/picard
+
+# PYTHON
+export PATH=/stornext/snfs6/rogers/drio_scratch/local/python/drd_py2/bin:$PATH
+export PYTHONPATH=$PYTHONPATH:/stornext/snfs6/rogers/drio_scratch/dev/py.analysis/drio.py:/stornext/snfs6/rogers/drio_scratch/dev/4librato/python-librato
+
+# submit (just in case)
+export LUA_PATH='/stornext/snfs6/rogers/drio_scratch/dev/drd.bio.toolbox/lua/libs/?.lua'
+export PATH=/stornext/snfs6/rogers/drio_scratch/dev/drd.bio.toolbox/lua:$PATH
