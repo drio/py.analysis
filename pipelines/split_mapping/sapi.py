@@ -172,6 +172,12 @@ def process_args():
     parser.add_argument('--scheduler', dest='scheduler', action='store',
                         choices={'pbs', 'single'}, default='single',
                         help='Specify what scheduler to use')
+
+    p = parser.parse_args()
+    if p.bam:
+        p.bam = os.path.realpath(p.bam)
+    if p.fasta:
+        p.fasta = os.path.realpath(p.fasta)
     return parser.parse_args()
 
 
