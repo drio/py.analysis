@@ -57,18 +57,18 @@ class Action(object):
         self.scripts_dir = os.path.dirname(os.path.realpath(__file__)) + "/sh"
 
     def cmds(self):
-        c_dir = os.getcwd()
-        sdir = self.scripts_dir
-        b = self.args.bam
-        ft = self.args.fasta
-        nr = self.args.num_reads
-        nt = self.args.n_threads
-        act = self.args.step
-
         # take care of the action
-        cmd = getattr(self, act)(sdir, act, bam=b, nreads=nr,
-                                 fasta=ft, n_threads=nt, curr_dir=c_dir)
-        return schedulify(cmd, self.args.scheduler)
+        try:
+            getattr(self, self.args.step)
+        except:
+            error("[%s] is not a valid step." % self.args.step)
+        else:
+            cmd = getattr(self, self.args.step)(
+                self.scripts_dir, self.args.step,
+                bam=self.args.bam, nreads=self.args.num_reads,
+                fasta=self.args.fasta, n_threads=self.args.n_threads,
+                curr_dir=os.getcwd())
+            return schedulify(cmd, self.args.scheduler)
 
     def fastqc(self, sdir, act, **kwargs):
         bam = kwargs["bam"]
@@ -98,8 +98,10 @@ class Action(object):
     def sampe(self, sdir, act, **kwargs):
         fasta, bam = kwargs["fasta"], kwargs["bam"]
         curr_dir = kwargs["curr_dir"]
+        check_bam(bam)
         check_file(curr_dir + "/splits/done.txt",
                    "Splits not completed. bailing out.")
+        check_file(fasta, "Need fasta file.")
         actual_n_splits = int(open(curr_dir +
                               "/splits/done.txt").read().strip())
         if len(glob.glob("./sais/*.sai"))/2 != actual_n_splits:
