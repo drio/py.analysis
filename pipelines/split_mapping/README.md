@@ -57,7 +57,7 @@ $ cat stats/stats.txt
 0 + 0 with mate mapped to a different chr (mapQ>=5)
 ```
 
-If you got to this poing, congrats you are ready to use the pipeline with your data.
+If you got to this point, congrats you are ready to use the pipeline with your data.
 
 ### Mapping steps
 
