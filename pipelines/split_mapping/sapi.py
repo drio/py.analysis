@@ -57,59 +57,71 @@ class Action(object):
         self.scripts_dir = os.path.dirname(os.path.realpath(__file__)) + "/sh"
 
     def cmds(self):
-        curr_dir = os.getcwd()
+        c_dir = os.getcwd()
         sdir = self.scripts_dir
-        bam = self.args.bam
-        fasta = self.args.fasta
-        nreads = self.args.num_reads
-        n_threads = self.args.n_threads
+        b = self.args.bam
+        ft = self.args.fasta
+        nr = self.args.num_reads
+        nt = self.args.n_threads
         act = self.args.step
 
-        if act == 'fastqc':
-            check_bam(bam)
-            cmd = ["%s/%s.sh %s" % (sdir, act, bam)]
-
-        if act == 'splits':
-            check_bam(bam)
-            check_num_reads(nreads)
-            cmd = ["%s/%s.sh %s %s" % (sdir, act, bam, nreads)]
-
-        if act == 'sais':
-            check_done("splits", "done.txt")
-            check_file(fasta, "Need fasta file.")
-            cmd = []
-            for f in glob.glob(curr_dir + "/splits/*.bam"):
-                sp_num = match_this("\.(\d+)\.", f)
-                for ot in [1, 2]:
-                    c = (("%s/%s.sh " + "%s " * 5) %
-                        (sdir, act, fasta, ot, n_threads, f, sp_num))
-                    cmd.append(c)
-
-        if act == 'sampe':
-            check_file(curr_dir + "/splits/done.txt",
-                       "Splits not completed. bailing out.")
-            actual_n_splits = int(open(curr_dir +
-                                  "/splits/done.txt").read().strip())
-            if len(glob.glob("./sais/*.sai"))/2 != actual_n_splits:
-                error("Number of splits does not match number of sai files")
-            ones = glob.glob(curr_dir + "/sais/1.*.sai")
-            twos = glob.glob(curr_dir + "/sais/2.*.sai")
-            cmd = []
-            for one, two in zip(ones, twos):
-                sp_num = match_this("1.(\d+)\.", one)
-                bam = glob.glob(curr_dir + "/splits/split.%s.bam" % sp_num)[0]
-                c = (("%s/%s.sh " + "%s " * 5) %
-                    (sdir, act, fasta, one, two, sp_num, bam))
-                cmd.append(c)
-
-        if act == 'merge':
-            actual_n_splits = int(open(curr_dir +
-                                  "/splits/done.txt").read().strip())
-            if len(glob.glob("./sampe/*.bam")) != actual_n_splits:
-                error("Number of sampe bams does not match number of splits")
-            cmd = ["%s/%s.sh" % (sdir, act)]
-
+        # take care of the action
+        cmd = getattr(self, act)(sdir, act, bam=b, nreads=nr,
+                                 fasta=ft, n_threads=nt, curr_dir=c_dir)
         return schedulify(cmd, self.args.scheduler)
+
+    def fastqc(self, sdir, act, **kwargs):
+        bam = kwargs["bam"]
+        check_bam(bam)
+        return ["%s/%s.sh %s" % (sdir, act, bam)]
+
+    def splits(self, sdir, act, **kwargs):
+        bam, nreads = kwargs["bam"], kwargs["nreads"]
+        check_bam(bam)
+        check_num_reads(nreads)
+        return ["%s/%s.sh %s %s" % (sdir, act, bam, nreads)]
+
+    def sais(self, sdir, act, **kwargs):
+        fasta, n_threads = kwargs["fasta"], kwargs["n_threads"]
+        curr_dir = kwargs["curr_dir"]
+        check_done("splits", "done.txt")
+        check_file(fasta, "Need fasta file.")
+        cmd = []
+        for f in glob.glob(curr_dir + "/splits/*.bam"):
+            sp_num = match_this("\.(\d+)\.", f)
+            for ot in [1, 2]:
+                c = (("%s/%s.sh " + "%s " * 5) %
+                    (sdir, act, fasta, ot, n_threads, f, sp_num))
+                cmd.append(c)
+        return cmd
+
+    def sampe(self, sdir, act, **kwargs):
+        fasta, bam = kwargs["fasta"], kwargs["bam"]
+        curr_dir = kwargs["curr_dir"]
+        check_file(curr_dir + "/splits/done.txt",
+                   "Splits not completed. bailing out.")
+        actual_n_splits = int(open(curr_dir +
+                              "/splits/done.txt").read().strip())
+        if len(glob.glob("./sais/*.sai"))/2 != actual_n_splits:
+            error("Number of splits does not match number of sai files")
+        ones = glob.glob(curr_dir + "/sais/1.*.sai")
+        twos = glob.glob(curr_dir + "/sais/2.*.sai")
+        cmd = []
+        for one, two in zip(ones, twos):
+            sp_num = match_this("1.(\d+)\.", one)
+            bam = glob.glob(curr_dir + "/splits/split.%s.bam" % sp_num)[0]
+            c = (("%s/%s.sh " + "%s " * 5) %
+                (sdir, act, fasta, one, two, sp_num, bam))
+            cmd.append(c)
+        return cmd
+
+    def merge(self, sdir, act, **kwargs):
+        curr_dir = kwargs["curr_dir"]
+        actual_n_splits = int(open(curr_dir +
+                              "/splits/done.txt").read().strip())
+        if len(glob.glob("./sampe/*.bam")) != actual_n_splits:
+            error("Number of sampe bams does not match number of splits")
+        return ["%s/%s.sh" % (sdir, act)]
 
 
 def process_args():
