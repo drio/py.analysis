@@ -8,6 +8,7 @@ The amount of reads generated in a single illumina lane is increasing constantly
 ### Quickstart
 
 NOTE: For hgsc people (Trivial to change for general use)
+
 (1) Setup your environment:
 
 ```$ source /stornext/snfs6/rogers/drio_scratch/dev/py.analysis/load_env```
