@@ -1,10 +1,19 @@
 #!/usr/bin/env python
+"""
+    sapi: split mapping pipeline
+    TODO:
+        1. add pbs
+        2. add steps in -h
+
+"""
 
 import sys
 import os
 import argparse
+from argparse import RawTextHelpFormatter
 import glob
 import re
+import inspect
 
 
 def error(msg):
@@ -136,20 +145,33 @@ class Action(object):
         return ["%s/%s.sh" % (sdir, act)]
 
 
+def list_steps():
+    methods = set({})
+    for name, _ in inspect.getmembers(Action, predicate=inspect.ismethod):
+        methods.add(name)
+
+    s = "Available steps:\n"
+    for name in methods.difference({"__init__", "cmds"}):
+        s = s + name + "\n"
+    return s
+
+
 def process_args():
-    parser = argparse.ArgumentParser(description='Split mapping pipeline')
-    parser.add_argument(dest='step', action='store', default='single')
+    parser = argparse.ArgumentParser(description="Split mapping pipeline",
+                                     formatter_class=RawTextHelpFormatter)
+    parser.add_argument(dest='step', action='store', default='single',
+                        help="Step you want to compute\n" + list_steps())
     parser.add_argument('-n', dest='num_reads', action='store',
-                        help='number of reads per split.')
+                        help='number of reads per split')
     parser.add_argument('-b', dest='bam', action='store',
                         help='input bam file.')
     parser.add_argument('-f', dest='fasta', action='store',
-                        help='input fasta file.')
+                        help='input fasta file')
     parser.add_argument('-t', dest='n_threads', action='store', default='1',
                         help='Number of threads')
     parser.add_argument('--scheduler', dest='scheduler', action='store',
                         choices={'pbs', 'single'}, default='single',
-                        help='Specify what scheduler to use.')
+                        help='Specify what scheduler to use')
     return parser.parse_args()
 
 
