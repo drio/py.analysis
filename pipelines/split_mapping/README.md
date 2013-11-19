@@ -3,7 +3,7 @@
 ### What is this?
 
 The amount of reads generated in a single illumina lane is increasing constantly. Mapping all those reads is quite straight forward thanks to aligners like BWA, 
-doing so in an efficient way (both time and space) is more complicated. This pipeline tries to helps with that.
+doing so in an efficient way (both time and space) is more complicated. This pipeline tries to help with that.
 
 
 ### Quickstart
