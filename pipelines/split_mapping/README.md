@@ -110,8 +110,10 @@ This is the fun part.
 
 We have to make a strategic decision here: do we control dependencies and fire up jobs automatically as previous steps are done? You are probably thinking this should be mandatory. This is where the cluster reliability comes into play. I cannot assume my cluster's software will properly signal job completions. Yes, it shouldn't be like that but it is: If the cluster gets flooded with jobs it will stop controlling job decencies so your pipeline could get stuck at any point. I have heart some schedulers handle this much better (LSF and SGE) compared to others (PBS/moab). 
 
-So based on these, I am not going to bother controlling dependencies. For now, I will let the user take care of that if they want to. 
+So based on these, I am not going to bother controlling dependencies for now, I will let the user take care of that if they want to. 
 
+It is easy for the user to establish dependencies and send all the whole jobs at once with the current implementation. 
+ 
 Now that we have made some decisions, let's add some more assumptions: We will have a bam as input. 
 
 So, how would the execution of the pipeline look like?
