@@ -2,7 +2,8 @@
 
 ### What is this?
 
-The amount of reads generated in a single illumina lane is increasing constantly. Mapping all those reads is quite straight forward thanks to aligners like BWA, doing so in an efficient way (both time and space) is more complicated.
+The amount of reads generated in a single illumina lane is increasing constantly. Mapping all those reads is quite straight forward thanks to aligners like BWA, 
+doing so in an efficient way (both time and space) is more complicated. This pipeline tries to help with that.
 
 
 ### Quickstart
@@ -37,7 +38,7 @@ $ ls
 dups  fastqc  merge  phix  sais  sampe  splits  stats
 ```
 
-You final bam will and some stats will be found here:
+Your final bam some stats will be found here:
 
 ```
 $ ls -aclhd dups/merged.sorted.dups.bam
@@ -107,10 +108,12 @@ Approach 1 is no viable for various reasons: First, we have tons of data coming.
 
 This is the fun part.
 
-We have to make an strategic decision here: do we control dependencies and fire up jobs automatically as previous steps are done? You are probably thinking this should be mandatory. This is where the cluster reliability comes into play. I cannot assume my cluster's software will properly signal job completions. Yes, it shouldn't be like that but it is: If the cluster gets flooded with jobs it will stop controlling job decencies so your pipeline could get stuck at any point. I have heart some schedulers handle this much better (LSF and SGE) compared to others (PBS/moab). 
+We have to make a strategic decision here: do we control dependencies and fire up jobs automatically as previous steps are done? You are probably thinking this should be mandatory. This is where the cluster reliability comes into play. I cannot assume my cluster's software will properly signal job completions. Yes, it shouldn't be like that but it is: If the cluster gets flooded with jobs it will stop controlling job decencies so your pipeline could get stuck at any point. I have heart some schedulers handle this much better (LSF and SGE) compared to others (PBS/moab). 
 
-So based on these, I am not going to bother controlling dependencies. I will let the user take care of that if they want to. Good luck with that.
+So based on these, I am not going to bother controlling dependencies for now, I will let the user take care of that if they want to. 
 
+It is easy for the user to establish dependencies and send all the whole jobs at once with the current implementation. 
+ 
 Now that we have made some decisions, let's add some more assumptions: We will have a bam as input. 
 
 So, how would the execution of the pipeline look like?
