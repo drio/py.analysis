@@ -56,10 +56,10 @@ def gen_job_name(sample_id, step, index):
     return "%s_%s_%s" % (sample_id, step, index)
 
 
-def cmd_to_pbs(cmd, sample_id, queue, step, index, mem, cores):
+def cmd_to_pbs(cmd, sample_id, queue, step, index, mem, cores, tmp):
     t = "echo '_CMD_' | qsub -N _NAME_ -q _QUEUE_ -d `pwd` "
     t += "-o moab_logs/_NAME_.o -e moab_logs/_NAME_.e "
-    t += "-l nodes=1:ppn=_CORES_,mem=_MEM_Gb -V"
+    t += "-l nodes=1:ppn=_CORES_,mem=_MEM_Gb -V "
     t = t.replace('_CMD_', cmd)
     t = t.replace('_QUEUE_', queue)
     t = t.replace('_NAME_', gen_job_name(sample_id, step, index))
@@ -68,15 +68,16 @@ def cmd_to_pbs(cmd, sample_id, queue, step, index, mem, cores):
     return t
 
 
-def schedulify(cmds, scheduler, sample_id, queue, step, mem, cores):
+def schedulify(cmds, scheduler, sample_id, queue, step, mem, cores, tmp):
     """ If user provides a scheduler, we have to wrap the cmds with
         the appropiate scheduler command
     """
     out = ""
     for idx, c in enumerate(cmds):
         if scheduler == 'pbs':
-            out += cmd_to_pbs(c, sample_id, queue, step, idx, mem, cores)
-        out += c + "\n"
+            out += cmd_to_pbs(c, sample_id, queue, step, idx, mem, cores, tmp)
+        else:
+            out += c + "\n"
     return out
 
 
@@ -96,11 +97,12 @@ class Action(object):
                 self.scripts_dir, self.args.step,
                 bam=self.args.bam, nreads=self.args.num_reads,
                 fasta=self.args.fasta, n_threads=self.args.n_threads,
-                curr_dir=os.getcwd())
+                curr_dir=os.getcwd(), tmp=self.args.tmp, mem=self.args.mem)
             return schedulify(cmd, self.args.scheduler,
                               self.args.sample_id, self.args.queue,
                               self.args.step,
-                              self.args.n_threads, self.args.mem)
+                              self.args.mem, self.args.n_threads,
+                              self.args.tmp)
 
     def fastqc(self, sdir, act, **kwargs):
         bam = kwargs["bam"]
@@ -151,16 +153,20 @@ class Action(object):
 
     def merge(self, sdir, act, **kwargs):
         curr_dir = kwargs["curr_dir"]
+        tmp_dir = kwargs["tmp"]
+        mem = kwargs["mem"]
         actual_n_splits = int(open(curr_dir +
                               "/splits/done.txt").read().strip())
         if len(glob.glob("./sampe/*.bam")) != actual_n_splits:
             error("Number of sampe bams does not match number of splits")
-        return ["%s/%s.sh" % (sdir, act)]
+        return ["%s/%s.sh %s %s" % (sdir, act, tmp_dir, mem)]
 
     def dups(self, sdir, act, **kwargs):
+        tmp_dir = kwargs["tmp"]
+        mem = kwargs["mem"]
         if len(glob.glob("./merge/*.bam")) != 1:
             error("No merge bam found. Run the merge step first")
-        return ["%s/%s.sh" % (sdir, act)]
+        return ["%s/%s.sh %s %s" % (sdir, act, tmp_dir, mem)]
 
     def stats(self, sdir, act, **kwargs):
         if len(glob.glob("./dups/*.bam")) != 1:
@@ -201,6 +207,12 @@ def process_args():
     parser.add_argument('-i', dest='sample_id', action='store',
                         required='True', help='sample id')
 
+    tmp_default = "/tmp"
+    if os.path.isdir("/space1/tmp"):
+        tmp_default = "/space1/tmp"
+    parser.add_argument('-p', dest='tmp', action='store', default=tmp_default,
+                        help='temporary directory to use')
+
     parser.add_argument('-s', dest='scheduler', action='store',
                         choices={'pbs', 'single'}, default='single',
                         help='Specify what scheduler to use')
@@ -210,7 +222,7 @@ def process_args():
         p.bam = os.path.realpath(p.bam)
     if p.fasta:
         p.fasta = os.path.realpath(p.fasta)
-    if p.scheduler and not(p.queue):
+    if p.scheduler != 'single' and not(p.queue):
         error("What queue do you want me to use?")
     return parser.parse_args()
 
