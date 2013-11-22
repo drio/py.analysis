@@ -4,6 +4,7 @@
     TODO:
         1. add pbs
         2. add steps in -h
+        3. remove unnecessary files
 
 """
 
@@ -51,11 +52,30 @@ def check_file(_file, msg):
         error(msg + " (" + _file + ")")
 
 
-def schedulify(cmds, scheduler):
+def gen_job_name(sample_id, step, index):
+    return "%s_%s_%s" % (sample_id, step, index)
+
+
+def cmd_to_pbs(cmd, sample_id, queue, step, index, mem, cores):
+    t = "echo '_CMD_' | qsub -N _NAME_ -q _QUEUE_ -d `pwd` "
+    t += "-o moab_logs/_NAME_.o -e moab_logs/_NAME_.e "
+    t += "-l nodes=1:ppn=_CORES_,mem=_MEM_Gb -V"
+    t = t.replace('_CMD_', cmd)
+    t = t.replace('_QUEUE_', queue)
+    t = t.replace('_NAME_', gen_job_name(sample_id, step, index))
+    t = t.replace('_CORES_', cores)
+    t = t.replace('_MEM_', mem)
+    return t
+
+
+def schedulify(cmds, scheduler, sample_id, queue, step, mem, cores):
+    """ If user provides a scheduler, we have to wrap the cmds with
+        the appropiate scheduler command
+    """
     out = ""
-    for c in cmds:
+    for idx, c in enumerate(cmds):
         if scheduler == 'pbs':
-            out += ("TODO")
+            out += cmd_to_pbs(c, sample_id, queue, step, idx, mem, cores)
         out += c + "\n"
     return out
 
@@ -77,7 +97,10 @@ class Action(object):
                 bam=self.args.bam, nreads=self.args.num_reads,
                 fasta=self.args.fasta, n_threads=self.args.n_threads,
                 curr_dir=os.getcwd())
-            return schedulify(cmd, self.args.scheduler)
+            return schedulify(cmd, self.args.scheduler,
+                              self.args.sample_id, self.args.queue,
+                              self.args.step,
+                              self.args.n_threads, self.args.mem)
 
     def fastqc(self, sdir, act, **kwargs):
         bam = kwargs["bam"]
@@ -167,9 +190,18 @@ def process_args():
                         help='input bam file.')
     parser.add_argument('-f', dest='fasta', action='store',
                         help='input fasta file')
+
     parser.add_argument('-t', dest='n_threads', action='store', default='1',
                         help='Number of threads')
-    parser.add_argument('--scheduler', dest='scheduler', action='store',
+    parser.add_argument('-m', dest='mem', action='store', default='5',
+                        help='Amount of mem to use (in Gbytes)')
+
+    parser.add_argument('-q', dest='queue', action='store',
+                        help='Cluster queue')
+    parser.add_argument('-i', dest='sample_id', action='store',
+                        required='True', help='sample id')
+
+    parser.add_argument('-s', dest='scheduler', action='store',
                         choices={'pbs', 'single'}, default='single',
                         help='Specify what scheduler to use')
 
@@ -178,6 +210,8 @@ def process_args():
         p.bam = os.path.realpath(p.bam)
     if p.fasta:
         p.fasta = os.path.realpath(p.fasta)
+    if p.scheduler and not(p.queue):
+        error("What queue do you want me to use?")
     return parser.parse_args()
 
 
