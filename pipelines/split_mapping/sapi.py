@@ -104,6 +104,13 @@ class Action(object):
                               self.args.mem, self.args.n_threads,
                               self.args.tmp)
 
+    def validate(self, sdir, act, **kwargs):
+        tmp_dir = kwargs["tmp"]
+        mem = kwargs["mem"]
+        bam = kwargs["bam"]
+        check_bam(bam)
+        return ["%s/%s.sh %s %s" % (sdir, act, tmp_dir, mem)]
+
     def fastqc(self, sdir, act, **kwargs):
         bam = kwargs["bam"]
         check_bam(bam)
