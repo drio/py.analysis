@@ -182,13 +182,23 @@ class Action(object):
 
 
 def list_steps():
+    desc = {
+        'fastqc':   "(0) Run fastQC on bam",
+        'validate': "(0) Validate a bam.",
+        'splits':   "(1) Split a bam so it has <n_reads> per split",
+        'sais':     "(2) Find candidate aligment locations for reads in splitted input",
+        'sampe':    "(3) Generate sam records from sai files",
+        'merge':    "(4) Merge splitted bams",
+        'dups':     "(5) Mark duplicates",
+        'stats':    "(6) Compute some metrics for given bam",
+    }
     methods = set({})
     for name, _ in inspect.getmembers(Action, predicate=inspect.ismethod):
         methods.add(name)
 
-    s = "Available steps:\n"
+    s = "+ Available steps (Number indicates order in the pipeline):\n"
     for name in methods.difference({"__init__", "cmds"}):
-        s = s + name + "\n"
+        s = s + "* " + name + ": " + desc[name] + "\n"
     return s
 
 
