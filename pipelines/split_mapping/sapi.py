@@ -57,8 +57,8 @@ def gen_job_name(sample_id, step, index):
 
 
 def cmd_to_pbs(cmd, sample_id, queue, step, index, mem, cores, tmp):
-    t = "echo '_CMD_' | qsub -N _NAME_ -q _QUEUE_ -d `pwd` "
-    t += "-o moab_logs/_NAME_.o -e moab_logs/_NAME_.e "
+    t = "mkdir -p logs; echo '_CMD_' | qsub -N _NAME_ -q _QUEUE_ -d `pwd` "
+    t += "-o logs/_NAME_.o -e logs/_NAME_.e "
     t += "-l nodes=1:ppn=_CORES_,mem=_MEM_Gb -V "
     t = t.replace('_CMD_', cmd)
     t = t.replace('_QUEUE_', queue)
@@ -109,7 +109,7 @@ class Action(object):
         mem = kwargs["mem"]
         bam = kwargs["bam"]
         check_bam(bam)
-        return ["%s/%s.sh %s %s" % (sdir, act, tmp_dir, mem)]
+        return ["%s/%s.sh %s %s %s" % (sdir, act, tmp_dir, mem, bam)]
 
     def fastqc(self, sdir, act, **kwargs):
         bam = kwargs["bam"]
@@ -231,7 +231,7 @@ def process_args():
         p.fasta = os.path.realpath(p.fasta)
     if p.scheduler != 'single' and not(p.queue):
         error("What queue do you want me to use?")
-    return parser.parse_args()
+    return p
 
 
 def do_work():
