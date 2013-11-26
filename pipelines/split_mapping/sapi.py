@@ -140,6 +140,7 @@ class Action(object):
     def sampe(self, sdir, act, **kwargs):
         fasta, bam = kwargs["fasta"], kwargs["bam"]
         curr_dir = kwargs["curr_dir"]
+        mem = kwargs["mem"]
         check_bam(bam)
         check_file(curr_dir + "/splits/done.txt",
                    "Splits not completed. bailing out.")
@@ -154,8 +155,8 @@ class Action(object):
         for one, two in zip(ones, twos):
             sp_num = match_this("1.(\d+)\.", one)
             bam = glob.glob(curr_dir + "/splits/split.%s.bam" % sp_num)[0]
-            c = (("%s/%s.sh " + "%s " * 5) %
-                (sdir, act, fasta, one, two, sp_num, bam))
+            c = (("%s/%s.sh " + "%s " * 6) %
+                (sdir, act, fasta, one, two, sp_num, bam, mem))
             cmd.append(c)
         return cmd
 
@@ -217,7 +218,7 @@ def process_args():
 
     parser.add_argument('-t', dest='n_threads', action='store', default='1',
                         help='Number of threads')
-    parser.add_argument('-m', dest='mem', action='store', default='5',
+    parser.add_argument('-m', dest='mem', action='store', default='8',
                         help='Amount of mem to use (in Gbytes)')
 
     parser.add_argument('-q', dest='queue', action='store',
