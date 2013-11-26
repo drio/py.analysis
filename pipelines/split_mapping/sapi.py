@@ -77,7 +77,8 @@ def schedulify(cmds, scheduler, sample_id, queue, step, mem, cores, tmp):
         if scheduler == 'pbs':
             out += cmd_to_pbs(c, sample_id, queue, step, idx, mem, cores, tmp)
         else:
-            out += c + "\n"
+            out += c
+        out += "\n"
     return out
 
 
