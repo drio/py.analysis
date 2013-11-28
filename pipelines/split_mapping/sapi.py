@@ -118,10 +118,13 @@ class Action(object):
         return ["%s/%s.sh %s" % (sdir, act, bam)]
 
     def splits(self, sdir, act, **kwargs):
+        tmp_dir = kwargs["tmp"]
+        mem = kwargs["mem"]
         bam, nreads = kwargs["bam"], kwargs["nreads"]
         check_bam(bam)
         check_num_reads(nreads)
-        return ["%s/%s.sh %s %s" % (sdir, act, bam, nreads)]
+        return ["%s/%s.sh %s %s %s %s" % (sdir, act, bam,
+                                          nreads, mem, tmp_dir)]
 
     def sais(self, sdir, act, **kwargs):
         fasta, n_threads = kwargs["fasta"], kwargs["n_threads"]
