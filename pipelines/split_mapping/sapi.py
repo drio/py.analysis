@@ -105,6 +105,13 @@ class Action(object):
                               self.args.mem, self.args.n_threads,
                               self.args.tmp)
 
+    def init(self, sdir, act, **kwargs):
+        bam, nreads = kwargs["bam"], kwargs["nreads"]
+        if not nreads:
+            error("Need number of reads per split.")
+        check_bam(bam)
+        return ["%s/%s.sh %s %s" % (sdir, act, bam, nreads)]
+
     def validate(self, sdir, act, **kwargs):
         tmp_dir = kwargs["tmp"]
         mem = kwargs["mem"]
@@ -195,6 +202,7 @@ def list_steps():
     desc = {
         'fastqc':   "Run fastQC on bam",
         'validate': "Validate a bam.",
+        'init':     "Perform various computations necessary in other steps",
         'splits':   "Split a bam so it has <n_reads> per split",
         'sais':     "Find candidate aligment locations for reads in splitted input",
         'sampe':    "Generate sam records from sai files",
