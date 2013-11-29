@@ -135,15 +135,15 @@ class Action(object):
 
     def sais(self, sdir, act, **kwargs):
         fasta, n_threads = kwargs["fasta"], kwargs["n_threads"]
-        curr_dir = kwargs["curr_dir"]
         check_done("splits", "done.txt")
         check_file(fasta, "Need fasta file.")
         cmd = []
-        for f in glob.glob(curr_dir + "/splits/*.bam"):
-            sp_num = match_this("\.(\d+)\.", f)
+        n_of_splits = int(open('init/nsplits.txt').read().rstrip())
+        for sp_num in range(0, n_of_splits):
             for ot in [1, 2]:
+                f = "../splits/split.%2.2d.bam" % sp_num
                 c = (("%s/%s.sh " + "%s " * 5) %
-                    (sdir, act, fasta, ot, n_threads, f, sp_num))
+                    (sdir, act, fasta, ot, n_threads, f, "%2.2d" % sp_num))
                 cmd.append(c)
         return cmd
 
