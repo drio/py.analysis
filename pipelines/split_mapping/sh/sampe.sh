@@ -10,6 +10,6 @@ MEM=$6
 mkdir -p sampe
 cd sampe
 
-bwa sampe $FASTA $SAI1 $SAI2 $BAM $BAM | \
+bwa sampe -P $FASTA $SAI1 $SAI2 $BAM $BAM | \
     java -Xmx${MEM}g -jar $PICARD/SortSam.jar \
     SORT_ORDER=coordinate INPUT=/dev/stdin OUTPUT=$SPLIT_NUMBER.bam
