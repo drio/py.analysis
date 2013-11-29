@@ -164,14 +164,17 @@ class Action(object):
         return cmd
 
     def merge(self, sdir, act, **kwargs):
+        fasta, bam = kwargs["fasta"], kwargs["bam"]
         curr_dir = kwargs["curr_dir"]
         tmp_dir = kwargs["tmp"]
         mem = kwargs["mem"]
+        check_bam(bam)
+        check_file(fasta, "Need fasta file.")
         actual_n_splits = int(open(curr_dir +
                               "/splits/done.txt").read().strip())
         if len(glob.glob("./sampe/*.bam")) != actual_n_splits:
             error("Number of sampe bams does not match number of splits")
-        return ["%s/%s.sh %s %s" % (sdir, act, tmp_dir, mem)]
+        return ["%s/%s.sh %s %s %s %s" % (sdir, act, tmp_dir, mem, bam, fasta)]
 
     def dups(self, sdir, act, **kwargs):
         tmp_dir = kwargs["tmp"]
@@ -231,6 +234,10 @@ def process_args():
     parser.add_argument('-i', dest='sample_id', action='store',
                         required='True', help='sample id')
 
+    parser.add_argument('-x', dest='execute', action='store_true', default=False,
+                        required=False,
+                        help='Do not show the cmd, execute it')
+
     tmp_default = "/tmp"
     if os.path.isdir("/space1/tmp"):
         tmp_default = "/space1/tmp"
@@ -253,7 +260,11 @@ def process_args():
 
 def do_work():
     args = process_args()
-    print Action(args).cmds()
+    cmd = Action(args).cmds()
+    if args.execute:
+        os.system(cmd)
+    else:
+        print cmd
 
 if __name__ == "__main__":
     do_work()
