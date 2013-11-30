@@ -68,6 +68,15 @@ def cmd_to_pbs(cmd, sample_id, queue, step, index, mem, cores, tmp):
     return t
 
 
+def cmd_to_csv(cmd, sample_id, queue, step, index, mem, cores, tmp):
+    t = "_NAME_,_CMD_,_CORES_,_MEM_"
+    t = t.replace('_CMD_', cmd)
+    t = t.replace('_NAME_', gen_job_name(sample_id, step, index))
+    t = t.replace('_CORES_', cores)
+    t = t.replace('_MEM_', mem)
+    return t
+
+
 def schedulify(cmds, scheduler, sample_id, queue, step, mem, cores, tmp):
     """ If user provides a scheduler, we have to wrap the cmds with
         the appropiate scheduler command
@@ -76,6 +85,8 @@ def schedulify(cmds, scheduler, sample_id, queue, step, mem, cores, tmp):
     for idx, c in enumerate(cmds):
         if scheduler == 'pbs':
             out += cmd_to_pbs(c, sample_id, queue, step, idx, mem, cores, tmp)
+        if scheduler == 'csv':
+            out += cmd_to_csv(c, sample_id, queue, step, idx, mem, cores, tmp)
         else:
             out += c
         out += "\n"
@@ -239,7 +250,7 @@ def process_args():
                         help='temporary directory to use')
 
     parser.add_argument('-s', dest='scheduler', action='store',
-                        choices={'pbs', 'single'}, default='single',
+                        choices={'pbs', 'single', 'csv'}, default='single',
                         help='Specify what scheduler to use')
 
     p = parser.parse_args()
@@ -247,7 +258,7 @@ def process_args():
         p.bam = os.path.realpath(p.bam)
     if p.fasta:
         p.fasta = os.path.realpath(p.fasta)
-    if p.scheduler != 'single' and not(p.queue):
+    if p.scheduler == 'pbs' and not(p.queue):
         error("What queue do you want me to use?")
     return p
 
