@@ -135,7 +135,6 @@ class Action(object):
 
     def sais(self, sdir, act, **kwargs):
         fasta, n_threads = kwargs["fasta"], kwargs["n_threads"]
-        check_done("splits", "done.txt")
         check_file(fasta, "Need fasta file.")
         cmd = []
         n_of_splits = int(open('init/nsplits.txt').read().rstrip())
@@ -152,19 +151,13 @@ class Action(object):
         curr_dir = kwargs["curr_dir"]
         mem = kwargs["mem"]
         check_bam(bam)
-        check_file(curr_dir + "/splits/done.txt",
-                   "Splits not completed. bailing out.")
         check_file(fasta, "Need fasta file.")
-        actual_n_splits = int(open(curr_dir +
-                              "/splits/done.txt").read().strip())
-        if len(glob.glob("./sais/*.sai"))/2 != actual_n_splits:
-            error("Number of splits does not match number of sai files")
-        ones = glob.glob(curr_dir + "/sais/1.*.sai")
-        twos = glob.glob(curr_dir + "/sais/2.*.sai")
         cmd = []
-        for one, two in zip(ones, twos):
-            sp_num = match_this("1.(\d+)\.", one)
-            bam = glob.glob(curr_dir + "/splits/split.%s.bam" % sp_num)[0]
+        n_of_splits = int(open('init/nsplits.txt').read().rstrip())
+        for sp_num in range(0, n_of_splits):
+            bam = curr_dir + "/splits/split.%2.2d.bam" % sp_num
+            one = "../sais/1.%2.2d.sai" % sp_num
+            two = "../sais/2.%2.2d.sai" % sp_num
             c = (("%s/%s.sh " + "%s " * 6) %
                 (sdir, act, fasta, one, two, sp_num, bam, mem))
             cmd.append(c)
@@ -172,22 +165,15 @@ class Action(object):
 
     def merge(self, sdir, act, **kwargs):
         fasta, bam = kwargs["fasta"], kwargs["bam"]
-        curr_dir = kwargs["curr_dir"]
         tmp_dir = kwargs["tmp"]
         mem = kwargs["mem"]
         check_bam(bam)
         check_file(fasta, "Need fasta file.")
-        actual_n_splits = int(open(curr_dir +
-                              "/splits/done.txt").read().strip())
-        if len(glob.glob("./sampe/*.bam")) != actual_n_splits:
-            error("Number of sampe bams does not match number of splits")
         return ["%s/%s.sh %s %s %s %s" % (sdir, act, tmp_dir, mem, bam, fasta)]
 
     def dups(self, sdir, act, **kwargs):
         tmp_dir = kwargs["tmp"]
         mem = kwargs["mem"]
-        if len(glob.glob("./merge/*.bam")) != 1:
-            error("No merge bam found. Run the merge step first")
         return ["%s/%s.sh %s %s" % (sdir, act, tmp_dir, mem)]
 
     def stats(self, sdir, act, **kwargs):
