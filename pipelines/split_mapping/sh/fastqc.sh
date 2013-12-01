@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mkdir fastqc
+mkdir -p fastqc
 cd fastqc
 fastqc -o . $1
 touch done.txt
