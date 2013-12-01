@@ -12,7 +12,6 @@ import sys
 import os
 import argparse
 from argparse import RawTextHelpFormatter
-import glob
 import re
 import inspect
 
@@ -59,12 +58,13 @@ def gen_job_name(sample_id, step, index):
 def cmd_to_pbs(cmd, sample_id, queue, step, index, mem, cores, tmp):
     t = "mkdir -p logs; echo '_CMD_' | qsub -N _NAME_ -q _QUEUE_ -d `pwd` "
     t += "-o logs/_NAME_.o -e logs/_NAME_.e "
-    t += "-l nodes=1:ppn=_CORES_,mem=_MEM_Gb -V "
-    t = t.replace('_CMD_', cmd)
+    t += "-l nodes=1:ppn=_CORES_,mem=_MEM_Gb -V"
     t = t.replace('_QUEUE_', queue)
     t = t.replace('_NAME_', gen_job_name(sample_id, step, index))
     t = t.replace('_CORES_', cores)
-    t = t.replace('_MEM_', mem)
+    # Make sure jobs don't get killed because they reach the max memory.
+    t = t.replace('_MEM_', "%d" % (int(mem) + 1))
+    t = t.replace('_CMD_', cmd)
     return t
 
 
@@ -73,7 +73,7 @@ def cmd_to_csv(cmd, sample_id, queue, step, index, mem, cores, tmp):
     t = t.replace('_CMD_', cmd)
     t = t.replace('_NAME_', gen_job_name(sample_id, step, index))
     t = t.replace('_CORES_', cores)
-    t = t.replace('_MEM_', mem)
+    t = t.replace('_MEM_', "%d" % (int(mem) + 1))
     return t
 
 
@@ -85,7 +85,7 @@ def schedulify(cmds, scheduler, sample_id, queue, step, mem, cores, tmp):
     for idx, c in enumerate(cmds):
         if scheduler == 'pbs':
             out += cmd_to_pbs(c, sample_id, queue, step, idx, mem, cores, tmp)
-        if scheduler == 'csv':
+        elif scheduler == 'csv':
             out += cmd_to_csv(c, sample_id, queue, step, idx, mem, cores, tmp)
         else:
             out += c
@@ -188,8 +188,6 @@ class Action(object):
         return ["%s/%s.sh %s %s" % (sdir, act, tmp_dir, mem)]
 
     def stats(self, sdir, act, **kwargs):
-        if len(glob.glob("./dups/*.bam")) != 1:
-            error("No dups bam found. Run the dups step first")
         return ["%s/%s.sh" % (sdir, act)]
 
 
@@ -254,7 +252,7 @@ def process_args():
                         help='Specify what scheduler to use')
 
     p = parser.parse_args()
-    if p.bam:
+    if p.bam and not os.path.isabs(p.bam):
         p.bam = os.path.realpath(p.bam)
     if p.fasta:
         p.fasta = os.path.realpath(p.fasta)
