@@ -6,7 +6,10 @@ cd init
 BAM=$1
 NRS=$2
 
-total=`samtools view $BAM |wc -l`
+[ ! -f ${BAM}.bai ] && samtools index $BAM
+
+date > time.txt
+total=`samtools idxstats $BAM | awk '{s+=$3+$4} END {print s}'`
 cof=`echo "$total/$NRS" |bc`
 rem=`echo "$total%$NRS" |bc`
 nsplits=$cof
@@ -16,3 +19,4 @@ fi
 echo $cof > cof.txt
 echo $rem > rem.txt
 echo $nsplits > nsplits.txt
+date >> time.txt
