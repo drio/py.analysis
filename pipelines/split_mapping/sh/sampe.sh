@@ -11,5 +11,5 @@ mkdir -p sampe
 cd sampe
 
 bwa sampe -P $FASTA $SAI1 $SAI2 $BAM $BAM | \
-    java -Xmx${MEM}g -jar $PICARD/SortSam.jar \
+    java -Xmx${MEM} -jar $PICARD/SortSam.jar \
     SORT_ORDER=coordinate INPUT=/dev/stdin OUTPUT=$SPLIT_NUMBER.bam

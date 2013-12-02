@@ -19,7 +19,7 @@ do
 done
 
 # http://sourceforge.net/apps/mediawiki/picard/index.php?title=Main_Page#Q:_MarkDuplicates_.28or_ValidateSamFile.29_produces_the_error_.22Value_was_put_into_PairInfoMap_more_than_once..22__What_should_I_do.3F
-java -Xmx${MEM}g -jar $PICARD/MergeBamAlignment.jar \
+java -Xmx${MEM} -jar $PICARD/MergeBamAlignment.jar \
     $INPUT \
     UNMAPPED_BAM=$UNMAPPED_BAM \
     REFERENCE_SEQUENCE=./`basename $REF` \

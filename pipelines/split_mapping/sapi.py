@@ -63,7 +63,7 @@ def cmd_to_pbs(cmd, sample_id, queue, step, index, mem, cores, tmp):
     t = t.replace('_NAME_', gen_job_name(sample_id, step, index))
     t = t.replace('_CORES_', cores)
     # Make sure jobs don't get killed because they reach the max memory.
-    t = t.replace('_MEM_', "%d" % (int(mem) + 1))
+    t = t.replace('_MEM_', mem)
     t = t.replace('_CMD_', cmd)
     return t
 
@@ -73,7 +73,7 @@ def cmd_to_csv(cmd, sample_id, queue, step, index, mem, cores, tmp):
     t = t.replace('_CMD_', cmd)
     t = t.replace('_NAME_', gen_job_name(sample_id, step, index))
     t = t.replace('_CORES_', cores)
-    t = t.replace('_MEM_', "%d" % (int(mem) + 1))
+    t = t.replace('_MEM_', mem)
     return t
 
 
@@ -229,8 +229,8 @@ def process_args():
 
     parser.add_argument('-t', dest='n_threads', action='store', default='1',
                         help='Number of threads')
-    parser.add_argument('-m', dest='mem', action='store', default='8',
-                        help='Amount of mem to use (in Gbytes)')
+    parser.add_argument('-m', dest='mem', action='store', default='8g',
+                        help='Amount of mem to use (Use g for gibabytes)')
 
     parser.add_argument('-q', dest='queue', action='store',
                         help='Cluster queue')

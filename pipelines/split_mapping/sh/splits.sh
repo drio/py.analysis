@@ -22,7 +22,7 @@ samtools view $INPUT_BAM | \
 for s in split*
 do
     (cat header.sam ; cat $s) |  \
-    java -Xmx${MEM}g -jar $PICARD/SortSam.jar \
+    java -Xmx${MEM} -jar $PICARD/SortSam.jar \
         INPUT=/dev/stdin \
         TMP_DIR=$TMP_DIR \
         SORT_ORDER=queryname \

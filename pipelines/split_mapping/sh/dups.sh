@@ -7,7 +7,7 @@ mkdir -p dups
 cd dups
 
 INPUT=`ls ../merge/*.bam`
-java -Xmx${MEM}g -jar $PICARD/MarkDuplicates.jar \
+java -Xmx${MEM} -jar $PICARD/MarkDuplicates.jar \
     TMP_DIR=$TMP_DIR \
     INPUT=$INPUT \
     METRICS_FILE=metrics.txt \
