@@ -3,6 +3,7 @@ import os, errno
 import glob
 from time import gmtime, strftime
 import re
+from collections import defaultdict
 
 _human_genome_sizes = {
   '1': 249250621, '2': 243199373, '3': 198022430, '4': 191154276, '5': 180915260,
@@ -117,3 +118,16 @@ def mkdir_p(path):
 
 def canonic_chrm(s):
   return re.sub(r'(^[cC]hrm?)', '', s)
+
+class BitMask(object):
+  """
+  A simple bitmask that let's you set and test if a particular locus is flagged
+  """
+  def __init__(self):
+    self.mask = defaultdict(lambda: 0)
+
+  def set(self, chrm, pos):
+    self.mask[chrm] = self.mask[chrm] | (1 << pos)
+
+  def exists(self, chrm, pos):
+    return (self.mask[chrm] & (1 << pos)) > 0
