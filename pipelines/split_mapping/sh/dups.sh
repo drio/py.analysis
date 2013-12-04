@@ -13,10 +13,6 @@ java -Xmx${MEM} -jar $PICARD/MarkDuplicates.jar \
     METRICS_FILE=metrics.txt \
     OUTPUT=merged.sorted.dups.bam
 
-
-
-
-
-
-
-
+rm -f ../merge/*.bam
+rm -f ../sampe/*.bam
+rm -f ../splits/*.bam
