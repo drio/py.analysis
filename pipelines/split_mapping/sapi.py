@@ -160,6 +160,7 @@ class Action(object):
     def sampe(self, sdir, act, **kwargs):
         fasta, bam = kwargs["fasta"], kwargs["bam"]
         curr_dir = kwargs["curr_dir"]
+        tmp_dir = kwargs["tmp"]
         mem = kwargs["mem"]
         check_bam(bam)
         check_file(fasta, "Need fasta file.")
@@ -169,8 +170,8 @@ class Action(object):
             bam = curr_dir + "/splits/split.%2.2d.bam" % sp_num
             one = "../sais/1.%2.2d.sai" % sp_num
             two = "../sais/2.%2.2d.sai" % sp_num
-            c = (("%s/%s.sh " + "%s " * 6) %
-                (sdir, act, fasta, one, two, sp_num, bam, mem))
+            c = (("%s/%s.sh " + "%s " * 7) %
+                (sdir, act, fasta, one, two, sp_num, bam, mem, tmp_dir))
             cmd.append(c)
         return cmd
 

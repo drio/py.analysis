@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 INPUT_BAM=$1
 NR_X_SPLIT=$2
@@ -17,6 +18,7 @@ TMP_DIR=$4
 mkdir -p splits
 cd splits
 samtools view -H $INPUT_BAM > header.sam
+samtools view -H $INPUT_BAM | grep -P "^@RG"> rg.sam
 samtools view $INPUT_BAM | \
     $SPLIT -d -l $NR_X_SPLIT - split.
 for s in split*
