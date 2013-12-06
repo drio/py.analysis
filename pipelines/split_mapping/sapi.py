@@ -58,7 +58,7 @@ def gen_job_name(sample_id, step, index):
 def cmd_to_pbs(cmd, sample_id, queue, step, index, mem, cores, tmp):
     t = "mkdir -p logs; echo '_CMD_' | qsub -N _NAME_ -q _QUEUE_ -d `pwd` "
     t += "-o logs/_NAME_.o -e logs/_NAME_.e "
-    t += "-l nodes=1:ppn=_CORES_,mem=_MEM_Gb -V"
+    t += "-l nodes=1:ppn=_CORES_,mem=_MEM_ -V"
     t = t.replace('_QUEUE_', queue)
     t = t.replace('_NAME_', gen_job_name(sample_id, step, index))
     t = t.replace('_CORES_', cores)

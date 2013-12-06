@@ -8,7 +8,7 @@ MEM=$2
 mkdir -p dups
 cd dups
 
-INPUT=`ls ../merge/*.bam`
+INPUT="../merge/merged.sorted.bam"
 java -Xmx${MEM} -jar $PICARD/MarkDuplicates.jar \
     TMP_DIR=$TMP_DIR \
     INPUT=$INPUT \

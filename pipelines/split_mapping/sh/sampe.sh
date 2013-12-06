@@ -12,10 +12,9 @@ mkdir -p sampe
 cd sampe
 
 # TODO: set -A as an option
-bwa sampe -r "`cat ../splits/rg.sam`" -P -A $FASTA $SAI1 $SAI2 $BAM $BAM | \
-java -Xmx${MEM} -jar $PICARD/SortSam.jar \
-    TMP_DIR=$TMP_DIR SORT_ORDER=coordinate \
-    INPUT=/dev/stdin OUTPUT=$TMP_DIR/tmp_${SPLIT_NUMBER}.bam
+bwa sampe -r "`cat ../splits/rg.sam`" -P -A $FASTA $SAI1 $SAI2 $BAM $BAM > $TMP_DIR/${SPLIT_NUMBER}.sam
+
 java -Xmx${MEM} -jar $PICARD/FixMateInformation.jar \
-    INPUT=$TMP_DIR/tmp_${SPLIT_NUMBER}.bam OUTPUT=$SPLIT_NUMBER.bam TMP_DIR=$TMP_DIR
-rm -f $TMP_DIR/tmp_${SPLIT_NUMBER}.bam
+    INPUT=$TMP_DIR/${SPLIT_NUMBER}.sam OUTPUT=${SPLIT_NUMBER}.bam TMP_DIR=$TMP_DIR
+
+rm -f $TMP_DIR/${SPLIT_NUMBER}.sam
