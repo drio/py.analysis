@@ -1,6 +1,6 @@
 #!flask/bin/python
 
-from flask import Flask, jsonify, abort, make_response, request
+from flask import Flask, jsonify, abort, make_response, request, redirect, url_for
 import time
 
 app = Flask(__name__)
@@ -19,12 +19,12 @@ def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
 
-@app.route('/todo/api/v1.0/samples', methods=['GET'])
+@app.route('/sapi/api/v1.0/samples', methods=['GET'])
 def get_samples():
     return jsonify({'samples': samples})
 
 
-@app.route('/todo/api/v1.0/samples/<int:sample_id>', methods=['GET'])
+@app.route('/sapi/api/v1.0/samples/<int:sample_id>', methods=['GET'])
 def get_sample(sample_id):
     sample = filter(lambda s: s['id'] == sample_id, samples)
     if len(sample) == 0:
@@ -32,7 +32,7 @@ def get_sample(sample_id):
     return jsonify({'sample': sample[0]})
 
 
-@app.route('/todo/api/v1.0/samples', methods=['POST'])
+@app.route('/sapi/api/v1.0/samples', methods=['POST'])
 def create_sample():
     if not request.json or not 'name' in request.json:
         abort(400)
@@ -45,7 +45,7 @@ def create_sample():
     return jsonify({'sample': sample}), 201
 
 
-@app.route('/todo/api/v1.0/samples/<int:sample_id>', methods=['PUT'])
+@app.route('/sapi/api/v1.0/samples/<int:sample_id>', methods=['PUT'])
 def update_sample(sample_id):
     sample = filter(lambda s: s['id'] == sample_id, samples)
     if len(sample) == 0:
@@ -63,7 +63,7 @@ def update_sample(sample_id):
     return jsonify({'sample': sample[0]})
 
 
-@app.route('/todo/api/v1.0/samples/<int:sample_id>', methods=['DELETE'])
+@app.route('/sapi/api/v1.0/samples/<int:sample_id>', methods=['DELETE'])
 def delete_sample(sample_id):
     sample = filter(lambda s: s['id'] == sample_id, samples)
     if len(sample) == 0:
@@ -71,6 +71,11 @@ def delete_sample(sample_id):
     samples.remove(sample[0])
     return jsonify({'result': True})
 
+@app.route('/frontend')
+def home():
+    return redirect(url_for('static', filename='frontend.html'))
+
 
 if __name__ == '__main__':
     app.run(debug=True)
+    url_for('static', filename='frontend.html')
