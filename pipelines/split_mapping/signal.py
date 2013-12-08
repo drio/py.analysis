@@ -35,4 +35,3 @@ else:
         sys.stderr.write("Usage:\n")
         sys.stderr.write("$ tool <resource_url> <sample_name> <step> <start or stop>\n")
         sys.stderr.write("$ tool list <resource_url>\n")
-        exit(1)
