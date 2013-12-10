@@ -3,11 +3,27 @@
 from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
-from flask import Flask, jsonify, abort, make_response, request, redirect, url_for
+from flask import Flask, jsonify, abort, make_response, request, redirect, url_for, g
 import time
+import redis
 
 app = Flask(__name__)
 
+
+def setup_redis():
+    if not app.redis.exists("samples"):
+        app.redis.set("samples", jsonify([]))
+
+
+def to_json():
+    return app.redis.get("samples")
+
+
+app.redis = redis.StrictRedis(host='localhost', port=6379, db=0)
+app.setup_redis = setup_redis
+app.to_json = to_json
+
+"""
 samples = [
     {
         'id': 1,
@@ -15,6 +31,7 @@ samples = [
         'steps': {}
     },
 ]
+"""
 
 
 @app.errorhandler(404)
@@ -24,7 +41,7 @@ def not_found(error):
 
 @app.route('/sapi/api/v1.0/samples', methods=['GET'])
 def get_samples():
-    return jsonify({'samples': samples})
+    return jsonify({'samples': app.to_json()})
 
 
 @app.route('/sapi/api/v1.0/samples/<int:sample_id>', methods=['GET'])
@@ -86,3 +103,4 @@ if __name__ == '__main__':
     http_server.listen(5000)
     IOLoop.instance().start()
     url_for('static', filename='frontend.html')
+    app.setup_redis()
