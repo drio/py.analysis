@@ -1,5 +1,8 @@
 #!flask/bin/python
 
+from tornado.wsgi import WSGIContainer
+from tornado.httpserver import HTTPServer
+from tornado.ioloop import IOLoop
 from flask import Flask, jsonify, abort, make_response, request, redirect, url_for
 import time
 
@@ -71,11 +74,15 @@ def delete_sample(sample_id):
     samples.remove(sample[0])
     return jsonify({'result': True})
 
+
 @app.route('/frontend')
 def home():
     return redirect(url_for('static', filename='frontend.html'))
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    #app.run(debug=True)
+    http_server = HTTPServer(WSGIContainer(app))
+    http_server.listen(5000)
+    IOLoop.instance().start()
     url_for('static', filename='frontend.html')
