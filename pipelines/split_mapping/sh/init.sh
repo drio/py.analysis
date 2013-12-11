@@ -1,11 +1,13 @@
 #!/bin/bash
 
+
 mkdir -p init
 cd init
 
 BAM=$1
 NRS=$2
 
+[ ! -f ${BAM}.bai ] && [ ! -w `dirname ${BAM}` ] && echo "Bam dir not writable. I can't create index." && exit 1
 [ ! -f ${BAM}.bai ] && samtools index $BAM
 
 date > time.txt
