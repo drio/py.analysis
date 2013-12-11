@@ -2,7 +2,7 @@
 
 [ $(which sapi.py) ] || (echo "sapi.py not found"; exit 1)
 
-curl -L http://cl.ly/2c2r2Z1X0L3e/phix.tar.bz2 | tar -jx
+curl -L http://cl.ly/1f0q3X2L373U/phix.tar.bz2 | tar -jx
 
 end="-x"
 bam="`pwd`/phix/phix.bam"
