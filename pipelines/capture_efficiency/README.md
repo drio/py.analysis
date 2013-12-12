@@ -34,7 +34,7 @@ $ MAKE=/stornext/snfs6/rogers/drio_scratch/dev/py.analysis/pipelines/capture_eff
 $ make -f $MAKE ID=18277 BAM=bams/18277.bam
 ```
 
-### Using the pipeline (multiple sample)
+### Using the pipeline (multiple samples)
 
 ```sh
 # Notice here I am using submit which takes care of sending jobs to your cluster
