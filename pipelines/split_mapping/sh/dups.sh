@@ -4,6 +4,7 @@ set -e
 
 TMP_DIR=$1
 MEM=$2
+ID=$3
 
 mkdir -p dups
 cd dups
@@ -13,7 +14,7 @@ java -Xmx${MEM} -jar $PICARD/MarkDuplicates.jar \
     TMP_DIR=$TMP_DIR \
     INPUT=$INPUT \
     METRICS_FILE=metrics.txt \
-    OUTPUT=merged.sorted.dups.bam
+    OUTPUT=${ID}.merged.sorted.dups.bam
 
 #rm -f ../merge/*.bam
 #rm -f ../sampe/*.bam

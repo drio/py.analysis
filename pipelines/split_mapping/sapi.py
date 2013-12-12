@@ -109,7 +109,8 @@ class Action(object):
                 self.scripts_dir, self.args.step,
                 bam=self.args.bam, nreads=self.args.num_reads,
                 fasta=self.args.fasta, n_threads=self.args.n_threads,
-                curr_dir=os.getcwd(), tmp=self.args.tmp, mem=self.args.mem)
+                curr_dir=os.getcwd(), tmp=self.args.tmp,
+                mem=self.args.mem, sample_id=self.args.sample_id)
             return schedulify(cmd, self.args.scheduler,
                               self.args.sample_id, self.args.queue,
                               self.args.step,
@@ -186,7 +187,8 @@ class Action(object):
     def dups(self, sdir, act, **kwargs):
         tmp_dir = kwargs["tmp"]
         mem = kwargs["mem"]
-        return ["%s/%s.sh %s %s" % (sdir, act, tmp_dir, mem)]
+        sample_id = kwargs["sample_id"]
+        return ["%s/%s.sh %s %s %s" % (sdir, act, tmp_dir, mem, sample_id)]
 
     def stats(self, sdir, act, **kwargs):
         return ["%s/%s.sh" % (sdir, act)]
