@@ -3,25 +3,43 @@
 from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
-from flask import Flask, jsonify, abort, make_response, request, redirect, url_for, g
-import time
+from flask import Flask, jsonify, abort, make_response, request, redirect, url_for
+import json
 import redis
+import time
 
 app = Flask(__name__)
 
 
+""" All the interactions with redis are coded here.
+    We serialize and deserialize the samples against
+    the samples key in redis.
+    There is also a key to keep the next id available.
+"""
 def setup_redis():
     if not app.redis.exists("samples"):
         app.redis.set("samples", jsonify([]))
+    if not app.redis.exists("current_id"):
+        app.redis.set("current_id", 0)
 
 
-def to_json():
-    return app.redis.get("samples")
+def get_samples():
+    return json.loads(app.redis.get("samples"))
+
+
+def get_id():
+    return app.redis.incr("last_id")
+
+
+def save(samples):
+    app.redis.set("samples", json.dumps(samples))
 
 
 app.redis = redis.StrictRedis(host='localhost', port=6379, db=0)
 app.setup_redis = setup_redis
-app.to_json = to_json
+app.get_samples = get_samples
+app.get_id = get_id
+app.save = save
 
 """
 samples = [
@@ -41,12 +59,12 @@ def not_found(error):
 
 @app.route('/sapi/api/v1.0/samples', methods=['GET'])
 def get_samples():
-    return jsonify({'samples': app.to_json()})
+    return jsonify({'samples': app.get_samples()})
 
 
 @app.route('/sapi/api/v1.0/samples/<int:sample_id>', methods=['GET'])
 def get_sample(sample_id):
-    sample = filter(lambda s: s['id'] == sample_id, samples)
+    sample = filter(lambda s: s['id'] == sample_id, app.get_samples())
     if len(sample) == 0:
         abort(404)
     return jsonify({'sample': sample[0]})
@@ -57,16 +75,19 @@ def create_sample():
     if not request.json or not 'name' in request.json:
         abort(400)
     sample = {
-        'id': samples[-1]['id'] + 1,
+        'id': app.get_id(),
         'name': request.json['name'],
         'steps': {},
     }
+    samples = app.get_samples()
     samples.append(sample)
+    app.save(samples)
     return jsonify({'sample': sample}), 201
 
 
 @app.route('/sapi/api/v1.0/samples/<int:sample_id>', methods=['PUT'])
 def update_sample(sample_id):
+    samples = app.get_samples()
     sample = filter(lambda s: s['id'] == sample_id, samples)
     if len(sample) == 0:
         abort(404)
@@ -79,16 +100,19 @@ def update_sample(sample_id):
     sample[0]['name'] = request.json.get('name', sample[0]['name'])
     _step = request.json.get('step')
     sample[0]['steps'][_step] = time.time()
+    app.save(samples)
 
     return jsonify({'sample': sample[0]})
 
 
 @app.route('/sapi/api/v1.0/samples/<int:sample_id>', methods=['DELETE'])
 def delete_sample(sample_id):
+    samples = app.get_samples()
     sample = filter(lambda s: s['id'] == sample_id, samples)
     if len(sample) == 0:
         abort(404)
     samples.remove(sample[0])
+    app.save(samples)
     return jsonify({'result': True})
 
 
