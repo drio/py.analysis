@@ -17,4 +17,6 @@ bwa sampe -r "`cat ../splits/rg.sam`" -P -A $FASTA $SAI1 $SAI2 $BAM $BAM > $TMP_
 java -Xmx${MEM} -jar $PICARD/FixMateInformation.jar \
     INPUT=$TMP_DIR/${SPLIT_NUMBER}.sam OUTPUT=${SPLIT_NUMBER}.bam TMP_DIR=$TMP_DIR
 
+rm -f $SAI1 $SAI2
 rm -f $TMP_DIR/${SPLIT_NUMBER}.sam
+rm -f $BAM
