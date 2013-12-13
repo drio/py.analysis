@@ -21,6 +21,8 @@ $ virtualenv flask
 $ flask/bin/pip install flask
 $ flask/bin/pip install tornado
 $ flask/bin/pip install redis
+$ flask/bin/pip install flask-httpauth
+$ flask/bin/pip install requests
 ```
 
 3. Install redis:

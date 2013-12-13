@@ -4,6 +4,7 @@ from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 from flask import Flask, jsonify, abort, make_response, request, redirect, url_for
+from flask.ext.httpauth import HTTPBasicAuth
 import json
 import redis
 import time
@@ -15,11 +16,19 @@ app = Flask(__name__)
     We serialize and deserialize the samples against
     the samples key in redis.
     There is also a key to keep the next id available.
+    And the credentials for the webserver are stored
+    here also.
 """
 def setup_redis():
-    if not app.redis.exists("samples"):
+    e, g = app.redis.exists, app.redis.get
+    if not e("user") or not e("pwd"):
+        raise RuntimeError("Please set user and pwd in redis server.")
+    f = open("static/credentials.json", "w")
+    f.write("{'user': '%s', 'pwd': '%s'}" % (g("user"), g("pwd")))
+    f.close()
+    if not e("samples"):
         app.redis.set("samples", jsonify([]))
-    if not app.redis.exists("current_id"):
+    if not e("current_id"):
         app.redis.set("current_id", 0)
 
 
@@ -51,6 +60,20 @@ samples = [
 ]
 """
 
+auth = HTTPBasicAuth()
+
+
+@auth.get_password
+def get_password(username):
+    if username == app.redis.get("user"):
+        return app.redis.get("pwd")
+    return None
+
+
+@auth.error_handler
+def unauthorized():
+    return make_response(jsonify({'error': 'Unauthorized access'}), 401)
+
 
 @app.errorhandler(404)
 def not_found(error):
@@ -58,6 +81,7 @@ def not_found(error):
 
 
 @app.route('/sapi/api/v1.0/samples', methods=['GET'])
+@auth.login_required
 def get_samples():
     return jsonify({'samples': app.get_samples()})
 
@@ -123,8 +147,8 @@ def home():
 
 if __name__ == '__main__':
     #app.run(debug=True)
+    app.setup_redis()
     http_server = HTTPServer(WSGIContainer(app))
     http_server.listen(5000)
     IOLoop.instance().start()
     url_for('static', filename='frontend.html')
-    app.setup_redis()

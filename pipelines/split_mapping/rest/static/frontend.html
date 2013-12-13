@@ -43,6 +43,12 @@ function SamplesViewModel() {
 
     self.URI = 'http://localhost:5000/sapi/api/v1.0/samples';
     self.samples = ko.observableArray();
+    // TODO: A nice enhancement that I will leave as an exercise for those
+    // interested would be to save the login credentials in a browser cookie, so that
+    // the user does not need to enter them every time. You get bonus points if you
+    // add a "Remember Me" checkbox to the login dialog.
+    self.username = 'miguel';
+    self.password = 'python';
     self.last = ko.observable(Date());
 
     self.ajax = function(uri, method, data) {
@@ -54,12 +60,10 @@ function SamplesViewModel() {
             cache: false,
             dataType: 'json',
             data: JSON.stringify(data),
-            /*
             beforeSend: function (xhr) {
                 xhr.setRequestHeader("Authorization",
                     "Basic " + btoa(self.username + ":" + self.password));
             },
-            */
             error: function(jqXHR) {
                 console.log("ajax error " + jqXHR.status);
             }
