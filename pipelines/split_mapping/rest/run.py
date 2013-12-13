@@ -17,4 +17,4 @@ http_server.listen(5000)
 IOLoop.instance().start()
 """
 
-url_for('static', filename='frontend.html')
+#url_for('static', filename='frontend.html')

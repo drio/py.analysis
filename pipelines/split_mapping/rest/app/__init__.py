@@ -1,6 +1,7 @@
 #!flask/bin/python
 
-from flask import Flask, jsonify, abort, make_response, request, redirect, url_for
+
+from flask import Flask, jsonify, abort, make_response, request, redirect, url_for, render_template
 from flask.ext.httpauth import HTTPBasicAuth
 import json
 import redis
@@ -12,16 +13,9 @@ app = Flask(__name__)
     We serialize and deserialize the samples against
     the samples key in redis.
     There is also a key to keep the next id available.
-    And the credentials for the webserver are stored
-    here also.
 """
 def setup_redis():
     e, g = app.redis.exists, app.redis.get
-    if not e("user") or not e("pwd"):
-        raise RuntimeError("Please set user and pwd in redis server.")
-    f = open("app/static/credentials.json", "w")
-    f.write("{'user': '%s', 'pwd': '%s'}" % (g("user"), g("pwd")))
-    f.close()
     if not e("samples"):
         app.redis.set("samples", jsonify([]))
     if not e("current_id"):
@@ -40,11 +34,18 @@ def save(samples):
     app.redis.set("samples", json.dumps(samples))
 
 
+def load_config(key):
+    data = open("app/config.json", "r").read()
+    _ = json.loads(data.rstrip())
+    return _[key]
+
+
 app.redis = redis.StrictRedis(host='localhost', port=6379, db=0)
 app.setup_redis = setup_redis
 app.get_samples = get_samples
 app.get_id = get_id
 app.save = save
+app.credentials = load_config('credentials')
 
 """
 samples = [
@@ -136,7 +137,12 @@ def delete_sample(sample_id):
     return jsonify({'result': True})
 
 
+@app.route('/')
+@app.route('/index')
+def index():
+    return render_template("index.html", title='Sapi Frontend', user=app.credentials)
+
+
 @app.route('/frontend')
 def home():
     return redirect(url_for('static', filename='frontend.html'))
-
