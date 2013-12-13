@@ -1,8 +1,5 @@
 #!flask/bin/python
 
-from tornado.wsgi import WSGIContainer
-from tornado.httpserver import HTTPServer
-from tornado.ioloop import IOLoop
 from flask import Flask, jsonify, abort, make_response, request, redirect, url_for
 from flask.ext.httpauth import HTTPBasicAuth
 import json
@@ -10,7 +7,6 @@ import redis
 import time
 
 app = Flask(__name__)
-
 
 """ All the interactions with redis are coded here.
     We serialize and deserialize the samples against
@@ -23,7 +19,7 @@ def setup_redis():
     e, g = app.redis.exists, app.redis.get
     if not e("user") or not e("pwd"):
         raise RuntimeError("Please set user and pwd in redis server.")
-    f = open("static/credentials.json", "w")
+    f = open("app/static/credentials.json", "w")
     f.write("{'user': '%s', 'pwd': '%s'}" % (g("user"), g("pwd")))
     f.close()
     if not e("samples"):
@@ -144,11 +140,3 @@ def delete_sample(sample_id):
 def home():
     return redirect(url_for('static', filename='frontend.html'))
 
-
-if __name__ == '__main__':
-    #app.run(debug=True)
-    app.setup_redis()
-    http_server = HTTPServer(WSGIContainer(app))
-    http_server.listen(5000)
-    IOLoop.instance().start()
-    url_for('static', filename='frontend.html')
