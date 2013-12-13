@@ -2,7 +2,7 @@
 
 ### What is this?
 
-The amount of reads generated in a single illumina lane is increasing constantly. Mapping all those reads is quite straight forward thanks to aligners like BWA, 
+The amount of reads generated in a single illumina lane is increasing constantly. Mapping all those reads is quite straight forward thanks to aligners like BWA,
 doing so in an efficient way (both time and space) is more complicated. This pipeline tries to help with that.
 
 
@@ -34,7 +34,7 @@ $ /stornext/snfs6/rogers/drio_scratch/dev/py.analysis/pipelines/split_mapping/te
 You are going to see a lot of output and after a minute or so you should have an output like this:
 
 ```
-$ ls 
+$ ls
 dups  fastqc  merge  phix  sais  sampe  splits  stats
 ```
 
@@ -60,7 +60,9 @@ $ cat stats/stats.txt
 
 If you got to this point, congrats you are ready to use the pipeline with your data.
 
-### Mapping steps
+
+
+### Random thoughts
 
 1. fastqc
 2. sai generation (finding alignment locations for the reads)
@@ -82,7 +84,7 @@ But remember, we are talking about 1 Billion reads for a 30x whole genome experi
 
 #### Approach 2: Split reads
 
-We can do better by exploiting the embarrassing parallel nature of the problem. We could split the reads in multiple chunks and compute step 2 in parallel. 
+We can do better by exploiting the embarrassing parallel nature of the problem. We could split the reads in multiple chunks and compute step 2 in parallel.
 
 The obvious benefit is the reduction of running time. Also, we could potentially avoid recomputations if a split has already been processed. That would add up complexity to the pipeline but it maybe worth it for your particular situation.
 
@@ -92,7 +94,7 @@ This is just a brainstorming on my end to think about what problem we have in my
 
 Approach 1 is no viable for various reasons: First, we have tons of data coming. Second, our cluster is taken down for maintenance once a month (don't ask), that means we could loose a lot of computations if step 2 does not complete prior to the downtime.
 
-#### The new pipeline steps: 
+#### The new pipeline steps:
 
 1. fastqc (1)
 2. sai generation (N)
@@ -108,18 +110,18 @@ Approach 1 is no viable for various reasons: First, we have tons of data coming.
 
 This is the fun part.
 
-We have to make a strategic decision here: do we control dependencies and fire up jobs automatically as previous steps are done? You are probably thinking this should be mandatory. This is where the cluster reliability comes into play. I cannot assume my cluster's software will properly signal job completions. Yes, it shouldn't be like that but it is: If the cluster gets flooded with jobs it will stop controlling job decencies so your pipeline could get stuck at any point. I have heart some schedulers handle this much better (LSF and SGE) compared to others (PBS/moab). 
+We have to make a strategic decision here: do we control dependencies and fire up jobs automatically as previous steps are done? You are probably thinking this should be mandatory. This is where the cluster reliability comes into play. I cannot assume my cluster's software will properly signal job completions. Yes, it shouldn't be like that but it is: If the cluster gets flooded with jobs it will stop controlling job decencies so your pipeline could get stuck at any point. I have heart some schedulers handle this much better (LSF and SGE) compared to others (PBS/moab).
 
-So based on these, I am not going to bother controlling dependencies for now, I will let the user take care of that if they want to. 
+So based on these, I am not going to bother controlling dependencies for now, I will let the user take care of that if they want to.
 
-It is easy for the user to establish dependencies and send all the whole jobs at once with the current implementation. 
- 
-Now that we have made some decisions, let's add some more assumptions: We will have a bam as input. 
+It is easy for the user to establish dependencies and send all the whole jobs at once with the current implementation.
+
+Now that we have made some decisions, let's add some more assumptions: We will have a bam as input.
 
 So, how would the execution of the pipeline look like?
 
 ```
-$ sapi 
+$ sapi
 Available actions:
     help
     version
@@ -157,14 +159,14 @@ I hope you get the point.
 How do we send this to the cluster?
 
 ```
-$ sapi sam | to_cluster 
+$ sapi sam | to_cluster
 sapi merge | \
-qsub 
--N one 
--q analysis 
--d `pwd` 
--o moab_logs/one.o 
--e moab_logs/one.e 
+qsub
+-N one
+-q analysis
+-d `pwd`
+-o moab_logs/one.o
+-e moab_logs/one.e
 -l nodes=1:ppn=1,mem=4Gb -V
 ```
 
@@ -181,16 +183,16 @@ In order to avoid coupling between sapi and to_cluster, we could pass those opti
 
 ```
 $ sapi merge
-java -jar XXXX .... 
+java -jar XXXX ....
 $ sapi merge -c pbs
-echo 'java -jar XXXXX' | qsub -c XXXX ..... 
+echo 'java -jar XXXXX' | qsub -c XXXX .....
 ```
 
-By default, we generate just the shell command, if you use the -c parameter (and provide the scheduler type as value) you 
+By default, we generate just the shell command, if you use the -c parameter (and provide the scheduler type as value) you
 will get the shell command ready to be submitted to your cluster.
 
 Ok.. hacking time... let's build a prototype.
 
 
 
-    
+
