@@ -7,6 +7,10 @@ SPLIT_NUMBER=$4
 BAM=$5
 MEM=$6
 TMP_DIR=$7
+URL=$8
+ID=$9
+
+
 
 mkdir -p sampe
 cd sampe
@@ -19,4 +23,7 @@ java -Xmx${MEM} -jar $PICARD/FixMateInformation.jar \
 
 rm -f $SAI1 $SAI2
 rm -f $TMP_DIR/${SPLIT_NUMBER}.sam
+
+signal.py $URL $ID sampe
+
 rm -f $BAM

@@ -110,7 +110,8 @@ class Action(object):
                 bam=self.args.bam, nreads=self.args.num_reads,
                 fasta=self.args.fasta, n_threads=self.args.n_threads,
                 curr_dir=os.getcwd(), tmp=self.args.tmp,
-                mem=self.args.mem, sample_id=self.args.sample_id)
+                mem=self.args.mem, sample_id=self.args.sample_id,
+                url=self.args.url)
             return schedulify(cmd, self.args.scheduler,
                               self.args.sample_id, self.args.queue,
                               self.args.step,
@@ -119,42 +120,52 @@ class Action(object):
 
     def init(self, sdir, act, **kwargs):
         bam, nreads = kwargs["bam"], kwargs["nreads"]
+        url = kwargs["url"]
+        _id = kwargs["sample_id"]
         if not nreads:
             error("Need number of reads per split.")
         check_bam(bam)
-        return ["%s/%s.sh %s %s" % (sdir, act, bam, nreads)]
+        return ["%s/%s.sh %s %s %s %s" % (sdir, act, bam, nreads, url, _id)]
 
     def validate(self, sdir, act, **kwargs):
         tmp_dir = kwargs["tmp"]
         mem = kwargs["mem"]
         bam = kwargs["bam"]
+        url = kwargs["url"]
+        _id = kwargs["sample_id"]
         check_bam(bam)
-        return ["%s/%s.sh %s %s %s" % (sdir, act, tmp_dir, mem, bam)]
+        return ["%s/%s.sh %s %s %s %s %s" % (sdir, act, tmp_dir, mem, bam, url, _id)]
 
     def fastqc(self, sdir, act, **kwargs):
         bam = kwargs["bam"]
+        url = kwargs["url"]
+        _id = kwargs["sample_id"]
         check_bam(bam)
-        return ["%s/%s.sh %s" % (sdir, act, bam)]
+        return ["%s/%s.sh %s %s %s" % (sdir, act, bam, url, _id)]
 
     def splits(self, sdir, act, **kwargs):
         tmp_dir = kwargs["tmp"]
         mem = kwargs["mem"]
+        url = kwargs["url"]
         bam, nreads = kwargs["bam"], kwargs["nreads"]
+        _id = kwargs["sample_id"]
         check_bam(bam)
         check_num_reads(nreads)
-        return ["%s/%s.sh %s %s %s %s" % (sdir, act, bam,
-                                          nreads, mem, tmp_dir)]
+        return ["%s/%s.sh %s %s %s %s %s %s" % (sdir, act, bam,
+                                          nreads, mem, tmp_dir, url, _id)]
 
     def sais(self, sdir, act, **kwargs):
         fasta, n_threads = kwargs["fasta"], kwargs["n_threads"]
         check_file(fasta, "Need fasta file.")
+        _id = kwargs["sample_id"]
         cmd = []
+        url = kwargs["url"]
         n_of_splits = int(open('init/nsplits.txt').read().rstrip())
         for sp_num in range(0, n_of_splits):
             for ot in [1, 2]:
                 f = "../splits/split.%2.2d.bam" % sp_num
-                c = (("%s/%s.sh " + "%s " * 5) %
-                    (sdir, act, fasta, ot, n_threads, f, "%2.2d" % sp_num))
+                c = (("%s/%s.sh " + "%s " * 7) %
+                    (sdir, act, fasta, ot, n_threads, f, "%2.2d" % sp_num, url, _id))
                 cmd.append(c)
         return cmd
 
@@ -162,6 +173,8 @@ class Action(object):
         fasta, bam = kwargs["fasta"], kwargs["bam"]
         curr_dir = kwargs["curr_dir"]
         tmp_dir = kwargs["tmp"]
+        _id = kwargs["sample_id"]
+        url = kwargs["url"]
         mem = kwargs["mem"]
         check_bam(bam)
         check_file(fasta, "Need fasta file.")
@@ -171,27 +184,32 @@ class Action(object):
             bam = curr_dir + "/splits/split.%2.2d.bam" % sp_num
             one = "../sais/1.%2.2d.sai" % sp_num
             two = "../sais/2.%2.2d.sai" % sp_num
-            c = (("%s/%s.sh " + "%s " * 7) %
-                (sdir, act, fasta, one, two, sp_num, bam, mem, tmp_dir))
+            c = (("%s/%s.sh " + "%s " * 9) %
+                (sdir, act, fasta, one, two, sp_num, bam, mem, tmp_dir, url, _id))
             cmd.append(c)
         return cmd
 
     def merge(self, sdir, act, **kwargs):
+        url = kwargs["url"]
         fasta, bam = kwargs["fasta"], kwargs["bam"]
         tmp_dir = kwargs["tmp"]
         mem = kwargs["mem"]
+        _id = kwargs["sample_id"]
         check_bam(bam)
         check_file(fasta, "Need fasta file.")
-        return ["%s/%s.sh %s %s %s %s" % (sdir, act, tmp_dir, mem, bam, fasta)]
+        return ["%s/%s.sh %s %s %s %s %s %s" % (sdir, act, tmp_dir, mem, bam, fasta, url, _id)]
 
     def dups(self, sdir, act, **kwargs):
         tmp_dir = kwargs["tmp"]
         mem = kwargs["mem"]
-        sample_id = kwargs["sample_id"]
-        return ["%s/%s.sh %s %s %s" % (sdir, act, tmp_dir, mem, sample_id)]
+        url = kwargs["url"]
+        _id = kwargs["sample_id"]
+        return ["%s/%s.sh %s %s %s %s" % (sdir, act, tmp_dir, mem, _id, url)]
 
     def stats(self, sdir, act, **kwargs):
-        return ["%s/%s.sh" % (sdir, act)]
+        url = kwargs["url"]
+        sample_id = kwargs["sample_id"]
+        return ["%s/%s.sh %s %s" % (sdir, act, url, sample_id)]
 
 
 def list_steps():
@@ -215,14 +233,48 @@ def list_steps():
     s = "+ Available steps:\n"
     for name in order:
         s = s + "* " + name + ": " + desc[name] + "\n"
+
+    s += "\n"
+    s += "Use check_env to verify your environment"
+
     return s
 
 
+def check_env():
+    def which(program):
+        def is_exe(fpath):
+            return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+        fpath, fname = os.path.split(program)
+        if fpath:
+            if is_exe(program):
+                return program
+        else:
+            for path in os.environ["PATH"].split(os.pathsep):
+                path = path.strip('"')
+                exe_file = os.path.join(path, program)
+                if is_exe(exe_file):
+                    return exe_file
+
+        return None
+
+    for p in ["bwa", "samtools", "bash", "fastqc", "sapi.py", "signal.py"]:
+        where = which(p)
+        msg = "found" if where else "!! NOT found"
+        print "[%s] %s (%s)" % (msg, p, where)
+
+
 def process_args():
+    if len(sys.argv) == 2 and sys.argv[1] == "check_env":
+        check_env()
+        exit(0)
+
     parser = argparse.ArgumentParser(description="Split mapping pipeline",
                                      formatter_class=RawTextHelpFormatter)
+
     parser.add_argument(dest='step', action='store', default='single',
                         help="Step you want to compute\n" + list_steps())
+
     parser.add_argument('-n', dest='num_reads', action='store',
                         help='number of reads per split')
     parser.add_argument('-b', dest='bam', action='store',
@@ -237,12 +289,19 @@ def process_args():
 
     parser.add_argument('-q', dest='queue', action='store',
                         help='Cluster queue')
-    parser.add_argument('-i', dest='sample_id', action='store',
-                        required='True', help='sample id')
+    parser.add_argument('-i', dest='sample_id', required=True,
+                        action='store', help='sample id')
 
     parser.add_argument('-x', dest='execute', action='store_true', default=False,
                         required=False,
                         help='Do not show the cmd, execute it')
+
+    parser.add_argument('-u', dest='url', action='store', required=False,
+                        help='URL for the rest service.')
+
+    parser.add_argument('-c', dest='check_env', action='store_true',
+                        help='Check binary dependencies')
+
 
     tmp_default = "/tmp"
     if os.path.isdir("/space1/tmp"):
@@ -255,12 +314,14 @@ def process_args():
                         help='Specify what scheduler to use')
 
     p = parser.parse_args()
+
     if p.bam and not os.path.isabs(p.bam):
         p.bam = os.path.realpath(p.bam)
     if p.fasta:
         p.fasta = os.path.realpath(p.fasta)
     if p.scheduler == 'pbs' and not(p.queue):
         error("What queue do you want me to use?")
+
     return p
 
 

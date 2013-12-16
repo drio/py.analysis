@@ -1,6 +1,13 @@
 #!/bin/bash
 
+BAM=$1
+URL=$2
+ID=$3
+
 mkdir -p fastqc
 cd fastqc
-fastqc -o . $1
+fastqc -o . $BAM
+
+signal.py $URL $ID fastqc
+
 touch done.txt

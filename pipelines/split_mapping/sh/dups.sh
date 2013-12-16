@@ -1,10 +1,9 @@
 #!/bin/bash
 
-set -e
-
 TMP_DIR=$1
 MEM=$2
 ID=$3
+URL=$4
 
 mkdir -p dups
 cd dups
@@ -15,5 +14,7 @@ java -Xmx${MEM} -jar $PICARD/MarkDuplicates.jar \
     INPUT=$INPUT \
     METRICS_FILE=metrics.txt \
     OUTPUT=${ID}.merged.sorted.dups.bam
+
+signal.py $URL $ID dups
 
 rm -f ../merge/*.bam

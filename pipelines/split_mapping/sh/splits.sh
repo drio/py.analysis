@@ -5,6 +5,9 @@ INPUT_BAM=$1
 NR_X_SPLIT=$2
 MEM=$3
 TMP_DIR=$4
+URL=$5
+ID=$6
+
 
 [ `uname` == "Darwin" ] && SPLIT="gsplit" || SPLIT="split"
 
@@ -35,5 +38,7 @@ do
 done
 
 ls split.* | grep -v bam | xargs rm -f
+
+signal.py $URL $ID splits
 
 ls *.bam | wc -l > ./done.txt
