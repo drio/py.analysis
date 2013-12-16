@@ -23,7 +23,8 @@
         <table class="table table-striped table-hover table-condensed">
         <tbody data-bind="foreach: samples">
             <tr>
-                <td><p data-bind="text: name"></p></td>
+                <td><b><p data-bind="text: name"></p></b></td>
+                <td><p data-bind="text: fastqc"></p></td>
                 <td><p data-bind="text: init"></p></td>
                 <td><p data-bind="text: splits"></p></td>
                 <td><p data-bind="text: sais"></p></td>
@@ -39,7 +40,7 @@
     <script type="text/javascript">
 function SamplesViewModel() {
     var self = this,
-        steps = ["init", "splits", "sais", "sampe", "merge", "dups", "stats"];
+        steps = ["fastqc", "init", "splits", "sais", "sampe", "merge", "dups", "stats", "validate"];
 
     self.URI = 'http://localhost:5000/sapi/api/v1.0/samples';
     self.samples = ko.observableArray();

@@ -14,12 +14,6 @@ app = Flask(__name__)
     the samples key in redis.
     There is also a key to keep the next id available.
 """
-def setup_redis():
-    e, g = app.redis.exists, app.redis.get
-    if not e("samples"):
-        app.redis.set("samples", jsonify([]))
-    if not e("current_id"):
-        app.redis.set("current_id", 0)
 
 
 def get_samples():
@@ -41,11 +35,11 @@ def load_config(key):
 
 
 app.redis = redis.StrictRedis(host='localhost', port=6379, db=0)
-app.setup_redis = setup_redis
 app.get_samples = get_samples
 app.get_id = get_id
 app.save = save
 app.credentials = load_config('credentials')
+
 
 """
 samples = [
@@ -62,8 +56,10 @@ auth = HTTPBasicAuth()
 
 @auth.get_password
 def get_password(username):
-    if username == app.redis.get("user"):
-        return app.redis.get("pwd")
+    #from flask import logging
+    #logging.getLogger().addHandler(logging.StreamHandler())
+    if username in app.credentials:
+        return app.credentials[username]
     return None
 
 
@@ -138,11 +134,12 @@ def delete_sample(sample_id):
 
 
 @app.route('/')
-@app.route('/index')
+@app.route('/index.html')
 def index():
-    return render_template("index.html", title='Sapi Frontend', user=app.credentials)
-
-
-@app.route('/frontend')
-def home():
-    return redirect(url_for('static', filename='frontend.html'))
+    user = {'name': None, 'pwd': None}
+    for u, p in app.credentials.items():
+        user['name'] = u
+        user['pwd'] = p
+        break
+    return render_template("index.html", title='Sapi Frontend',
+                           user=user)

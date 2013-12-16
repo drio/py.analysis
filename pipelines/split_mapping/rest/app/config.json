@@ -1,3 +1,3 @@
 {
-  "credentials" : { "name": "miguel", "pwd": "python"}
+  "credentials" : {"miguel": "python"}
 }
