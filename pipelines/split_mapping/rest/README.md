@@ -1,23 +1,20 @@
 ### Intro
 
 Here you have the restful service that keeps track of sample progress.  We have
-the restful service ```rest/app.py``` and a frontend
-```rest/static/frontend.html```.
+the restful service and a frontend.
 
 We use python, flask, tornado and redis for the backend.
 
 ### Setup
 
-1. Use [virtualenv](http://www.virtualenv.org/en/latest/) to create a python
+Use [virtualenv](http://www.virtualenv.org/en/latest/) to create a python
 env:
 
-```
-$ virtualenv flask
-```
+```$ virtualenv flask```
 
-2. Install the necessary packages:
+Install the necessary packages:
 
-```
+```sh
 $ flask/bin/pip install flask
 $ flask/bin/pip install tornado
 $ flask/bin/pip install redis
@@ -25,7 +22,7 @@ $ flask/bin/pip install flask-httpauth
 $ flask/bin/pip install requests
 ```
 
-3. Install redis:
+Install redis:
 
 Use your package manager of choice for that or compile from sources.
 
