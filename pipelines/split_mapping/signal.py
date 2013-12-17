@@ -12,7 +12,7 @@ def check_service(url):
         requests.get(url, auth=authentication()).json()
     except:
         sys.stderr.write("Problems connecting to service (%s). Bailing out.\n" % url)
-        exit(1)
+        exit(0)
 
 
 def update_resource(url=None, name=None, step=None):
@@ -41,7 +41,7 @@ def set_auth():
         pwd = os.environ['SAPI_PWD']
     except:
         sys.stderr.write('Env vars for service credentials not setup (SAPI_USER SAPI_PWD)\n')
-        exit(1)
+        exit(0)
 
     def a():
         return HTTPBasicAuth(user, pwd)
