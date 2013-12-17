@@ -23,6 +23,7 @@ java -Xmx${MEM} -jar $PICARD/SortSam.jar \
     INPUT=/dev/stdin \
     TMP_DIR=$TMP_DIR \
     SORT_ORDER=queryname \
+    VALIDATION_STRINGENCY=LENIENT \
     OUTPUT=/dev/stdout | \
         samtools view - | \
         $SPLIT -d -l $NR_X_SPLIT - split.
@@ -33,6 +34,7 @@ do
     java -Xmx${MEM} -jar $PICARD/SortSam.jar \
         INPUT=/dev/stdin \
         TMP_DIR=$TMP_DIR \
+        VALIDATION_STRINGENCY=LENIENT \
         SORT_ORDER=queryname \
         OUTPUT=$s.bam
 done
