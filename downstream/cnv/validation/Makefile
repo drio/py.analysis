@@ -50,7 +50,7 @@ all: wgsim normal.reads.fq.bam  mutated.reads.fq.bam roc.data.$(SEED).txt
 
 various_th:
 	@for min in `seq 1000 1000 5000`;do \
-		for t in `seq 0.1 0.1 1`;do \
+		for t in `seq 0.1 0.1 3`;do \
 			rm -f calls.txt && make -f $(THIS_MAKE) THRESHOLD=$$t MIN_EVENT_SIZE=$$min ;\
 		done; \
 	done

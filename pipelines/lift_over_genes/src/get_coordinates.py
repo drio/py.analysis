@@ -37,5 +37,5 @@ for l in drdcommon.xopen("-"):
       if len(_) == 2 and _[0] == "exon_number":
         e_num = re.sub('\"', '', _[1])
       if g_name in gene_names and g_name and e_num and t_name:
-        print "chr%s %s %s %s %s %s" % (chrm, start, end, g_name, e_num, t_name)
+        print "\t".join(["chr"+chrm, start, end, g_name, e_num, t_name])
         break

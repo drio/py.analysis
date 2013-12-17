@@ -30,7 +30,7 @@ var app = function() {
     return load();
   };
 
-  dotplot = function(data, div_id, h, w, xlabel, ylabel, title) {
+  dotplot = function(data, div_id, h, w, xlabel, ylabel, title_text) {
     var dp = {},
         svg, g, title,
         r = 4, padding_x = 45, padding_y = 20,
@@ -53,7 +53,7 @@ var app = function() {
           .attr("x", (w - (w/2)))
           .attr("y", 0)
           .attr("dy", ".75em")
-          .text(title)
+          .text(title_text)
           .attr("class", "title");
 
       svg.append("text")
@@ -113,6 +113,7 @@ var app = function() {
   };
 
 
+  // Main
   d3.csv(csv, function(rows) {
     var d = data(rows), m = 1000,
         h = 200, w = 400,
