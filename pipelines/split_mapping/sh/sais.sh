@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 FASTA=$1
 ONE_TWO=$2
 N_THREADS=$3

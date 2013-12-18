@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 BAM=$1
 URL=$2
 ID=$3

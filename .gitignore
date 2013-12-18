@@ -1,3 +1,5 @@
+*.rdb
+*.pyc
 downstream/cnv/validation/data/
 add_on_target/rhemac.lifted_over.human.vchrome.targets.bed.gz
 pipelines/lift_over_genes/bin/liftOver

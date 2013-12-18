@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 TMP_DIR=$1
 MEM=$2
 UNMAPPED_BAM=$3
@@ -26,18 +28,12 @@ java -Xmx${MEM} -jar $PICARD/MergeSamFiles.jar \
     TMP_DIR=$TMP_DIR \
     SORT_ORDER=coordinate \
     USE_THREADING=true \
-    OUTPUT=merged.sorted.bam && rm -f ../sampe/*.bam
+    VALIDATION_STRINGENCY=LENIENT \
+    OUTPUT=merged.sorted.bam
 
 signal.py $URL $ID merge
 
+rm -f ../sampe/*.bam
+
 touch done.txt
 
-# http://sourceforge.net/apps/mediawiki/picard/index.php?title=Main_Page#Q:_MarkDuplicates_.28or_ValidateSamFile.29_produces_the_error_.22Value_was_put_into_PairInfoMap_more_than_once..22__What_should_I_do.3F
-#java -Xmx${MEM} -jar $PICARD/MergeBamAlignment.jar \
-#    $INPUT \
-#    UNMAPPED_BAM=$UNMAPPED_BAM \
-#    REFERENCE_SEQUENCE=./`basename $REF` \
-#    PAIRED_RUN=true \
-#    TMP_DIR=$TMP_DIR \
-#    SORT_ORDER=coordinate \
-#    OUTPUT=merged.sorted.bam

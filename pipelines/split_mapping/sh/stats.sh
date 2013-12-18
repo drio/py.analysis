@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 URL=$1
 ID=$2
 

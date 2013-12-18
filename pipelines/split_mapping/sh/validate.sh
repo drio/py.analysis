@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 TMP_DIR=$1
 MEM=$2
 INPUT=$3
@@ -12,6 +14,7 @@ cd validate
 java -Xmx${MEM} -jar $PICARD/ValidateSamFile.jar \
     TMP_DIR=$TMP_DIR \
     INPUT=$INPUT \
+    VALIDATION_STRINGENCY=LENIENT \
     OUTPUT=validate.txt
 
 signal.py $URL $ID validate
