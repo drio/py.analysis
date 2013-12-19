@@ -1,0 +1,9 @@
+bam="_BAM_"
+fa="_FA_"
+id="_ID_"
+t=_CR_
+nrps=_NR_
+tmp="_TMP_"
+url="_URL_"
+user="_USER_"
+pass="_PWD_"
