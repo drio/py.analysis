@@ -21,6 +21,7 @@ Some premises first:
 My proposal:
 
 The idea is very simple: The sysadmins will load these Alkek machines with a vanilla Linux installation (ideally this process should be automatic) and give root access to the user (or users of a group) so they can use it any way they want.
+If something breaks, the sysadmins should be able to take all the machines to the initial state automatically.
 
 One concrete usage for this environment would be setting up a parallel mapping pipeline. The head node pulls bams from ardmore, splits them and performs the mapping on the rest of the nodes. Once completed the results are moved back to the head node where the merge and other pipeline steps are completed. Finally, the resulting bam can be sent back to ardmore. If properly designed, this setup can be easily reused by different groups --including production-- as they have picks of load.
 
