@@ -55,6 +55,15 @@ def gen_job_name(sample_id, step, index):
     return "%s_%s_%s" % (sample_id, step, index)
 
 
+def extra_mem(o_mem):
+    if o_mem[-1] == 'g' or o_mem[-1] == 'G':
+        num = int(match_this("^(\d+)", o_mem))
+        num += 2
+        return "%sg" % num
+    else:
+        return o_mem
+
+
 def cmd_to_pbs(cmd, sample_id, queue, step, index, mem, cores, tmp):
     t = "mkdir -p logs; echo '_CMD_' | qsub -N _NAME_ -q _QUEUE_ -d `pwd` "
     t += "-o logs/_NAME_.o -e logs/_NAME_.e "
@@ -62,8 +71,12 @@ def cmd_to_pbs(cmd, sample_id, queue, step, index, mem, cores, tmp):
     t = t.replace('_QUEUE_', queue)
     t = t.replace('_NAME_', gen_job_name(sample_id, step, index))
     t = t.replace('_CORES_', cores)
-    # Make sure jobs don't get killed because they reach the max memory.
-    t = t.replace('_MEM_', mem)
+    # The JVM uses more memory than specified by the -X parameters (check
+    # (http://blogs.vmware.com/apps/2011/06/taking-a-closer-look-at-sizing-the-java-process.html) for
+    # more details. If the cluster software has hard memory limits jobs may
+    # get killed. To avoid this, we request some extra memory when sending
+    # the job to the cluster.
+    t = t.replace('_MEM_', extra_mem(mem))
     t = t.replace('_CMD_', cmd)
     return t
 
