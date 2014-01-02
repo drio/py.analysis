@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 import sys
-import re
 import random
 import drdcommon as common
+from sapi import extra_mem, match_this
 
 TOOL_NAME = "cmds2submit.py"
 MAIN_HELP = """Usage: %s file.tsv\n""" % (TOOL_NAME)
@@ -26,7 +26,7 @@ def cmd2submit(lines, prev):
             redi = '>>'
 
         print "%s submit %s -s %s -m %s -c %s '%s' | bash %s %s" % \
-              (dep_input, dep_flag, name, mem, cores, _cmd, redi, output_dep)
+              (dep_input, dep_flag, name, extra_mem(mem), cores, _cmd, redi, output_dep)
 
     return output_dep
 

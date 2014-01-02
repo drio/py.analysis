@@ -32,10 +32,15 @@ Start the http server and redis:
 
 ```
 $ redis-server &> logs.redis.txt &
-$ ./app.py &> logs.rest.txt &
+$ git clone path_to_split_mapping_repo
+$ cd split_mapping/rest
+$ ./run.py &> logs.rest.txt &
 ```
 
-Use the ```signal.py``` tool to create some samples and introduce stage
+First you should change ```app/config.json``` and setup whatever login/pwd you
+prefer for the service.
+
+Use then ```signal.py``` to create some samples and introduce stage
 changes:
 
 ```
@@ -75,4 +80,5 @@ $ signal.py list $url
 
 As you add and modify samples, check the backend to see it gets updated. Point your browser to
 your backend, in this case [http://localhost:5000/frontend.html](http://localhost:5000/static/frontend.html).
+
 
