@@ -14,7 +14,7 @@ rhesus DNA on a human chip.
 ### Filtering criteria
 
 Very simple: find the average read depth for all the
-exons.  The use that average to create an interval of valid read depth.  Any
+exons.  Then use that average to create an interval of valid read depth.  Any
 exon with a read depth within the interval will pass the filter.
 
 The interval will be generated like this:
