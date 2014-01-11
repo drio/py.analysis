@@ -40,3 +40,8 @@ $ make -f $MAKE ID=18277 BAM=bams/18277.bam
 # Notice here I am using submit which takes care of sending jobs to your cluster
 $ (for b in bams/*.bam; do id=`basename $b | sed 's/.bam//'`; submit -s ${id}_crv "make -f $MAKE ID=$id BAM=$b"; echo "#"; done) | bash
 ```
+
+### Others
+
+You can use ```src/means.py``` to get the mean of ane exon for all the samples. This
+may be useful to perform further filtering.
