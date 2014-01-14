@@ -18,7 +18,7 @@ for l in xopen("-"):
             if i > 0:
                 num += 1
 
-        if num >= min_num_samples:
+        if num > min_num_samples:
             sys.stdout.write(l)
         else:
             sys.stderr.write(l)

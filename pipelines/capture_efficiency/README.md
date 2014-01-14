@@ -41,7 +41,15 @@ $ make -f $MAKE ID=18277 BAM=bams/18277.bam
 $ (for b in bams/*.bam; do id=`basename $b | sed 's/.bam//'`; submit -s ${id}_crv "make -f $MAKE ID=$id BAM=$b"; echo "#"; done) | bash
 ```
 
-### Others
+### Population level filtering
 
-You can use ```src/means.py``` to get the mean of ane exon for all the samples. This
-may be useful to perform further filtering.
+Once we have filtered out the targets (exons) for the individuals samples we can apply
+a second level of filtering. From the same directory where we generated the individual
+results:
+
+```sh
+$ make -f /path/to/Makefile all.out.10.bed all.pass.10.bed
+```
+
+Notice the software will use ```.10.``` in the filtering. In this case, we have to have
+more than 10 samples for which that exon passed the first level filtering.
