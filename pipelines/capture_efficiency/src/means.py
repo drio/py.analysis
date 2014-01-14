@@ -31,12 +31,14 @@ class Data(object):
         for k, means in self.d.items():
             o = k + " "
             for _id in ids:
+                if _id not in means:
+                    means[_id] = 0
                 o += "%s " % means[_id]
             print re.sub("\s", self.sep, o)
 
 d = Data()
 ids = []
-for f in glob.glob("*.stats.gz"):
+for f in glob.glob("*.pass.gz"):
     match = re.search("^(\d+)\.", f)
     if match:
         _id = int(match.group(1))
