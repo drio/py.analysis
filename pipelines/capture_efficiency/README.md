@@ -71,4 +71,4 @@ $ head all.pass.10.bed
 ```
 
 Here are the types for the columns in the output: Chrm, start, end, gene_name, exon number, transcript id and 
-the final number indicate how many samples have an accepted coverage for that exon.
+the final number indicates ?how many samples have an accepted coverage for that exon.
