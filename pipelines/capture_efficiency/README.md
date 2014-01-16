@@ -69,3 +69,6 @@ $ head all.pass.10.bed
 3       176871164       176871258       MMU.13875       2       MMU.13875-203   49
 3       176871164       176871258       MMU.13875       2       MMU.13875-202   49
 ```
+
+Here are the types for the columns in the output: Chrm, start, end, gene_name, exon number, transcript id and 
+the final number indicate how many samples have an accepted coverage for that exon.
