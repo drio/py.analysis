@@ -52,4 +52,20 @@ $ make -f /path/to/Makefile all.out.10.bed all.pass.10.bed
 ```
 
 Notice the software will use ```.10.``` in the filtering. In this case, we have to have
-more than 10 samples for which that exon passed the first level filtering.
+at least 10 samples for which that exon passed the first level filtering.
+
+```sh
+$ head all.out.10.bed
+9       68868671        68868838        RUFY2   9       RUFY2-203       6
+5       157418332       157418453       MMU.2733        4       MMU.2733-201    8
+4       105767394       105767552       ARID1B  9       ARID1B-203      4
+20      2904690 2904716 PRSS21  2       PRSS21-201      9
+2       45808430        45808574        MMU.10529       4       MMU.10529-201   9
+...
+$ head all.pass.10.bed
+13      9950891 9950908 TAF1B   1       TAF1B-201       47
+5       106107700       106107798       MMU.4610        12      MMU.4610-205    38
+3       176871164       176871258       MMU.13875       2       MMU.13875-201   49
+3       176871164       176871258       MMU.13875       2       MMU.13875-203   49
+3       176871164       176871258       MMU.13875       2       MMU.13875-202   49
+```

@@ -18,7 +18,10 @@ for l in xopen("-"):
             if i > 0:
                 num += 1
 
-        if num > min_num_samples:
-            sys.stdout.write(l)
+
+        out = "\t".join(l.strip().split("\t")[0:6]) + "\t" + str(num) + "\n"
+
+        if num >= min_num_samples:
+            sys.stdout.write(out)
         else:
-            sys.stderr.write(l)
+            sys.stderr.write(out)

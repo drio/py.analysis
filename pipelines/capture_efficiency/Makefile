@@ -24,6 +24,6 @@ gtf.gz:
 	curl $(GTF) > $@
 
 # Apply the second filter (aggregate mode) where we only save exons that
-# pass in a certain number of individuals (%)
+# pass, in a certain number of individuals (%)
 all.out.%.bed all.pass.%.bed:
 	$(SRC)/means.py | $(SRC)/population_filter.py $* 2> all.out.$*.bed > all.pass.$*.bed
