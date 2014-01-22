@@ -1,0 +1,33 @@
+#1. DOWNLOAD MASKED REFERENCE FROM UCSC
+wget ftp://hgdownload.cse.ucsc.edu/goldenPath/rheMac2/bigZips/chromFaMasked.tar.gz
+tar xzf chromFaMasked.tar.gz
+
+#2. DOWNLOAD CHROM INFO
+wget ftp://hgdownload.cse.ucsc.edu/goldenPath/rheMac2/database/chromInfo.txt.gz
+
+#3. MAKE 36 bp windows from masked assembly
+getKmers.sh
+
+#4. INDEX mrFast Masket rhesus macaque 2 reference and sliding windows mapping
+./mrsFast_reference_is_multiFASTA.sh 
+
+#5. COUNT NUMBER OF MAPPING PER EACH ASSEMBLY WINDOW
+cd scripts
+mkdir out_mn
+
+qsub -cwd -o out_mn/ -e out_mn/ -l h_vmem=10G -N CountMappings -b y perl countMappings_allKmers_skip_scaffolds_wo_mrsFast_output.pl
+
+#6. MAKE BED OVEREPRESENTATED REGIONS
+/aplic/perl/bin/perl overrepresentedKmers2bed.pl
+
+#7. SORT AND MERGE OVEREPRESENTED BED FILE REGIONS
+./prepareBEDtoMask.sh
+
+#8. MASK FASTA REFERENCE FROM BED, MASK repeat masked reference with regions that are overrepresentated in the genome
+./maskFastaFromBed.sh
+
+#9.Calculate Assembly Stats Overrepresented kmers masked
+./calculateAssemblyStats.sh
+
+#10. Calculate stats hard masked not treated reference
+./calculateAssemblyStatsPreviousTreatment.sh 
