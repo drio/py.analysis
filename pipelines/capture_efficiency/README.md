@@ -24,6 +24,9 @@ average = compute average RD on all exons for that sample
 min = average - (average - 20)
 max = average + (average - 20)
 interval = (min, max)
+
+ min    avg-20          avg-20   max
+  |------------- avg -------------|
 ```
 
 ### Using the pipeline (single sample)
