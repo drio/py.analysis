@@ -21,9 +21,8 @@ The interval will be generated like this:
 
 ```
 average = compute average RD on all exons for that sample
-interval_size = average - 20
-min = average - interval_size
-max = average + interval_size
+min = average - (average - 20)
+max = average + (average - 20)
 interval = (min, max)
 ```
 
