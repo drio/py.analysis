@@ -16,7 +16,7 @@ fasta_genome=$1
 # Some sanity checks
 #
 [ ".$fasta_genome" == "." ] && error "Need path to fasta file genome."
-for b in mrsfast maskFastaFromBed
+for b in mrsfast maskFastaFromBed fastaFromBed
 do
   `which $b &>/dev/null` || error "$b not in path."
 done
@@ -39,7 +39,7 @@ fi
 echo -e "mrsfast --index $fasta_genome --ws 12 ${fasta_genome}.index\tindexing\t-"
 echo
 
-# get Kmers
+# Generate kmer intervals (bed)
 #################################################################################
 K=36
 STEP=5
@@ -51,14 +51,25 @@ do
 done < $_chrm_info_bed
 echo
 
+# Kmerify reference
+#################################################################################
+while read line
+do
+	_cName=$(echo -e $line | cut -f1 -d' ')
+  _bed="${_cName}_k${K}_step${STEP}_intervals.bed"
+  _out="${_cName}.fa"
+  echo -e "fastaFromBed -fi $fasta_genome -bed $_bed -fo $_out\tkmerify\tintervals"
+done < $_chrm_info_bed
+echo
+
 # Map kmers against genome
 #################################################################################
 while read line
 do
 	_cName=$(echo -e $line | cut -f1 -d' ')
-  _reads="${_cName}_k${K}_step${STEP}_intervals.bed"
+  _reads="${_cName}.fa"
   _out="${_cName}_k${K}_step${STEP}_intervals.map"
-  echo -e "mrsfast --search $fasta_genome --seq $_reads -o $_out -e 2\tmapping\tintervals"
+  echo -e "mrsfast --search $fasta_genome --seq $_reads -o $_out -e 2\tmapping\tkmerify"
 done < $_chrm_info_bed
 echo
 
@@ -69,7 +80,7 @@ rm -f $_counts_bed
 while read line
 do
 	_cName=$(echo -e $line | cut -f1 -d' ')
-  _kmers="${_cName}_k${K}_step${STEP}_intervals.bed"
+  _kmers="${_cName}.fa"
   _maps="${_cName}_k${K}_step${STEP}_intervals.map"
   echo -e "${SRC_DIR}/countMappings_allKmers_skip_scaffolds_wo_mrsFast_output.pl $_kmers $_maps $_cName >> $_counts_bed\tcounts\tintervals,mappings"
 done < $_chrm_info_bed
