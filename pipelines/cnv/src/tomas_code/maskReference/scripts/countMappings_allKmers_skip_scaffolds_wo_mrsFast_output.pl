@@ -17,36 +17,36 @@ open OUT, ">$out" or die;
 
 # Define those chromosomes for which mrsFAST output mappings
 my %mapped;
-foreach (@mappingsFiles)
+foreach (@mappingsFiles) 
 {
 	my $chr = $_;
 	$chr =~ s/_k36_step5_intervals.map//;
 	$chr =~ s/\/scratch\/primate\/Assemblies\/rhesusMac2\/CNV\/mrsFast\///;
 
-	unless (exists $mapped{$chr})
+	unless (exists $mapped{$chr}) 
 	{
 		$mapped{$chr} = 1;
 	}
 }
-
+	
 # Set hashes
-foreach (@kmersFiles)
+foreach (@kmersFiles) 
 {
 	# Get chromosome name
 	my $chr = $_;
 	$chr =~ s/_k36_step5_intervals.fa.masked//;
 	$chr =~ s/\/scratch\/primate\/Assemblies\/rhesusMac2\/CNV\/intervalsFasta\///;
 
-	unless (exists $mapped{$chr})
+	unless (exists $mapped{$chr}) 
 	{
 		next;
 	}
 
-	# Define counters
+	# Define counters	
 	my %kmersSeqs;
 	my %kmersCounts;
 	my $kmers = 0;
-	my $pair = 0;
+	my $pair = 0;	
 	my $kmerId;
 	my $kmerSeq;
 	my $kmerLen;
@@ -66,11 +66,11 @@ foreach (@kmersFiles)
 			next if ($kmerSeq =~ /N{$kmerLen}/);
 			$kmersSeqs{$kmerId} = $kmerSeq;
 			$kmersCounts{$kmerId} = 0;
-			$kmers++;
+			$kmers++;				
 		}
 	}
 	# Check that the number of kmers read = number of elements in the hash
-	unless ($kmers == scalar keys %kmersSeqs)
+	unless ($kmers == scalar keys %kmersSeqs) 
 	{
 		print "***** the number of kmers read is not equal to the number of elements in the hash! *****\n";
 	}

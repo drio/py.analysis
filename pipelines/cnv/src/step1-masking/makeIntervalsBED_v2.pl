@@ -9,8 +9,8 @@ my $cName = $ARGV[0];
 my $cLen = $ARGV[1];
 
 # Size of kmers and step
-my $k = 36;
-my $step = 5;
+my $k = $ARGV[2] + 0;
+my $step = $ARGV[3] + 0;
 
 print STDERR "# defining $k -mers(step = $step) for chromosome $cName (length = $cLen)\n";
 my $intervals = $cName . "_k" . $k . "_step" . $step . "_intervals.bed";

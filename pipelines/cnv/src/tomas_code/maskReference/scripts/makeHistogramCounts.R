@@ -1,10 +1,11 @@
 ## Import & edit
-counts <- read.delim("counts.txt", h = F)
+setwd("/scratch/primate/Assemblies/rhesusMac2/CNV/")
+counts <- read.delim("kmerCountsWithMrsFast.txt", h = F)
 names(counts) <- c("chrom", "start", "end", "seq", "counts")
 
 
 ## Save & load
-#save.image("makeHistogramCounts.RData")
+save.image("makeHistogramCounts.RData")
 #load("makeHistogramCounts.RData")
 
 
@@ -22,7 +23,7 @@ for (i in 1:length(counts.table[, 1])) {
 }
 
 
-## Plot
+## Plot 
 #x11()
 png("cumulativeDistribution.png", h = 700, w = 700, res = 100)
 plot(counts.table$counts, counts.table$cum.freq, xlim = c(0, 100),
