@@ -16,7 +16,7 @@ fasta_genome=$1
 # Some sanity checks
 #
 [ ".$fasta_genome" == "." ] && error "Need path to fasta file genome."
-for b in mrsfast maskFastaFromBed fastaFromBed
+for b in R grep cut awk mrsfast maskFastaFromBed fastaFromBed
 do
   `which $b &>/dev/null` || error "$b not in path."
 done
