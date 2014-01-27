@@ -38,3 +38,17 @@ downstream/saturation_snps/data/
 downstream/saturation_snps/pngs/
 tests/test_cnv.pyc
 tests/test_sam.pyc
+pipelines/cnv/chrm_info.bed
+pipelines/cnv/data/*.fa
+pipelines/cnv/data/*.fa.index
+pipelines/cnv/data/*.fa.fai
+pipelines/cnv/data/small_rhesus/*.fa.fai
+pipelines/cnv/data/small_rhesus/*.fa
+pipelines/cnv/data/small_rhesus/*.fa.index
+pipelines/cnv/mrsfast/*
+pipelines/cnv/mrsfast/sample_genome/*
+pipelines/cnv/mrsfast/sample_genome_two/*
+pipelines/cnv/data/small_rhesus/small.rhemac2.*
+
+
+
