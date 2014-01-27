@@ -94,13 +94,13 @@ echo
 
 #cat $fasta_genome | src/step1/calculateAssemblyStats_v2.pl > stats.txt
 
+# Mask genome
+#################################################################################
+echo -e "maskFastaFromBed -fi $fasta_genome -bed $_merged_counts_bed -fo masked.fa\tmasking\tmerge_counts"
+
+
 # Make dot plot (cumulative percentage of the genome covered for different numbers
 # of hits allowed per each kmer.
 #################################################################################
 echo -e "cat $_merged_counts_bed | R CMD BATCH ${SRC_DIR}/makeHistogramCounts.R\tdotplot\tmerge_counts"
 echo
-
-# Mask genome
-#################################################################################
-echo -e "maskFastaFromBed -fi $fasta_genome -bed $_merged_counts_bed -fo masked.fa\tmasking\tmerge_counts"
-
