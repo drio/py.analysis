@@ -89,7 +89,7 @@ echo
 # Count how many hits we have per kmer
 #################################################################################
 _merged_counts_bed="counts.bed"
-echo -e "cat counts* | grep -v '#' | grep -v -P '^$' >> $_merged_counts_bed\tmerge_counts\tcounts"
+echo -e "cat counts* | grep -v \# | grep -v -P \^\$ >> $_merged_counts_bed\tmerge_counts\tcounts"
 echo
 
 #cat $fasta_genome | src/step1/calculateAssemblyStats_v2.pl > stats.txt
