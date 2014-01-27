@@ -1,3 +1,5 @@
+# This is to generate a small genome (for testing) from rheMac2
+#
 url:="http://hgdownload.cse.ucsc.edu/goldenPath/rheMac2/bigZips/chromFa.tar.gz"
 genome:=rhemac2
 nbp:=$(shell echo "100000" | bc)
