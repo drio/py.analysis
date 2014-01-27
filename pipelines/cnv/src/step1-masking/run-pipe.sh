@@ -75,15 +75,21 @@ echo
 
 # Count how many hits we have per kmer
 #################################################################################
-_counts_bed=counts.bed
 rm -f $_counts_bed
 while read line
 do
 	_cName=$(echo -e $line | cut -f1 -d' ')
   _kmers="${_cName}.fa"
   _maps="${_cName}_k${K}_step${STEP}_intervals.map"
-  echo -e "${SRC_DIR}/countMappings_allKmers_skip_scaffolds_wo_mrsFast_output.pl $_kmers $_maps $_cName >> $_counts_bed\tcounts\tintervals,mappings"
+  _counts_bed=counts._${_cName}.bed
+  echo -e "${SRC_DIR}/countMappings_allKmers_skip_scaffolds_wo_mrsFast_output.pl $_kmers $_maps $_cName > $_counts_bed\tcounts\tintervals,mappings"
 done < $_chrm_info_bed
+echo
+
+# Count how many hits we have per kmer
+#################################################################################
+_merged_counts_bed="counts.bed"
+echo -e "cat counts* | grep -v '#' | grep -v -P '^$' >> $_merged_counts_bed\tmerge_counts\tcounts"
 echo
 
 #cat $fasta_genome | src/step1/calculateAssemblyStats_v2.pl > stats.txt
@@ -91,10 +97,10 @@ echo
 # Make dot plot (cumulative percentage of the genome covered for different numbers
 # of hits allowed per each kmer.
 #################################################################################
-echo -e "cat $_counts_bed | R CMD BATCH ${SRC_DIR}/makeHistogramCounts.R\tdotplot\tcounts"
+echo -e "cat $_merged_counts_bed | R CMD BATCH ${SRC_DIR}/makeHistogramCounts.R\tdotplot\tmerge_counts"
 echo
 
 # Mask genome
 #################################################################################
-echo -e "maskFastaFromBed -fi $fasta_genome -bed $_counts_bed -fo masked.fa\tmasking\tcounts"
+echo -e "maskFastaFromBed -fi $fasta_genome -bed $_merged_counts_bed -fo masked.fa\tmasking\tmerge_counts"
 
