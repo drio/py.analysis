@@ -21,8 +21,11 @@ MAIN_HELP = """Usage: %s file.tsv\n""" % (TOOL_NAME)
 
 def cmd2submit(lines, prev, sep="\t"):
     output_dep = "./deps.%s.txt" % int(random.random()*10000)
+    i = 1
     for idx, l in enumerate(lines):
         _cmd, _name, _dep = l.split(sep)
+        _name += "." + str(i)
+        i += 1
 
         dep_input, dep_flag = '', ''
         if prev:
@@ -36,7 +39,7 @@ def cmd2submit(lines, prev, sep="\t"):
             redi = '>>'
 
         print "%s submit %s -s %s -m %s -c %s '%s' | bash %s %s" % \
-              (dep_input, dep_flag, _name, "4G", "1", _cmd, redi, output_dep)
+              (dep_input, dep_flag, _name, "6G", "1", _cmd, redi, output_dep)
 
     return output_dep
 
