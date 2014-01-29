@@ -4,8 +4,7 @@ use warnings;
 
 
 my $kmer_file = $ARGV[0];
-my $map_file  = $ARGV[1];
-my $chr       = $ARGV[2];
+my $chr       = $ARGV[1];
 
 # Define counters
 my %kmersSeqs;
@@ -43,9 +42,8 @@ unless ($kmers == scalar keys %kmersSeqs)
 }
 
 # Open file
-open FILE, $map_file or die "Could not open $map_file: $!";
 print "# Counting the number of times each K-mers from $chr is mapped\n";
-while (<FILE>) {
+while (<STDIN>) {
     my @row = split("\t", $_);
     $kmersCounts{$row[0]}++;
     my @subrow = split(":", $row[0]);

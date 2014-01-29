@@ -69,7 +69,7 @@ do
 	_cName=$(echo -e $line | cut -f1 -d' ')
   _reads="${_cName}.fa"
   _out="${_cName}_k${K}_step${STEP}_intervals.map"
-  echo -e "mrsfast --search $fasta_genome --seq $_reads -o $_out -e 2\tmapping\tkmerify"
+  echo -e "mrsfast --search $fasta_genome --seq $_reads -o $_out --outcomp -e 2\tmapping\tkmerify"
 done < $_chrm_info_bed
 echo
 
@@ -80,9 +80,9 @@ while read line
 do
 	_cName=$(echo -e $line | cut -f1 -d' ')
   _kmers="${_cName}.fa"
-  _maps="${_cName}_k${K}_step${STEP}_intervals.map"
-  _counts_bed=counts._${_cName}.bed
-  echo -e "${SRC_DIR}/countMappings_allKmers_skip_scaffolds_wo_mrsFast_output.pl $_kmers $_maps $_cName > $_counts_bed\tcounts\tintervals,mappings"
+  _maps="${_cName}_k${K}_step${STEP}_intervals.map.gz"
+  _counts_bed=counts.${_cName}.bed
+  echo -e "gzip -cd $_maps | ${SRC_DIR}/countMappings_allKmers_skip_scaffolds_wo_mrsFast_output.pl $_kmers $_cName > $_counts_bed\tcounts\tintervals,mappings"
 done < $_chrm_info_bed
 echo
 

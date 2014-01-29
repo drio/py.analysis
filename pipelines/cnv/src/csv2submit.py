@@ -39,7 +39,7 @@ def cmd2submit(lines, prev, sep="\t"):
             redi = '>>'
 
         print "%s submit %s -s %s -m %s -c %s '%s' | bash %s %s" % \
-              (dep_input, dep_flag, _name, "6G", "1", _cmd, redi, output_dep)
+              (dep_input, dep_flag, _name, "16G", "1", _cmd, redi, output_dep)
 
     return output_dep
 

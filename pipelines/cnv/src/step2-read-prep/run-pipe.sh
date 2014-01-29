@@ -45,9 +45,8 @@ echo
 #
 _tmp="/space1/tmp"
 _out="/dev/stdout"
-_one="java -Xmx8G -jar $PICARD/MarkDuplicates.jar TMP_DIR=$_tmp INPUT=$input_bam OUTPUT=$_out METRICS_FILE=/dev/null "
+_one="java -Xmx14G -jar $PICARD/MarkDuplicates.jar REMOVE_DUPLICATES=True TMP_DIR=$_tmp INPUT=$input_bam OUTPUT=$_out METRICS_FILE=/dev/null "
 _two="samtools view - "
 _three="$SRC_DIR/subreads.py | gzip - > $sample_id.fa.gz"
 _cmd="$_one | $_two | $_three"
 echo -e "$_cmd\trm_dups_gen_reads\t-"
-
