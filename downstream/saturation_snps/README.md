@@ -50,3 +50,8 @@ $ submit -s saturation -m12G -c2 "./run.sh"
 Notice that I am requesting quite a lot of memory. Use 16G to play save (for 55 wgs 30x samples).
 The walltime time was around 10 hours.
 
+#### Using the `-a <num>` parameter to specify when to count a snp
+
+You can use the `-a <num>` parameter to tell the saturation tool in how many samples
+we have to see the snp in order to start counting it. By default this value is 2. Use `-a 1`
+if you want a snp to be counted as soon as is seen in one animal.
