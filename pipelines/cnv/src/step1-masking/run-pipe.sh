@@ -69,7 +69,8 @@ do
 	_cName=$(echo -e $line | cut -f1 -d' ')
   _reads="${_cName}.fa"
   _out="${_cName}_k${K}_step${STEP}_intervals.map"
-  echo -e "mrsfast --search $fasta_genome --seq $_reads -o $_out --outcomp -e 2\tmapping\tkmerify"
+  #echo -e "mrsfast --search $fasta_genome --seq $_reads -o $_out --outcomp -e 2\tmapping\tkmerify"
+  echo -e "mrsfast --search $fasta_genome --seq $_reads -o /dev/stdout -e 2 | cut -f1 | gzip -c > $_out\tmapping\tkmerify"
 done < $_chrm_info_bed
 echo
 
