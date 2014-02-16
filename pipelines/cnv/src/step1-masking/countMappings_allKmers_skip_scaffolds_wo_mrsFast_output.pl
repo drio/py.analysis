@@ -17,8 +17,8 @@ my $kmerLen;
 
 # Open file
 open FILE, $kmer_file or die "Could not open $kmer_file: $!";
-print "\n";
-print "# Defining hash with kmers for $chr\n";
+print STDERR "\n";
+print STDERR "# Defining hash with kmers for $chr\n";
 while (<FILE>) {
     # Get kmer identifier
     if ($_ =~ /^>(.*)/) {$kmerId = $1; $pair++;}
@@ -38,17 +38,18 @@ while (<FILE>) {
 # Check that the number of kmers read = number of elements in the hash
 unless ($kmers == scalar keys %kmersSeqs)
 {
-    print "***** the number of kmers read is not equal to the number of elements in the hash! *****\n";
+    print STDERR "***** the number of kmers read is not equal to the number of elements in the hash! *****\n";
 }
 
 # Open file
-print "# Counting the number of times each K-mers from $chr is mapped\n";
+print STDERR "# Counting the number of times each K-mers from $chr is mapped\n";
 while (<STDIN>) {
+    chomp();
     my @row = split("\t", $_);
     $kmersCounts{$row[0]}++;
     my @subrow = split(":", $row[0]);
     unless ($chr eq $subrow[0]) {
-        print "***** chromosomes differ! $chr != $subrow[0] *****\n";
+        print STDERR "***** chromosomes differ! $chr != $subrow[0] *****\n";
     }
 }
 
