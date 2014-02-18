@@ -1,0 +1,18 @@
+
+1. Mask over-represented regions of the reference genome
+2. Remove dups, split and trim reads (36bp)
+
+3. Map splitted reads to masked reference
+
+4. Canavar:
+    1. find read depth for the three window schemas
+        # Once per each genome
+        $ mrcanavar --prep --gz -fasta ../step1/genome/rhemac2.all_chrms.fa -gaps empty -conf out.conf
+    2. find read depth (+perform GC correction) on windows from #1
+        $ mrcanavar --read -conf out.conf -samdir sam_files_are_here/ -depth mysample.depth
+    3. compute absolute copy number and make the CNV calls
+        $ mrcanavar --call -conf out.conf -depth mysample.depth -o mysample
+
+5. Call events:
+    two methods
+
