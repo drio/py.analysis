@@ -32,7 +32,7 @@ for sam in $sam_dir/*.sam.gz
 do
     bn=`basename $sam`
     mkdir -p ./$bn
-    [ ! -d ./$bn ] && ln -s `readlink -e $sam` ./$bn/$bn
+    [ ! -f ./$bn/$bn ] && ln -s `readlink -e $sam` ./$bn/$bn
     single_sam_dir=`pwd`/$bn
     echo -e "mrcanavar --read --gz -conf conf.bin -samdir $single_sam_dir -depth ${bn}.depth\trdepth.${bn}\twindows"
     depth_files="$depth_files ${bn}.depth"
