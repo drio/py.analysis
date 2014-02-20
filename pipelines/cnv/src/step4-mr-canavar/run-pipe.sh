@@ -1,12 +1,5 @@
 #!/bin/bash
 #
-#1. find read depth for the three window schemas (Only necessary once per each genome)
-#    $ mrcanavar --prep --gz -fasta ../step1/genome/rhemac2.all_chrms.fa -gaps empty -conf out.conf
-#2. find read depth (+perform GC correction) on windows from #1
-#    $ mrcanavar --read -conf conf.bin -samdir sam_files_are_here/ -depth mysample.depth
-#3. compute absolute copy number and make the CNV calls
-#    $ mrcanavar --call -conf conf.bin -depth mysample.depth -o mysample
-#
 SRC_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 error() {
@@ -28,12 +21,28 @@ do
   `which $b &>/dev/null` || error "$b not in path."
 done
 
-# Map kmers against genome
-#################################################################################
-echo -e "touch empty; mrcanavar --prep --gz -fasta $ref_fasta -gaps empty -conf conf.bin\twindows\t-"
-echo -e "mrcanavar --read --gz -conf conf.bin -samdir $sam_dir -depth sample.depth\trdepth\twindows"
-echo -e "mrcanavar --call -conf conf.bin -depth sample.depth -o output\tcall_cnvs\trdepth"
+# Compute the genomic windows
+touch empty
+echo -e "mrcanavar --prep --gz -fasta $ref_fasta -gaps empty -conf conf.bin\twindows\t-"
 echo
 
+# Find RD (and GC content on regions for all the split alignments)
+depth_files=""
+for sam in $sam_dir/*.sam.gz
+do
+    bn=`basename $sam`
+    mkdir -p ./$bn
+    [ ! -d ./$bn ] && ln -s `readlink -e $sam` ./$bn/$bn
+    single_sam_dir=`pwd`/$bn
+    echo -e "mrcanavar --read --gz -conf conf.bin -samdir $single_sam_dir -depth ${bn}.depth\trdepth.${bn}\twindows"
+    depth_files="$depth_files ${bn}.depth"
+done
+echo
 
+# Merge the results from the previous steps
+echo -e "mrcanavar --conc -conf conf.bin -concdepth $depth_files -depth merged.depth\tmergeRD\trdepth"
+echo
 
+# perform GC correction and call duplicated/deleted regions
+echo -e "mrcanavar --call -conf conf.bin -depth merged.depth -o output\tcall_cnvs\tmergeRD"
+echo
