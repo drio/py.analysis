@@ -55,3 +55,18 @@ The walltime time was around 10 hours.
 You can use the `-a <num>` parameter to tell the saturation tool in how many samples
 we have to see the snp in order to start counting it. By default this value is 2. Use `-a 1`
 if you want a snp to be counted as soon as is seen in one animal.
+
+#### How can I control the order in which the samples are computed?
+
+In all the previous sections we have been using `gzip -cd *.gz` to generate the stream that we feed 
+into the saturation tool. Let's imagine you have two subgroups of samples and you want to feed first 
+one of the groups to the tool. Here is one possible approach to acomplish this:
+
+```sh
+$ ls group1
+file1.vcf.gz file2.vcf.gz
+$ ls group2
+file1.vcf.gz file2.vcf.gz
+$ (gzip -cd group1/*.gz; gzip -cd group2/*.gz) | saturation.py | tee data.txt | grep -v samples | awk '{print $1" "$2}' | plot_sat.py "title: subs" "x: samples " "y: # of events" > subs.plot.py
+```
+
