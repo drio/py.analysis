@@ -73,9 +73,7 @@ $ (gzip -cd group1/*.gz; gzip -cd group2/*.gz) | saturation.py | tee data.txt | 
 ### Other questions:
 
 
-#### Just to understand the curve well (There are some sudden bumps in the curve
-#### and want to know which specific samples through this) is it possible to include
-#### the sample names either in the sat.e or data.txt?
+#### Just to understand the curve well (There are some sudden bumps in the curve and want to know which specific samples through this) is it possible to include the sample names either in the sat.e or data.txt?
 
 We don't have the sample names available when the script is running, just the
 vcf data. So generated the sample id cannot be done at that level. That being
