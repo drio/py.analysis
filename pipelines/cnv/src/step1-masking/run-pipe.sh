@@ -4,6 +4,7 @@
 # Masking over-represented parts of the genome
 #
 SRC_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+NREADS_X_SPLIT=5000000 # 5M
 
 error() {
   local msg=$1
@@ -62,6 +63,11 @@ do
 done < $_chrm_info_bed
 echo
 
+# Improvement:
+# calculate # of reads per kmerified fasta
+# split kmerified fasta
+# change next step to be aware of the splits
+
 # Map kmers against genome
 #################################################################################
 while read line
@@ -71,7 +77,7 @@ do
   #_out="${_cName}_k${K}_step${STEP}_intervals.map"
   #echo -e "mrsfast --search $fasta_genome --seq $_reads -o $_out --outcomp -e 2\tmapping\tkmerify"
   _out="${_cName}_k${K}_step${STEP}_intervals.map.gz"
-  echo -e "mrsfast --search $fasta_genome --seq $_reads -o /dev/stdout -e 2 | cut -f1 | gzip -c > $_out\tmapping\tkmerify"
+  echo -e "mrsfast --search $fasta_genome --seq $_reads -o /dev/stdout -e 2 | cut -f1 | grep -P "^${_cName}:\d+-\d+" | gzip -c > $_out\tmapping\tkmerify"
 done < $_chrm_info_bed
 echo
 
