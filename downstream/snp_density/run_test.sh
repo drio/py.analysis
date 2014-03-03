@@ -11,7 +11,7 @@ Chr3	0	10000	0
 Chr3	10001	20000	3
 EOF
 ) > truth.bed
-cat test.vcf | ./snp_density.py  > foo.bed
+cat test.vcf | ./snp_density.py 10000  > foo.bed
 diff foo.bed truth.bed > /dev/null
 if [ $? -eq 0 ];then
   echo "PASS"

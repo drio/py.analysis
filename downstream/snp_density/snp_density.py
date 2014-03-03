@@ -16,13 +16,12 @@ tool = %s
 Given a vcf (stdin; snps only), compute the snp density
 
 Usage:
-  $ gzip -cd input.vcf.gz | grep -v "#" | %s > density.bed
+  $ gzip -cd input.vcf.gz | grep -v "#" | %s <window_size> > density.bed
 
 """ % (tool, tool)
 
 
-def do_work(fd_vcf):
-    w_size = 10000
+def do_work(fd_vcf, w_size):
     w      = (0, 0+w_size)
     cc, pc = None, None
     num    = 0
@@ -50,12 +49,13 @@ def do_work(fd_vcf):
 
 
 def main():
-    if len(sys.argv) != 1:
+    if len(sys.argv) != 2:
         drdcommon.error("Wrong # of args", usage)
     if not drdcommon.data_in_stdin():
         drdcommon.error("No data in stdin.", usage)
     fd_vcf = drdcommon.xopen("-")
-    do_work(fd_vcf)
+    w_size = int(sys.argv[1])
+    do_work(fd_vcf, w_size)
     fd_vcf.close()
 
 if __name__ == "__main__":
