@@ -24,7 +24,6 @@ NOTE: We are only counting events seen in at least 2 animals.
 
 """ % (tool, tool)
 
-MIN_QUAL = 20
 AT_LEAST_SEEN = 2
 
 class Saturation(object):
@@ -94,13 +93,12 @@ class Saturation(object):
                 return
             else:
                 snp = VcfSnp(l)
-                if snp.has_high_quality(MIN_QUAL):
-                    if snp.is_a_substitution():
-                        self.subs[snp.coordinate()] += 1
-                    else:
-                        self.indels[snp.coordinate()] += 1
-                    if snp.annotated:
-                        self.genes_partial[snp.gene] = True
+                if snp.is_a_substitution():
+                    self.subs[snp.coordinate()] += 1
+                else:
+                    self.indels[snp.coordinate()] += 1
+                if snp.annotated:
+                    self.genes_partial[snp.gene] = True
 
         self.more_samples_to_process = False
 
