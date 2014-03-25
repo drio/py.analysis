@@ -91,7 +91,14 @@ So in order.txt you have now the actual files and the line number is the order
 in which they are run.
 
 
+#### Can I check the saturation for genes instead of snps?
 
+Yes, if your vcf files are annotated with snp effect. Example:
+
+```sh
+$ src="/stornext/snfs6/rogers/drio_scratch/dev/py.analysis/downstream/saturation_snps"
+$ gzip -cd *.anno*.gz  | $src/gene_saturation_snpeff.sh | $src/plot_sat.py "title: subs" "x: samples " "y: # of events" > plot.png
+```
 
 
 
