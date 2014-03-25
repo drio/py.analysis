@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# std dev of var allele ratios for all the groups
+# Compute 10kb genomic windows and plot results
 #
 import pandas as pd
 from collections import defaultdict
