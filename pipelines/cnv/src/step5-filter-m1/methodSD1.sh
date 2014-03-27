@@ -25,10 +25,12 @@ done
 
 # Prepare a bed file with the regions considered as repeats, gaps, etc...
 #
-BED_RMASK=./rMask.bed # TODO: ??????????????
 # curl http://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/rmsk.txt.gz | \
-#   gzip -c - | sed 's/chr//g' | grep -e _repeat |  awk '{print $6"\t"$7"\t"$8}' > simple_repeats.bed
-BED_TRF=./simple_repeats.bed
+#   gzip -cd - | sed 's/chr//g' | cut -f 6-8 > rMask.bed
+BED_RMASK=./rMask.bed
+# curl http://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/simpleRepeat.txt.gz  | \
+#   gzip -cd - | sed 's/chr//g' | cut -f 2-4 > trf.bed
+BED_TRF=./trf.bed
 [ ! -f $BED_RMASK ] && echo "Need $BED_RMASK" && exit 1
 [ ! -f $BED_TRF ] && echo "Need $BED_TRF" && exit 1
 BED_REPEATS=repeats.rMask.trf.bed # merges all previous files in this one
