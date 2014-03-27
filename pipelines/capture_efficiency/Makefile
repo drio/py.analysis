@@ -29,7 +29,7 @@ all.bed:
 	$(SRC)/matrix.py > all.bed
 
 all.pass.%.bed: all.bed
-	awk '{if ($$7 >= $*) print;}' $< > $@
+	awk '{if ($$7 >= $*) print;}' $< | grep -v "^#"  > $@
 
 all.out.%.bed: all.bed
-	awk '{if ($$7 < $*) print;}' $< > $@
+	awk '{if ($$7 < $*) print;}' $< | grep -v "^#"  > $@
