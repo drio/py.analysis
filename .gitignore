@@ -49,6 +49,6 @@ pipelines/cnv/mrsfast/*
 pipelines/cnv/mrsfast/sample_genome/*
 pipelines/cnv/mrsfast/sample_genome_two/*
 pipelines/cnv/data/small_rhesus/small.rhemac2.*
-
-
+pipelines/cnv/data/*
+pipelines/cnv/src/tomas_code/filters/CNVPostProcess.tar.gz
 
