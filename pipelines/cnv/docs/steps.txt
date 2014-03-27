@@ -1,5 +1,6 @@
 
 1. Mask over-represented regions of the reference genome
+
 2. Remove dups, split and trim reads (36bp)
 
 3. Map splitted reads to masked reference
@@ -15,4 +16,3 @@
 
 5. Call events:
     two methods
-

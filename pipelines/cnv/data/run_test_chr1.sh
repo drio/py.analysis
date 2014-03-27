@@ -1,8 +1,9 @@
+PIPE_DIR=/stornext/snfs6/rogers/drio_scratch/dev/py.analysis/pipelines/cnv
 cp small_rhesus/small.rhemac2.100000.sizes.bed ./chrm_info.bed
 
 mrsfast --index small_rhesus/small.rhemac2.100000.fa --ws 12 small_rhesus/small.rhemac2.100000.fa.index
 
-/stornext/snfs6/rogers/drio_scratch/dev/py.analysis/pipelines/cnv/src/step1-masking/makeIntervalsBED_v2.pl chr1 100000 36 5 > chr1_k36_step5_intervals.bed
+$PIPE_DIR/src/step1-masking/makeIntervalsBED_v2.pl chr1 100000 36 5 > chr1_k36_step5_intervals.bed
 
 fastaFromBed -fi small_rhesus/small.rhemac2.100000.fa -bed chr1_k36_step5_intervals.bed -fo chr1.fa
 
