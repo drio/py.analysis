@@ -77,7 +77,7 @@ do
   #_out="${_cName}_k${K}_step${STEP}_intervals.map"
   #echo -e "mrsfast --search $fasta_genome --seq $_reads -o $_out --outcomp -e 2\tmapping\tkmerify"
   _out="${_cName}_k${K}_step${STEP}_intervals.map.gz"
-  echo -e "mrsfast --search $fasta_genome --seq $_reads -o /dev/stdout -e 2 | cut -f1 | grep -P "^${_cName}:\d+-\d+" | gzip -c > $_out\tmapping\tkmerify"
+  echo -e "mrsfast --search $fasta_genome --seq $_reads -o /dev/stdout -e 2 | cut -f1 | grep -P \"^${_cName}:\d+-\d+\" | gzip -c > $_out\tmapping\tkmerify"
 done < $_chrm_info_bed
 echo
 
