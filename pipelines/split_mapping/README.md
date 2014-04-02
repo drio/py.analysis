@@ -28,7 +28,7 @@ sapi.py: error: too few arguments
 
 ```
 $ mkdir test; cd test
-$ /stornext/snfs6/rogers/drio_scratch/dev/py.analysis/pipelines/split_mapping/test/run.sh
+$ /stornext/snfs6/rogers/drio_scratch/dev/py.analysis/pipelines/split_mapping/test/run-phix.sh
 ```
 
 You are going to see a lot of output and after a minute or so you should have an output like this:
