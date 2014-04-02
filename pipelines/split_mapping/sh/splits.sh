@@ -10,11 +10,12 @@ ID=$6
 
 
 [ `uname` == "Darwin" ] && SPLIT="gsplit" || SPLIT="split"
+[ `uname` == "Darwin" ] && GREP="ggrep" || GREP="grep"
 
 mkdir -p splits
 cd splits
 samtools view -H $INPUT_BAM > header.sam
-samtools view -H $INPUT_BAM | grep -P "^@RG"> rg.sam
+samtools view -H $INPUT_BAM | $GREP -P "^@RG"> rg.sam
 
 # We need to sort the input bam by queryname so we have
 # the two reads of a pair adjacent to each other.
@@ -39,7 +40,7 @@ do
         OUTPUT=$s.bam
 done
 
-ls split.* | grep -v bam | xargs rm -f
+ls split.* | $GREP -v bam | xargs rm -f
 
 signal.py $URL $ID splits
 
