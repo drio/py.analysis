@@ -26,7 +26,7 @@ reads per split since the numbre of reads in the test bam file is very small:
 
 ```sh
 $ cd step2-read-prep
-$ ./run.sh  | sed 's/20000000/50000/g | bash
+$ ./run.sh  | sed 's/20000000/50000/g' | bash
 ```
 
 And continue with the others.
