@@ -46,3 +46,30 @@ Good, edit ./common.sh now.
 Now, go ahead and edit `./common.sh` to reflect your data set.
 
 Once done with it, execute the different step as in the testing example.
+
+### A word on disk space usage
+
+This pipeline consumes tons of disk space when used against a mamal genome with 30x coverage samples. 
+Here is an example for a 1kg sample:
+
+```sh
+$ du -hs *
+241G    bam
+64K     common.sh
+673M    filter
+27G     genome
+1.3T    step1 # 
+11G     step2
+9.7T    step3 # <-------- !!!
+76G     step4
+552M    validations
+```
+
+Notice that data in step1 -- particulary alignments --, can be removed once the step completes 
+and the masked genome has been generated.
+
+And obiviously, you want to clean up step3 once you have the cnv calls done (filter step). 
+
+In general, you want to clean up everything and keep only the final results and, of course, the 
+masked reference genome. That step is particularly time consuming, the good news is you have to 
+run it only once per each genome.
