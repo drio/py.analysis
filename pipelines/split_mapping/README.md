@@ -62,7 +62,9 @@ If you got to this point, congrats you are ready to use the pipeline with your d
 
 ### Real datasets
 
+```sh
 $ sapi-bootstrap.sh
 // edit your config.sh
 $ ./run.sh
+```
 
