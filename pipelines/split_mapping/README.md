@@ -60,6 +60,9 @@ $ cat stats/stats.txt
 
 If you got to this point, congrats you are ready to use the pipeline with your data.
 
+### Real datasets
 
-
+$ sapi-bootstrap.sh
+// edit your config.sh
+$ ./run.sh
 
