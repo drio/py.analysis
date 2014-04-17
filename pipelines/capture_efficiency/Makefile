@@ -33,3 +33,8 @@ all.pass.%.bed: all.bed
 
 all.out.%.bed: all.bed
 	awk '{if ($$7 < $*) print;}' $< | grep -v "^#"  > $@
+
+# PartIII: Why did we toss the exon? over or under represented?
+why_out.bed: out_but_target_in_design.bed
+	$(SRC)/enumerate.sh | $(SRC)/reduce.py 2> $@.errors | grep -v chrm | $(SRC)/why_out.py $< > $@
+

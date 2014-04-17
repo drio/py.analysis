@@ -23,6 +23,11 @@ for t in d:
     m, line = t
     if m < _min or m > _max:
         drops += 1
-        sys.stderr.write(line + "\n")
+        _ = ""
+        if m < _min:
+            _ = "min"
+        else:
+            _ = "max"
+        sys.stderr.write(line + "\t" + _ + "\n")
     else:
-        print line
+        print line + "\t" + "pass"
