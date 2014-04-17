@@ -315,7 +315,6 @@ def process_args():
     parser.add_argument('-c', dest='check_env', action='store_true',
                         help='Check binary dependencies')
 
-
     tmp_default = "/tmp"
     if os.path.isdir("/space1/tmp"):
         tmp_default = "/space1/tmp"

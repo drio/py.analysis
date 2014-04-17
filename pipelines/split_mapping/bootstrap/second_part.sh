@@ -1,6 +1,6 @@
 #!/bin/sh
 
-source config.sh
+source ./config.sh
 
 #sapi.py -i $id -b $bam init -n $nrps -x
 end="-s csv"
