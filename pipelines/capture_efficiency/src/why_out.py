@@ -25,9 +25,11 @@ for l in drdcommon.xopen(sys.argv[1]):
     if k in d:
         _min, _max, _pass = d[k]
         if _min > _max:
-            print l + "\t" + "under"
+            call = "under"
         else:
-            print l + "\t" + "over"
+            call = "over"
+        _ = "%s %s %s %s %s %s %s" % (chrm, start, stop, _min, _max, _pass, call)
+        print _.replace(" ", "\t")
     else:
         sys.stderr.write("I cannot find key!")
         raise
