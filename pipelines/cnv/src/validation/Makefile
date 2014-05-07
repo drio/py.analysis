@@ -4,7 +4,7 @@ MAKE_DIR := $(dir $(THIS_MAKE))
 .PHONY: publish
 
 results.%:
-	read a b c d <<< $$(echo "$@" | ruby  -ne 'print $$_.match(/results.(\d+)-(\d+)-(\d+)-(\d+)/)[1..4].join(" ")');\
+	read a b c d <<< $$(echo "$@" | ruby  -ne 'print $$_.match(/results.([.\d]+)-(\d+)-(\d+)-(\d+)/)[1..4].join(" ")');\
 	$(MAKE_DIR)/run-intersect.sh $$a $$b $$c $$d | tee $@
 
 

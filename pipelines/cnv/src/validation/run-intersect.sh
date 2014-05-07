@@ -36,20 +36,17 @@ if $run_first_part
 then
   cd truth
 
-#  echo "Preparing merged.bed" 1>&2
-#  cat bak/*.bed | sed 's/chr//' | grep -vP "^X|^Y" | sed 's/10+/10/' | \
-#    awk -v c=$cutoff_truth '{if ($4>=c) print}' | \
-#    cut -f 1,2,3 | sort -k1,1n -k2,2n -T=/tmp -S4G | \
-#    mergeBed -i stdin > merged.bed
-
-  for i in bak/*bed
+for i in bak/*bed
   do
     o=`basename $i | sed 's/Homo_sapiens-//g' | sed -s 's/_1000bp_simple_per_1kb.HM.bedgraph.bed//g'`
     echo $o >&2
-    cat $i | sed 's/chr//' | grep -vP '^X|^Y' | sed 's/10+/10/' | \
+    cat $i | sed 's/chr//' | grep -vP '^X|^Y|^GL' | sed 's/10+/10/' | \
       awk -v a=$cutoff_truth_min -v c=$cutoff_truth_max '{if ($4>=a && $4<=c) print}' | sort -k1,1n -k2,2n > $o &
   done
   wait
+
+  echo "Preparing merged.bed" 1>&2
+  cat *GDP* | sort -T /dev/shm/ -k1,1n -k2,2n | mergeBed -i stdin > merged.bed
 
   cd ..
 fi
@@ -58,7 +55,7 @@ cd filter
 # Our Raw calls
 #
 echo "Preparing raw calls" >&2
-cut -f1,2,3,5 output.copynumber.bed | grep -vP "^X|^Y" | sed '1,2d' | \
+cut -f1,2,3,5 output.copynumber.bed | grep -vP "^X|^Y|^GL" | sed '1,2d' | \
   awk -v a=$cutoff_raw_data_min -v c=$cutoff_raw_data_max '{if ($4>=a && $4<=c) print;}' | sort -k1,1n -k2,2n > raw_calls.bed
 
 # Perform the intersections
@@ -67,7 +64,7 @@ our_calls_file="raw_calls.bed"
 bp_raw=`awk 'BEGIN{a=0}; {a = ($3-$2) + a}; END{print a}' $our_calls_file`
 bp_raw_si=`echo $bp_raw | numfmt --to=si`
 
-for i in ../truth/*HGD*
+for i in ../truth/*HGD* ../truth/merged.bed
 do
   _bn=`basename $i`
 
