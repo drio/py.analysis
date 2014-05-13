@@ -4,6 +4,7 @@ import glob
 from time import gmtime, strftime
 import re
 from collections import defaultdict
+import subprocess
 
 _human_genome_sizes = {
   '1': 249250621, '2': 243199373, '3': 198022430, '4': 191154276, '5': 180915260,
@@ -131,3 +132,10 @@ class BitMask(object):
 
   def exists(self, chrm, pos):
     return (self.mask[chrm] & (1 << pos)) > 0
+
+
+def run_cmd(cmd):
+    if (type(cmd) == str):
+        cmd = cmd.split()
+    out_text = subprocess.check_output(cmd).decode('utf-8')
+    return out_text
