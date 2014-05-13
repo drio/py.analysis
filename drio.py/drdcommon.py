@@ -135,7 +135,4 @@ class BitMask(object):
 
 
 def run_cmd(cmd):
-    if (type(cmd) == str):
-        cmd = cmd.split()
-    out_text = subprocess.check_output(cmd).decode('utf-8')
-    return out_text
+    return [l.rstrip() for l in os.popen(cmd).readlines()]
