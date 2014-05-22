@@ -35,10 +35,10 @@ help:
 
 
 $(ID).fq.tar.bz2: check.txt
-	tar -jcvf $@ $<
+	tar -jcvf $@ $(ID).1.fq $(ID).2.fq
 	rm -f *_tmp *.fq
 
-check.txt: $(ID).1.fq $(ID).2.fq unpaired.fq reads_in_bam.txt reads.fq.1 reads.fq.2
+check.txt: $(ID).1.fq $(ID).2.fq reads_in_bam.txt reads.fq.1 reads.fq.2
 	@(_1=`cat reads.fq.1`;\
 	_2=`cat reads.fq.2`;\
 	_B=`cat reads_in_bam.txt`;\
@@ -54,9 +54,6 @@ check.txt: $(ID).1.fq $(ID).2.fq unpaired.fq reads_in_bam.txt reads.fq.1 reads.f
 %.2.fq:
 	@echo "noop" > /dev/null
 
-unpaired.fq:
-	@echo "noop" > /dev/null
-
 reads_in_bam.txt: $(ID).bam
 	samtools view $< | wc -l > $@
 
@@ -70,4 +67,5 @@ clean:
 	rm -f reads* check.txt *.fq _tmp*
 
 .PHONY: help clean
+.PRECIOUS: $(ID).fq.tar.bz2
 
