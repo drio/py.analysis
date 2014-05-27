@@ -1,0 +1,22 @@
+# vim: ft=make :
+#
+THIS_MAKE := $(lastword $(MAKEFILE_LIST))
+MAKE_DIR := $(dir $(THIS_MAKE))
+
+PAD_SIZE := 36
+
+%.fa.pad:
+	$(MAKE_DIR)/pad_gaps.py $*.fa | awk '{print $$1"\t"$$2-$(PAD_SIZE)"\t"$$3+$(PAD_SIZE)}' | \
+		ruby -ane 'if $$F[1].to_i < 1 then puts "#{$$F[0]}\t1\t#{$$F[2]}" else print $$_ end' > pads.bed;\
+	bedtools maskfasta -fi $*.fa -bed pads.bed -fo $@
+
+test:
+	@$(MAKE_DIR)/pad_gaps.py test-input.fa > pads.bed;\
+	o_diff=`diff pads.bed truth.bed`;\
+	[ ".$$o_diff" == "." ] && echo "OK" || echo "different! truth, $<"
+
+truth.bed: test-input.fa
+	./pad_gaps.py test-input.fa 36 > truth.bed
+
+.PHONY: test
+.PRECIOUS: pads.bed
