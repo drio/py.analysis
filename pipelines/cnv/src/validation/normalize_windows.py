@@ -13,6 +13,7 @@
 # $ grep -P "^18" $cvar |  cut -f1,2,3,5 | awk '{print "chr"$_}' | $norm $truth | tail
 #
 import sys
+import math
 import numpy as np
 import scipy
 import drdcommon as drd
@@ -61,7 +62,7 @@ def compute_vals_wins(stream, working_chrm):
     and:
         100010001 (a_vals)
     """
-    a_vals = scipy.zeros((_250m), int)
+    a_vals = scipy.zeros((_250m), float)
     a_wins = scipy.zeros((_250m), int)
     for i in stream:
         chrm, start, stop, val = i.rstrip().split()
@@ -69,7 +70,7 @@ def compute_vals_wins(stream, working_chrm):
             s, e = int(start), int(stop)
             a_wins[s], a_wins[e] = 1, 1
             for j in range(s, e+1):
-                a_vals[j] = float(val)
+                a_vals[j] = math.ceil(float(val)*100)/100
     return a_vals, a_wins
 
 def cv(a, s, e):
