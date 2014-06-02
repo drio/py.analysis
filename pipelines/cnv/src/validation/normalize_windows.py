@@ -101,7 +101,7 @@ def method2(stream1, stream2, working_chrm):
             _first = False
         else:
             s, e = _prev, coor
-            print "%s %s %s %s %s" % (working_chrm, s, e, cv(a_s1_vals, s, e), cv(a_s2_vals, s, e))
+            print "%s\t%s\t%s\t%s\t%s" % (working_chrm, s, e, cv(a_s1_vals, s, e), cv(a_s2_vals, s, e))
             _prev = coor
 
 if __name__ == "__main__":

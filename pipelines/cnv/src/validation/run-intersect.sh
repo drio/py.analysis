@@ -7,7 +7,7 @@ usage() {
   local _exit=$1
   cat <<EOF
 Usage:
-  $ tool <cutoff_raw_data_min> <cutoff_raw_data_max> <cutoff_truth> <cutoff_truth_max>
+  $ tool <cutoff_raw_data_min> <cutoff_raw_data_max> <cutoff_truth> <cutoff_truth_max> <truth_bed> <calls_bed>
 EOF
   exit $_exit
 }
@@ -22,41 +22,36 @@ cutoff_raw_data_min=$1
 cutoff_raw_data_max=$2
 cutoff_truth_min=$3
 cutoff_truth_max=$4
+truth_file=$5
+calls_file=$6
+
 
 [ ".$cutoff_raw_data_min" == "." ] && error "Need cutoff min param for raw set."
 [ ".$cutoff_raw_data_max" == "." ] && error "Need cutoff max param for raw set."
 [ ".$cutoff_truth_min" == "." ] && error "Need cutoff min param for truth set."
 [ ".$cutoff_truth_min" == "." ] && error "Need cutoff max param for truth set."
+[ ".$truth_file" == "." ] && error "Need truth file."
+[ ".$calls_file" == "." ] && error "Need calls file."
 
-[ ! -d ./truth ] && error "No truth dir found."
-[ ! -d ./filter ] && error "No filter dir found."
 
-run_first_part=true
-if $run_first_part
-then
-  cd truth
+echo "Preparing truth" >&2
+p_truth="truth.$RANDOM.$RANDOM"
+sed 's/chr//' $truth_file | grep -vP '^X|^Y|^GL|random' | sed 's/10+/10/' | \
+  awk -v a=$cutoff_truth_min -v c=$cutoff_truth_max '{if ($4>=a && $4<=c) print}' | sort -k1,1n -k2,2n > $p_truth
 
-for i in bak/*bed
-  do
-    o=`basename $i | sed 's/Homo_sapiens-//g' | sed -s 's/_1000bp_simple_per_1kb.HM.bedgraph.bed//g'`
-    echo $o >&2
-    cat $i | sed 's/chr//' | grep -vP '^X|^Y|^GL' | sed 's/10+/10/' | \
-      awk -v a=$cutoff_truth_min -v c=$cutoff_truth_max '{if ($4>=a && $4<=c) print}' | sort -k1,1n -k2,2n > $o &
-  done
-  wait
-
-  echo "Preparing merged.bed" 1>&2
-  cat *GDP* | sort -T /dev/shm/ -k1,1n -k2,2n | mergeBed -i stdin > merged.bed
-
-  cd ..
-fi
-
-cd filter
-# Our Raw calls
-#
 echo "Preparing raw calls" >&2
-cut -f1,2,3,5 output.copynumber.bed | grep -vP "^X|^Y|^GL" | sed '1,2d' | \
-  awk -v a=$cutoff_raw_data_min -v c=$cutoff_raw_data_max '{if ($4>=a && $4<=c) print;}' | sort -k1,1n -k2,2n > raw_calls.bed
+n_cols=`awk '{print NF}' $calls_file | sort -nu | tail -n 1`
+if [ $n_cols -eq 5 ]; then
+  echo "<5> columns detected." >&2
+  cut -f1,2,3,5 $calls_file | grep -vP "^X|^Y|^GL|random" | sed 's/chr//' | sed '1,2d' | \
+    awk -v a=$cutoff_raw_data_min -v c=$cutoff_raw_data_max '{if ($4>=a && $4<=c) print;}' | sort -k1,1n -k2,2n > raw_calls.bed
+elif [ $n_cols -eq 3 ]; then
+  echo "<3> columns detected." >&2
+  grep -vP "^X|^Y|^GL|random" $calls_file | sed 's/chr//' | sort -k1,1n -k2,2n > raw_calls.bed
+else
+  echo "Incorrect number of columns in input calls. Bailing out."
+  exit 1
+fi
 
 # Perform the intersections
 #
@@ -64,7 +59,7 @@ our_calls_file="raw_calls.bed"
 bp_raw=`awk 'BEGIN{a=0}; {a = ($3-$2) + a}; END{print a}' $our_calls_file`
 bp_raw_si=`echo $bp_raw | numfmt --to=si`
 
-for i in ../truth/*HGD* ../truth/merged.bed
+for i in $p_truth
 do
   _bn=`basename $i`
 
@@ -81,4 +76,5 @@ do
   _p1=`echo "scale=2; ($bp_int/$bp_if)*100" | bc`
   echo "$_bn,$our_calls_file,$bp_if_si,$bp_raw_si,$_p1"
 done
-cd ..
+
+rm -f $p_truth

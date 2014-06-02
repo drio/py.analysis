@@ -19,9 +19,11 @@ do
   [ ! -f "$f" ] && usage "Input files do not exists"
 done
 
+mkdir -p all
 for chrm in `seq 1 22`
 do
-  cmd="grep -P \"^chr${chrm}\" $cvar | cut -f1,2,3,5 | sed \"s/chr//\" | $norm $truth - $chrm > $chrm.bed"
+  #cmd="cut -f1,2,3,5 $cvar | sed '1,2d' | $norm $truth - chr$chrm > all/$chrm.bed"
+  cmd="$norm $truth $cvar chr$chrm > all/$chrm.bed"
   echo $cmd | submit -s norm.$chrm -m8G "$cmd"
 done
 
