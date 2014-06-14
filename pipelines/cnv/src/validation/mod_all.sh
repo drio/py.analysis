@@ -22,11 +22,7 @@ done
 mkdir -p all
 for chrm in `seq 1 22`
 do
-  # truth format:
-  # chrY    37149   37649   10+
-  # mrcanavar raw calls:
-  # CHROM  START   END     GC%     COPYNUMBER
-  cmd="cut -f1,2,3,5 $cvar | sed '1,2d' | $norm $truth - chr$chrm > all/$chrm.bed"
+  cmd="cut -f1,2,3,5 $cvar | sed \"1,2d\" | $norm $truth - chr$chrm > all/$chrm.bed"
   #cmd="$norm $truth $cvar chr$chrm > all/$chrm.bed"
   echo $cmd | submit -s norm.$chrm -m8G "$cmd"
 done
