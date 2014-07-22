@@ -15,7 +15,7 @@ help:
 
 update:
 	@cd /Users/drio/dev/py.analysis;\
-	rsync -avz --progress * ardmore:/stornext/snfs6/rogers/drio_scratch/dev/py.analysis/
+	rsync -avz --progress * ardmore:/stornext/snfs7/rogers/drio_scratch/dev/py.analysis/
 
 watch:
 	@echo "Watching for: $(WATCH_FOR)"

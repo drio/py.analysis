@@ -3,8 +3,9 @@ use strict;
 use warnings;
 
 
-my $kmer_file = $ARGV[0];
-my $chr       = $ARGV[1];
+my $al_file   = $ARGV[0];
+my $kmer_file = $ARGV[1];
+my $chr       = $ARGV[2];
 
 # Define counters
 my %kmersSeqs;
@@ -40,10 +41,12 @@ unless ($kmers == scalar keys %kmersSeqs)
 {
     print STDERR "***** the number of kmers read is not equal to the number of elements in the hash! *****\n";
 }
+close FILE;
 
 # Open file
 print STDERR "# Counting the number of times each K-mers from $chr is mapped\n";
-while (<STDIN>) {
+open FILE, $al_file or die "Could not open $al_file: $!";
+while (<FILE>) {
     chomp();
     my @row = split("\t", $_);
     $kmersCounts{$row[0]}++;
@@ -59,3 +62,4 @@ foreach (keys %kmersCounts) {
     my @row = split("[:-]", $_);
     print STDOUT "$row[0]\t$row[1]\t$row[2]\t" . $kmersSeqs{$_} . "\t" . $kmersCounts{$_} . "\n";
 }
+close FILE;
