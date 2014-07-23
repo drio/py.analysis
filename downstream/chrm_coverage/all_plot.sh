@@ -1,7 +1,5 @@
 #!/bin/bash
 
-
-
 for cov_f in *.gz
 do
   for chrm in `cat genome.bed  | awk '{print $1}' | grep -v random`

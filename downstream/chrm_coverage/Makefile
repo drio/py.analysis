@@ -1,13 +1,16 @@
-bams.bed:
-	curl -s "https://docs.google.com/spreadsheet/pub?key=0Ao0CXEbTWQu2dHJTcUxIOEFtNy1qWGlXQ0Z4RGlOLVE&single=true&gid=0&output=txt" | awk -F"\t" '{print $11"\t"$2}' > bams.bed
+#
+SRC := $(dir $(shell readlink -f Makefile))
+BAM := input.bam
+BT  := /hgsc_software/BEDTools/latest/bin/bedtools
 
-coverage:
-	for b in *.bam;do submit -s cov.`basename $$b` ./extract_cov.sh $$b ; done
+plot.%.png: coverage.bed.gz
+	gzip -cd $< | grep -P "^$*\t" | $(SRC)/plot.py > $@
 
-links: bams.bed
-	cat bams.bed | awk -F"\t" '{print "ln -s "$$1" "$$2".bam"}' | grep -v DNA | bash
+coverage.bed.gz: genome.bed
+	$(BT) genomecov -g $< -ibam $(BAM) -d | gzip -c > $@
 
-kill:
-	qstat -a | grep "cov." | awk '{print $$1}' |xargs -I{} bkill {}
+genome.bed: $(BAM)
+	samtools view -H $< $(BAM) | grep SQ | awk -F: '{print $$2"1\t"$$3}' | sed 's/LN//g' > $@
 
-.PHONY: links coverage kill
+
+.PHONY: coverage
