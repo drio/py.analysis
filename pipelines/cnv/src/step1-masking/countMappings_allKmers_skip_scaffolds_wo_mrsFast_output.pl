@@ -1,4 +1,5 @@
 #!/usr/bin/env perl
+# vim: set ts=2 noet sw=2:
 use strict;
 use warnings;
 
@@ -15,8 +16,9 @@ my $pair = 0;
 my $kmerId;
 my $kmerSeq;
 my $kmerLen;
+my $brokenLines = 0;
 
-# Open file
+# Hash the kmer file [id] -> seq; [id] -> 0
 open FILE, $kmer_file or die "Could not open $kmer_file: $!";
 print STDERR "\n";
 print STDERR "# Defining hash with kmers for $chr\n";
@@ -43,20 +45,30 @@ unless ($kmers == scalar keys %kmersSeqs)
 }
 close FILE;
 
-# Open file
+# Count the number of hits per each kmer
+# Check that the alignment matches matches the chrm we are working on
 print STDERR "# Counting the number of times each K-mers from $chr is mapped\n";
 open FILE, $al_file or die "Could not open $al_file: $!";
 while (<FILE>) {
+		my $_chr = substr $_, -1;
+    if ($_chr ne "\n") {
+        print STDERR "skipping broken line: $_\n";
+				$brokenLines++;
+				next;
+		}
     chomp();
     my @row = split("\t", $_);
+    # Expected line format:
+    # 11:134658435-134658471  0       1       923942  255     36M     *       0       0       GGTGACAGAGCGAGACTCCGTCTCAAAAAAAAAAAA    *       NM:i:2  MD:Z:10G8A16
     $kmersCounts{$row[0]}++;
     my @subrow = split(":", $row[0]);
     unless ($chr eq $subrow[0]) {
         print STDERR "***** chromosomes differ! $chr != $subrow[0] *****\n";
     }
 }
+print STDERR "# of brokenLines: $brokenLines\n";
 
-# Print to output file
+# Dump the number of hits per kmer (number of places where the kmer maps to)
 foreach (keys %kmersCounts) {
     next if ($kmersCounts{$_} <= 1);
     my @row = split("[:-]", $_);
