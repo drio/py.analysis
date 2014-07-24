@@ -16,7 +16,9 @@ my $pair = 0;
 my $kmerId;
 my $kmerSeq;
 my $kmerLen;
+
 my $brokenLines = 0;
+my $brokenLinesDiffer = 0;
 
 # Hash the kmer file [id] -> seq; [id] -> 0
 open FILE, $kmer_file or die "Could not open $kmer_file: $!";
@@ -57,16 +59,21 @@ while (<FILE>) {
 				next;
 		}
     chomp();
-    my @row = split("\t", $_);
+
     # Expected line format:
     # 11:134658435-134658471  0       1       923942  255     36M     *       0       0       GGTGACAGAGCGAGACTCCGTCTCAAAAAAAAAAAA    *       NM:i:2  MD:Z:10G8A16
-    $kmersCounts{$row[0]}++;
-    my @subrow = split(":", $row[0]);
-    unless ($chr eq $subrow[0]) {
-        print STDERR "***** chromosomes differ! $chr != $subrow[0] *****\n";
+    my @row = split("\t", $_);
+		my @subrow = split(":", $row[0]);
+    if ($chr eq $subrow[0]) {
+			$kmersCounts{$row[0]}++;
+		}
+    else {
+			$brokenLinesDiffer++;
+      print STDERR "***** chromosomes differ! $chr != $subrow[0] *****\n";
     }
 }
 print STDERR "# of brokenLines: $brokenLines\n";
+print STDERR "# of brokenLinesDiffer: $brokenLinesDiffer\n";
 
 # Dump the number of hits per kmer (number of places where the kmer maps to)
 foreach (keys %kmersCounts) {
