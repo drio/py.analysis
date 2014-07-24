@@ -62,18 +62,22 @@ while (<FILE>) {
 
     # Expected line format:
     # 11:134658435-134658471  0       1       923942  255     36M     *       0       0       GGTGACAGAGCGAGACTCCGTCTCAAAAAAAAAAAA    *       NM:i:2  MD:Z:10G8A16
+		# Only increment the counter (kmer hits) if have a valid alignment record
     my @row = split("\t", $_);
-		my @subrow = split(":", $row[0]);
-    if ($chr eq $subrow[0]) {
-			$kmersCounts{$row[0]}++;
+		my $len = @row;
+		if ($len == 3) {
+			my @subrow = split(":", $row[0]);
+			if ($chr eq $subrow[0]) {
+				$kmersCounts{$row[0]}++;
+			} else {
+				$brokenLines++;
+				print STDERR "***** chromosomes differ! $chr != $subrow[0] *****\n";
+			}
+		} else {
+			$brokenLines++;
 		}
-    else {
-			$brokenLinesDiffer++;
-      print STDERR "***** chromosomes differ! $chr != $subrow[0] *****\n";
-    }
 }
 print STDERR "# of brokenLines: $brokenLines\n";
-print STDERR "# of brokenLinesDiffer: $brokenLinesDiffer\n";
 
 # Dump the number of hits per kmer (number of places where the kmer maps to)
 foreach (keys %kmersCounts) {
