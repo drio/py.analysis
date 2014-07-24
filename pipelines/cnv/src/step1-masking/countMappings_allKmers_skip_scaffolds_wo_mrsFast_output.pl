@@ -65,7 +65,7 @@ while (<FILE>) {
 		# Only increment the counter (kmer hits) if have a valid alignment record
     my @row = split("\t", $_);
 		my $len = @row;
-		if ($len == 3) {
+		if ($len == 13) {
 			my @subrow = split(":", $row[0]);
 			if ($chr eq $subrow[0]) {
 				$kmersCounts{$row[0]}++;
