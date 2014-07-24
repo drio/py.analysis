@@ -2,15 +2,9 @@
 #
 # Compute 10kb genomic windows and plot results
 #
-import pandas as pd
-from collections import defaultdict
-#
 import drdcommon
-from drdvcf import Vcf, VcfSnp
-import drdplots
 import sys
 import matplotlib.pyplot as plt
-from drdmath import log_it
 
 def plot(x, y, title, xlabel, ylabel):
     #x_ticks = [i for i in range(1,int(max(x))+5) if i % 5 == 0 or i == 1]

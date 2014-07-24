@@ -3,11 +3,15 @@
 This is a simple pipeline to generate per read coverage plots on
 bam files.
 
+Given a bam file with alignments, it will compute the per base coverage
+`coverage.bed.gz` and generate per chrm coverage plots.
+
 ### Usage
 
 ```sh
 $ mkdir dir
 $ cd dir
+$ ln -s /path/to/bam/to/analyze ./input.bam
 $ ln -s /stornext/snfs7/rogers/drio_scratch/dev/py.analysis/downstream/chrm_coverage/Makefile
 $ make plot.Chr1.png
 ```
