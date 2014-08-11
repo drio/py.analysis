@@ -40,59 +40,74 @@ func (h *Hits) setup() {
 	h.Count = 0
 }
 
-func (h *Hits) update(bf *bufio.Reader)  {
+func (h *Hits) update(bf *bufio.Reader, chrm string)  {
 	mem := runtime.MemStats{}
 	p := 0
+	process_chrm := false
+
+	done := func() {
+		fmt.Fprintf(os.Stderr, "\n")
+		h.first = false
+	}
+
+	defer done()
 
 	for line:= range files.IterLines(bf) {
   	if line[0] == '>' {
+			if process_chrm { // we have already process our chrm, get out
+				return
+			}
+			if line[1:] == chrm {
+				process_chrm = true
+			}
 			continue
 		}
 
-		for _, r := range line {
-			c := string(r)
-			if c != "\n" {
-				if c == "N" {
-					if h.first {
-						h.bf[p] = true
-					} else {
-						if h.bf[p] {
-							h.Count += 1
+		if process_chrm {
+			for _, r := range line {
+				c := string(r)
+				if c != "\n" {
+					if c == "N" {
+						if h.first {
+							h.bf[p] = true
+						} else {
+							if h.bf[p] {
+								h.Count += 1
+							}
 						}
 					}
-				}
-				p++
-				if (p % 1000000 == 0) {
-					runtime.ReadMemStats(&mem)
-					fmt.Fprintf(os.Stderr, "%d; [TotalAlloc: %f Mb]\r", p, float64(mem.TotalAlloc/1000000))
+					p++
+					if (p % 1000000 == 0) {
+						runtime.ReadMemStats(&mem)
+						fmt.Fprintf(os.Stderr, "%d; [TotalAlloc: %f Mb]\r", p, float64(mem.TotalAlloc/1000000))
+					}
 				}
 			}
 		}
   }
-	fmt.Fprintf(os.Stderr, "\n")
-	h.first = false
 }
 
 
-// go run xxxx file1.fa file2.fa
 func main() {
-	if len(os.Args) != 3 {
-		fmt.Println("Usage: tool <file1.fa> <file2.fa>")
+	if len(os.Args) != 5 {
+		fmt.Println("Usage: tool <file1.fa> <file2.fa> <chrm_first> <chrm_second>")
 		os.Exit(1)
 	}
 
 	hits := Hits{}
 	hits.setup()
 
+	chrm := os.Args[3]
 	f1, bf1 := files.Xopen(os.Args[1])
 	defer f1.Close()
-	fmt.Fprintf(os.Stderr, "Loading 1st file...\n")
-	hits.update(bf1)
+	fmt.Fprintf(os.Stderr, "Loading 1st file... (chrm: %s)\n", chrm)
+	hits.update(bf1, chrm)
 
+	chrm = os.Args[4]
 	f2, bf2 := files.Xopen(os.Args[2])
 	defer f2.Close()
-	fmt.Fprintf(os.Stderr, "Loading 2on file...\n")
-	hits.update(bf2)
+	fmt.Fprintf(os.Stderr, "Loading 2st file... (chrm: %s)\n", chrm)
+	hits.update(bf2, chrm)
 
 	fmt.Println(hits.Count)
 }
