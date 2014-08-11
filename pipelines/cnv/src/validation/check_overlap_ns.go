@@ -3,33 +3,19 @@
 /*
  * Compares two fasta files (one chrm each) and reports
  * bp locations where N is present in both files:
-*
- * Example:
- * 234 2
- * 111 1
- * ...
- * In bp position 234 both files have a N
- * In bp position 111 only one of the files has the N
- *
- * Quick way to check the number of Ns in a file:
- * $ cat chr21.fa.kmer.masked | ruby -ane 'BEGIN{@c=0}; next if $_[0] == ">"; $_.each_char {|c| @c +=1 if c == "N"}; END{puts @c}'
- * 29852808
- * If we do
- * $ go run $SRC/validation/check_overlap_ns.go chr21.fa.kmer.masked chr21.fa.kmer.masked 50000000
- * we should get 29852808
  */
 package main
 
 import (
-	"os"
+	"bufio"
 	"fmt"
 	"github.com/drio/drio.go/common/files"
-	"bufio"
+	"os"
 	"runtime"
 )
 
 type Hits struct {
-	bf []bool // "bit" field
+	bf    []bool // "bit" field
 	first bool
 	Count int
 }
@@ -40,22 +26,24 @@ func (h *Hits) setup() {
 	h.Count = 0
 }
 
-func (h *Hits) update(bf *bufio.Reader, chrm string)  {
+func (h *Hits) update(bf *bufio.Reader, chrm string) int {
 	mem := runtime.MemStats{}
 	p := 0
 	process_chrm := false
+	num_ns := 0
 
 	done := func() {
 		fmt.Fprintf(os.Stderr, "\n")
 		h.first = false
+		return num_ns
 	}
 
 	defer done()
 
-	for line:= range files.IterLines(bf) {
-  	if line[0] == '>' {
+	for line := range files.IterLines(bf) {
+		if line[0] == '>' {
 			if process_chrm { // we have already process our chrm, get out
-				return
+				return -1
 			}
 			if line[1:] == chrm {
 				process_chrm = true
@@ -68,6 +56,7 @@ func (h *Hits) update(bf *bufio.Reader, chrm string)  {
 				c := string(r)
 				if c != "\n" {
 					if c == "N" {
+						num_ns++
 						if h.first {
 							h.bf[p] = true
 						} else {
@@ -77,16 +66,15 @@ func (h *Hits) update(bf *bufio.Reader, chrm string)  {
 						}
 					}
 					p++
-					if (p % 1000000 == 0) {
+					if p%1000000 == 0 {
 						runtime.ReadMemStats(&mem)
-						fmt.Fprintf(os.Stderr, "%d; [TotalAlloc: %f Mb]\r", p, float64(mem.TotalAlloc/1000000))
+						fmt.Fprintf(os.Stderr, "%d; [TotalAlloc: %f Mb]; Ns:%d\r", p, float64(mem.TotalAlloc/1000000), num_ns)
 					}
 				}
 			}
 		}
-  }
+	}
 }
-
 
 func main() {
 	if len(os.Args) != 5 {
@@ -101,13 +89,13 @@ func main() {
 	f1, bf1 := files.Xopen(os.Args[1])
 	defer f1.Close()
 	fmt.Fprintf(os.Stderr, "Loading 1st file... (chrm: %s)\n", chrm)
-	hits.update(bf1, chrm)
+	ns_in_first := hits.update(bf1, chrm)
 
 	chrm = os.Args[4]
 	f2, bf2 := files.Xopen(os.Args[2])
 	defer f2.Close()
 	fmt.Fprintf(os.Stderr, "Loading 2st file... (chrm: %s)\n", chrm)
-	hits.update(bf2, chrm)
+	ns_in_second := hits.update(bf2, chrm)
 
-	fmt.Println(hits.Count)
+	fmt.Fprintf(os.Stdout, "ns_in_first %s ns_in_second %s overlap %s", ns_in_first, ns_in_second, hits.Count)
 }
