@@ -4,6 +4,10 @@ This document's aim is to describe in detail the status of the efforts towards
 building a cnv pipeline. Once the software is completed, it will be validated
 using a set of highly analyzed human samples.
 
+### Building Blocks
+
+![](https://raw.githubusercontent.com/drio/py.analysis/master/pipelines/cnv/src/schema/cnv.png)
+
 ### Step1: Preparing the reference genome. (masked.fa)
 
 In this step we want to mask all the regions of the genome that are over-represented.
