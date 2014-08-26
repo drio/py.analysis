@@ -32,6 +32,7 @@ src="$SRC_DIR/../"
 
 # Do not change
 fasta_masked="`pwd`/step1-masking/masked.fa"
+fasta_masked_pad="`pwd`/step1-masking/masked.fa.pad"
 step1_sh="\$src/step1-masking/run-pipe.sh"
 step2_sh="\$src/step2-read-prep/run-pipe.sh"
 step3_sh="\$src/step3-mapping/run-pipe.sh"
