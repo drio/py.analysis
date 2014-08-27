@@ -78,14 +78,14 @@ In our calls, the range of possible values for the cnv values are: [0.. 100000].
 the cnv calls may be artifact. The script only accounts events that are smaller than a certain
 value (*<100*).
 
-Notice we interval values at the end of the first two lines. Those are the min and max values 
+Notice the interval values at the end of the first two lines. Those are the min and max values 
 that we use as threshold to determine what calls we include when computing the intersections.
 -1 means we are ignoring deletions and only accounting for duplications.
 
-The script computes the overlap between A and B and B and A. A being the cnv events from the truth set
-and B our pipeline calls.
+The script computes the overlap between A/B and B/A. A being the cnv events from the truth set
+and B the events called by our pipeline.
 
-The results show a 65% overlap between A and B (90 if we look at bp). When we compute the overlaps
+The results show a 65% overlap between A and B (90 if we look at bp level). When we compute the overlaps
 the other way around we get a 12% overlap (.34% if we look at bp level).
 
 
