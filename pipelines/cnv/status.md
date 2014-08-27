@@ -64,13 +64,13 @@ be found [here](https://github.com/drio/py.analysis/blob/master/pipelines/cnv/sr
 These are the results:
 
 ```
-truth/originals/Homo_sapiens-French_HGDP00521_1000bp_simple_per_1kb.HM.bedgraph.bed (-1, 3)
+ruth/originals/Homo_sapiens-French_HGDP00521_1000bp_simple_per_1kb.HM.bedgraph.bed (-1, 3)
 pipeline.calls.bed (-1, 3)
 
 overlap bp_overlap num_events_a bp_events_a num_events_b bp_events_b num_overlaps_a_b bp_overalps_a_b
 --
-A ∩ B: .65 .90 38999 217112153 191755 1685806730 25706 195511042
-B ∩ A: .12 .34 191755 1685806730 38999 217112153 24515 5
+A (Truth) ∩ B (Pipeline calls): .63 .80 38999 217112153 191698 1459170215 24720 174655789
+B (Pipeline calls) ∩ A (Truth): .12 .26 191698 1459170215 38999 217112153 24339 387943058
 ```
 
 It is important to notice that the posible cnv values for the truth set calls are [0 .. 10].
@@ -85,8 +85,8 @@ that we use as threshold to determine what calls we include when computing the i
 The script computes the overlap between A/B and B/A. A being the cnv events from the truth set
 and B the events called by our pipeline.
 
-The results show a 65% overlap between A and B (90 if we look at bp level). When we compute the overlaps
-the other way around we get a 12% overlap (.34% if we look at bp level).
+The results show a 63% overlap between A and B (80 if we look at bp level). When we compute the overlaps
+the other way around we get a 12% overlap (.26% if we look at bp level).
 
 
 
