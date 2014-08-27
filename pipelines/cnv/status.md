@@ -69,8 +69,8 @@ pipeline.calls.bed (-1, 3)
 
 overlap bp_overlap num_events_a bp_events_a num_events_b bp_events_b num_overlaps_a_b bp_overalps_a_b
 --
-proportion of events in Truth that overlap with Our calls: .65 .90 38999 217112153 191755 1685806730 25706 195511042
-proportion of events in Our calls that overlap with A Truth: .12 .34 191755 1685806730 38999 217112153 24515 5
+A ∩ B: .65 .90 38999 217112153 191755 1685806730 25706 195511042
+B ∩ A: .12 .34 191755 1685806730 38999 217112153 24515 5
 ```
 
 It is important to notice that the posible cnv values for the truth set calls are [0 .. 10].
