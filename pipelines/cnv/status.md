@@ -63,7 +63,7 @@ be found [here](https://github.com/drio/py.analysis/blob/master/pipelines/cnv/sr
 
 These are the results:
 
-```sh
+```
 truth/originals/Homo_sapiens-French_HGDP00521_1000bp_simple_per_1kb.HM.bedgraph.bed (-1, 3)
 pipeline.calls.bed (-1, 3)
 
