@@ -64,8 +64,8 @@ be found [here](https://github.com/drio/py.analysis/blob/master/pipelines/cnv/sr
 These are the results:
 
 ```
-ruth/originals/Homo_sapiens-French_HGDP00521_1000bp_simple_per_1kb.HM.bedgraph.bed (-1, 3)
-pipeline.calls.bed (-1, 3)
+truth/originals/Homo_sapiens-French_HGDP00521_1000bp_simple_per_1kb.HM.bedgraph.bed (-1, 3)
+pipeline.calls.bed (-1, 3, 100)
 
 overlap bp_overlap num_events_a bp_events_a num_events_b bp_events_b num_overlaps_a_b bp_overalps_a_b
 --
