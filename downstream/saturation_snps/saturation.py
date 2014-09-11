@@ -3,7 +3,6 @@
 from __future__ import division
 from collections import defaultdict
 import sys, os.path, argparse
-import pysam
 #
 import drdcommon
 from drdvcf import VcfSnp
