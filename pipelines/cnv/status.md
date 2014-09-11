@@ -53,18 +53,40 @@ call copy number on those.
 
 ### Validation
 
-To test the quality of our calls, plot the copy number calls between one of
-the truth set samples and our calls. Notice we have to process both calls since
-the window sizes are different. Check ```validation/normalize_windows.py``` for
-details on how this is done.
+Previous attempts on validating the pipeline involved running the pipeline against a 1kb human 
+dataset. To improve the validation and since the raw reads for the French sample within the 
+truth set are available, we decided to use those.
 
-With both call sets in the same windows, we go ahead and dotplot each cnv value.
-Notice we collapse adjacent windows to step up the plotting process:
+Once we have results from the pipeline, we compute the overlaps between CNV events called 
+from canavar and the events called in the truth set. The script performing this task can 
+be found [here](https://github.com/drio/py.analysis/blob/master/pipelines/cnv/src/validation/v2-run-intersect.sh).
 
-![](http://is04607.com/primates/cnv/dp_calls_vs_truth.png)
+These are the results:
 
-Another plot that help us in the validation process is the distribution of
-cnv values across the control regions (as defined by mrcanavar):
+```
+truth/originals/Homo_sapiens-French_HGDP00521_1000bp_simple_per_1kb.HM.bedgraph.bed (-1, 3)
+pipeline.calls.bed (-1, 3, 100)
 
-![](http://is04607.com/primates/cnv/dist_cnv_values_across_control.png)
+overlap bp_overlap num_events_a bp_events_a num_events_b bp_events_b num_overlaps_a_b bp_overalps_a_b
+--
+A (Truth) ∩ B (Pipeline calls): .63 .80 38999 217112153 191698 1459170215 24720 174655789
+B (Pipeline calls) ∩ A (Truth): .12 .26 191698 1459170215 38999 217112153 24339 387943058
+```
+
+It is important to notice that the posible cnv values for the truth set calls are [0 .. 10].
+In our calls, the range of possible values for the cnv values are: [0.. 100000]. High values for 
+the cnv calls may be artifact. The script only accounts events that are smaller than a certain
+value (*<100*).
+
+Notice the interval values at the end of the first two lines. Those are the min and max values 
+that we use as threshold to determine what calls we include when computing the intersections.
+-1 means we are ignoring deletions and only accounting for duplications.
+
+The script computes the overlap between A/B and B/A. A being the cnv events from the truth set
+and B the events called by our pipeline.
+
+The results show a 63% overlap between A and B (80 if we look at bp level). When we compute the overlaps
+the other way around we get a 12% overlap (.26% if we look at bp level).
+
+
 
