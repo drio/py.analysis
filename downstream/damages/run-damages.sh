@@ -6,8 +6,27 @@
 #
 src="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-id=34601
-vcf=/stornext/snfs5/rogers/Fawcett/CRV/phaseI/exomes/vcfs/34601.vcf.anno.gz
+usage() {
+  local msg=$1
+  echo $1
+  echo "Usage: `basename $0` <sample_id> <path_to_vcf>"
+  exit 1
+}
+
+#id=34601
+#vcf=/stornext/snfs5/rogers/Fawcett/CRV/phaseI/exomes/vcfs/34601.vcf.anno.gz
+
+[ $# -ne 2 ] && usage "Wrong number of parameters."
+id=$1
+vcf=$2
+
+[ $id == "." ] && usage "Need sample id."
+[ $vcf == "." ] && usage "Need vcf file."
+[ ! -f $vcf ] && usage "I can't find vcf file."
+
+[ ! -f inputs/pp.txt ] && usage "I can't find inputs/pp.txt"
+[ ! -f inputs/sift.txt ] && usage "I can't find inputs/sift.txt"
+[ ! -f inputs/lo.txt.gz ] && usage "I can't find inputs/lo.txt.gz"
 
 output_dir=output
 mkdir -p $output_dir
