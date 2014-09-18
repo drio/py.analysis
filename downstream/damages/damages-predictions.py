@@ -23,7 +23,7 @@ def load_predictions(i_file, chrm_col, coor_col, columns):
             header=False
             continue
         s = l.split("\t")
-        key = s[chrm_col] + "_" + s[coor_col]
+        key = drdcommon.canonic_chrm(s[chrm_col]) + "_" + s[coor_col]
         _tmp = []
         for c in columns:
             _tmp.append(s[c])

@@ -77,6 +77,8 @@ cat $output_dir/pre.bed | $src/damages-lift.py $output_dir/lo.fixed.bed.gz > $ou
 # have interesting predictions
 #
 echo "Generating results ..."
-cat $output_dir/pre-lift.bed | $src/damages-vcf.py $id <(gzip -cd $vcf| sed 's/Chr/chr/') > $output_dir/$id.bed
+extension="${vcf##*.}"
+[ "$extension" == "gz" ] && _cat="gzip -cd " || _cat="cat"
+cat $output_dir/pre-lift.bed | $src/damages-vcf.py $id <($_cat $vcf | sed 's/Chr/chr/') > $output_dir/$id.bed
 
 echo "Done!"
