@@ -62,8 +62,7 @@ if [ ! -f "$output_dir/lo.fixed.bed.gz" ];then
   gzip -cd inputs/lo.txt.gz | \
   ruby -ane '
     chrm, start = $F[3].split(":")
-    _end = (start.to_i + 1).to_s
-    puts $F[0..2].join("\t") + "\t" + chrm + "\t" + start + "\t" + _end
+    puts $F[0..2].join("\t") + "\t" + chrm + "\t" + start + "\t" + start
   ' | gzip -c - > $output_dir/lo.fixed.bed.gz
 else
   skipping

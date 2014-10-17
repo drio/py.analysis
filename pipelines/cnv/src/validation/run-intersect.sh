@@ -38,7 +38,7 @@ calls_file=$7
 
 RAND=`strings /dev/urandom | grep -o '[[:alnum:]]' | head -n 30 | tr -d '\n'; echo`
 
-echo "Preparing truth" >&2
+echo "Preparing truth ($truth_file)" >&2
 # chr1    0       1231    2
 p_truth="truth.$RAND"
 sed 's/chr//' $truth_file | grep -vP '^X|^Y|^GL|random' | sed 's/10+/10/' | \
@@ -46,7 +46,7 @@ sed 's/chr//' $truth_file | grep -vP '^X|^Y|^GL|random' | sed 's/10+/10/' | \
   awk -v ws=$min_win_size '{if ($3-$2>ws) print}' | \
   sort -k1,1 -k2,2n > $p_truth
 
-echo "Preparing raw calls" >&2
+echo "Preparing raw calls ($calls_file)" >&2
 #CHROM  START   END     GC%     COPYNUMBER
 #
 #chr1    0       2679    0.577000        21.883331

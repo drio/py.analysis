@@ -18,6 +18,15 @@ then
   exit 1
 fi
 
+if [ ! -f ./output.copynumber.bed ];then
+  echo "Need output.copynumber.bed from canavar."
+  exit 1
+fi
+if [ ! -f ./output.cw_norm.bed ];then
+  echo "Need output.cw_norm.bed from canavar."
+  exit 1
+fi
+
 for b in R sortBed mergeBed intersectBed groupBy subtractBed
 do
   `which $b &>/dev/null` || error "$b not in path."
@@ -43,7 +52,7 @@ BED_GAPS=gaps.bed
 # Computations start here
 # Merge repeats in one file
 #
-cat $BED_RMASK $BED_TRF | sortBed -i stdin | mergeBed -i stdin > $BED_REPEATS
+[ ! -f $BED_REPEATS ] && cat $BED_RMASK $BED_TRF | sortBed -i stdin | mergeBed -i stdin > $BED_REPEATS
 
 # Compute cuttoffs
 #
@@ -55,13 +64,14 @@ echo $sample "gain cutoff: " $gain
 #
 dups=./final.calls.dups.m1.bed
 # In stdin we have the calls from canavar
+# CHROM  START   END     GC%     COPYNUMBER
 cat - | \
   sed 1,2d | \
   grep -v 'chrY\|chrX\|chrUn\|chrM'| \
   awk -v gain=$gain '{if (gain <= $5 && $5 < 100) print}' | \
   cut -f 1,2,3,5 | \
   mergeBed -i stdin -n | \
-  awk '{if ($4>=5 && $3-$2>10000) print}' | \
+  awk '{if ($4>=3 && $3-$2>10000) print}' | \
   intersectBed -wo -a stdin -b $BED_REPEATS | \
   groupBy -i stdin -g 1,2,3,4 -c 8 -o sum |  \
   awk '{OFS="\t"; if ($5 < 0.85*($3-$2)) print $1,$2,$3}' | \

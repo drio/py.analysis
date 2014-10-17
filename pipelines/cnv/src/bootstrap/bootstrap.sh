@@ -9,6 +9,7 @@
 # bam/
 # common.sh
 # genome/
+# step0-rmdups/
 # step1-masking/
 # step2-read-prep/
 # step3-mapping/
@@ -58,6 +59,7 @@ bam="`pwd`/bam/24898.300k.bam"
 src="$SRC_DIR/../"
 
 fasta_masked="`pwd`/step1-masking/masked.fa"
+step0_sh="\$src/step0-rmdups/run-pipe.sh"
 step1_sh="\$src/step1-masking/run-pipe.sh"
 step2_sh="\$src/step2-read-prep/run-pipe.sh"
 step3_sh="\$src/step3-mapping/run-pipe.sh"

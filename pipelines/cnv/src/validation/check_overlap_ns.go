@@ -32,18 +32,10 @@ func (h *Hits) update(bf *bufio.Reader, chrm string) int {
 	process_chrm := false
 	num_ns := 0
 
-	done := func() {
-		fmt.Fprintf(os.Stderr, "\n")
-		h.first = false
-		return num_ns
-	}
-
-	defer done()
-
 	for line := range files.IterLines(bf) {
 		if line[0] == '>' {
 			if process_chrm { // we have already process our chrm, get out
-				return -1
+				break
 			}
 			if line[1:] == chrm {
 				process_chrm = true
@@ -74,6 +66,10 @@ func (h *Hits) update(bf *bufio.Reader, chrm string) int {
 			}
 		}
 	}
+
+	fmt.Fprintf(os.Stderr, "\n")
+	h.first = false
+	return num_ns
 }
 
 func main() {
@@ -97,5 +93,5 @@ func main() {
 	fmt.Fprintf(os.Stderr, "Loading 2st file... (chrm: %s)\n", chrm)
 	ns_in_second := hits.update(bf2, chrm)
 
-	fmt.Fprintf(os.Stdout, "ns_in_first %s ns_in_second %s overlap %s", ns_in_first, ns_in_second, hits.Count)
+	fmt.Fprintf(os.Stdout, "%d %d %d %2.3f\n", ns_in_first, ns_in_second, hits.Count, float64(hits.Count)/float64(ns_in_second))
 }

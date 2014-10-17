@@ -25,8 +25,8 @@ def main():
             chrm_from, start_from, end_from = s[0:3] # hsap
             chrm_to, start_to, end_to = s[3:6] # rhmac
             # human -> rhmac
-            #link[chrm_from + "_" + end_from] = chrm_to + "_" + end_to
-            link[chrm_from + "_" + start_from] = chrm_to + "_" + start_to
+            link[chrm_from + "_" + end_from] = chrm_to + "_" + end_to
+            #link[chrm_from + "_" + start_from] = chrm_to + "_" + start_to
 
         for l in drdcommon.xopen("-"):
             s = l.rstrip().split("\t")

@@ -4,12 +4,11 @@
 [ ! -f "./chrm_info.bed" ] && echo "I can't find ./chrm_info.bed" && exit 1
 source ../common.sh
 
-N_READS_SPLIT=10000000
+N_READS_SPLIT=5000000 # /2
 
 # Build the script we will use to process split reads and only
-# output the ones that are not properly map by bwa.
+# output the ones that are not properly(1) map by bwa.
 # Do this to send as less reads as possible to mrfast (it is slow).
-build_bwa() {
 (
   cat <<EOF
 #!/bin/bash
@@ -22,7 +21,6 @@ bwa aln $fasta \$1 |  \
   awk '{if (\$5 == 0) print ">"\$1"\n"\$10;}'
 EOF
 ) > bwa.sh; chmod 755 ./bwa.sh
-}
 
 split() {
   local chrm=$1
@@ -32,14 +30,24 @@ split() {
   echo $cmd | submit -s $chrm.split
 }
 
+bwa_reduce() {
+  for s in split.*
+  do
+    cmd="./bwa.sh $s > tmp.$s; mv tmp.$s $s"
+    echo $cmd | submit -s bwa.$s -m6g
+  done
+}
+
 map_counts() {
   local chrm=$1
   local len=$2
   local dep=$3
   for s in split.${chrm}.*
   do
-    cmd="./bwa.sh $s | tee bwa.$s | $step1_sh map -f $fasta -r - | grep -P 'MD:Z:' | $step1_sh count -m bwa.$s -a - -c $chrm > counts.$s"
-    echo $cmd | submit -s map.$s -m 10g
+    # FIXME: very broken, stdout does not stream as expected
+    #cmd="$step1_sh map -f $fasta -r bwa.$s | $step1_sh count -m bwa.$s -a - -c $chrm > counts.$s"
+    cmd="mrsfast --search $fasta --seq $s -o /dev/stdout -e 2 | `dirname $step1_sh`/countMappings_allKmers_skip_scaffolds_wo_mrsFast_output.pl /dev/stdin $s $chrm > counts.$s"
+    echo $cmd | submit -s map.$s -m 8g
   done
 }
 
@@ -62,13 +70,16 @@ all_chrms() {
 
 
 index() {
-  echo "$step1_sh index -f $fasta" | submit -s index$id
+	echo "mrsfast --index $fasta --ws 12"
 }
 
 # Main
 #######
-build_bwa
+echo "Start here..."
+# Mask rtf, simple, gaps
+
 #index
 #all_chrms "split"
-all_chrms "map_counts" "null"
+#bwa_reduce
+#all_chrms "map_counts" "null"
 #all_chrms "mask"

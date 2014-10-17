@@ -11,6 +11,8 @@ error() {
 ref_fasta=$1
 sam_dir=$2
 
+# TODO: Create the padded reference and use it!!
+
 # Some sanity checks
 #
 [ ".$ref_fasta" == "." ] && error "Need path to refence."

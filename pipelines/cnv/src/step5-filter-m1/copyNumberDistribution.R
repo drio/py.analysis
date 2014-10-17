@@ -61,7 +61,9 @@ max(k2)
 # Gain/loss cut-offs
 ##############################################################################
 
-# Using only control regions, normalize copy number (using an Stdev excluding windows with the 1% most extreme copy number) and define cut-offs as +-3 Stdev of the normalized distribution
+# Using only control regions, normalize copy number (using an Stdev excluding
+# windows with the 1% most extreme copy number) and define cut-offs as +-3 Stdev
+# of the normalized distribution
 cutoffs <- data.frame(matrix(ncol = 7, nrow = 0))
 names(cutoffs) <- c("sample", "mean", "stDev_99", "wins.excl", "p.wins.excl", "gain_cutoff", "loss_cutoff")
 for (i in 1:length(samples)) {

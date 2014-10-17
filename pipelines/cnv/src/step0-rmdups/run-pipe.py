@@ -3,6 +3,7 @@
 # vim: set ts=4 sw=4 ft=python:
 import sys
 import os
+from glob import glob
 from itertools import chain
 
 def trimed_lines_no_comments(f):
@@ -15,8 +16,8 @@ def get_fasta(common="../common.sh"):
             return val[1:-1]
     return None
 
-def submit(cmd, name):
-    print "echo '%s' | submit -s %s -m 8G -c 4" % (cmd, name)
+def submit(cmd, name, cores=1, mem="8G"):
+    print "echo '%s' | submit -s %s -m %s -c %s" % (cmd, name, cores, mem)
 
 def bwa(config, fasta):
     # RG fa fa fq1 fa fq2 fq1 fq2 out_name.bam
@@ -28,16 +29,18 @@ def bwa(config, fasta):
         with open(rg_f_name, 'w') as rg_f:
             rg = "@RG\tID:%s\tPL:ILLUMINA\tLB:%s\tSM:%s" % (_id, lib, sample)
             rg_f.write(rg)
-            submit(tmpl % (rg_f_name, fasta, fasta, fq1, fasta, fq2, fq1, fq2, _id), "bwa" + _id)
+            submit(tmpl % (rg_f_name, fasta, fasta, fq1, fasta, fq2, fq1, fq2, _id), "bwa" + _id, 8, "16G")
 
-def merge(deps):
-    tmpl = 'java -Xmx8G -jar $PICARD/MergeSamFiles.jar \
+def merge():
+    bams = " ".join(["INPUT=%s" % b for b in glob("*.bam")])
+    cmd = 'java -Xmx12G -jar $PICARD/MergeSamFiles.jar \
         TMP_DIR=/space1/tmp \
         SORT_ORDER=coordinate \
         USE_THREADING=true \
         VALIDATION_STRINGENCY=LENIENT \
-        $INPUT \
-        OUTPUT=merged.sorted.bam'
+        %s \
+        OUTPUT=merged.sorted.bam' % (bams)
+    submit(cmd, "merge", 3, "16G")
 
 def dups():
     tmpl = 'java -Xmx${MEM} -jar $PICARD/MarkDuplicates.jar \
@@ -50,8 +53,8 @@ def dups():
 if __name__ == "__main__":
     config = "config.txt"
     if os.path.isfile(config):
-        bwa("config.txt", get_fasta())
-        #merge
+        #bwa("config.txt", get_fasta())
+        merge()
         #dups
     else:
         sys.stderr.write("config.txt not found, generating ...\n")

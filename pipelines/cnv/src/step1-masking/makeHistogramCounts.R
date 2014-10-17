@@ -1,6 +1,7 @@
 ## Import & edit
 args <- commandArgs()
-counts <- read.delim(args[10], h = F)
+f <- file("stdin")
+counts <- read.delim(f, h = F)
 names(counts) <- c("chrom", "start", "end", "seq", "counts")
 
 ## How many kmers?
@@ -18,7 +19,7 @@ for (i in 1:length(counts.table[, 1])) {
 }
 
 ## Plot
-png("cumulativeDistribution.png", h = 700, w = 700, res = 100)
+png("cumu.dist.png", h = 700, w = 700, res = 100)
 plot(counts.table$counts, counts.table$cum.freq, xlim = c(0, 100),
 	ylab = "Cumulative percentage",
 	xlab = "# placements for a given K-mer",

@@ -2,7 +2,7 @@
 #
 # vim: ts=2 et:
 #
-norm="/stornext/snfs6/rogers/drio_scratch/dev/py.analysis/pipelines/cnv/src/validation/normalize_windows.py"
+norm="./src/normalize_windows.py"
 
 usage() {
   local msg=$1
@@ -22,7 +22,7 @@ done
 mkdir -p all
 for chrm in `seq 1 22`
 do
-  cmd="cut -f1,2,3,5 $cvar | sed \"1,2d\" | $norm $truth - chr$chrm > all/$chrm.bed"
+  cmd="cut -f1,2,3,5 $cvar | sed \"1,2d\" | $norm $truth - $chrm > all/$chrm.bed"
   #cmd="$norm $truth $cvar chr$chrm > all/$chrm.bed"
   echo $cmd | submit -s norm.$chrm -m8G "$cmd"
 done
