@@ -17,7 +17,7 @@ def get_fasta(common="../common.sh"):
     return None
 
 def submit(cmd, name, cores=1, mem="8G"):
-    print "echo '%s' | submit -s %s -m %s -c %s" % (cmd, name, cores, mem)
+    print "echo '%s' | submit -s %s -m %s -c %s" % (cmd, name, mem, cores)
 
 def bwa(config, fasta):
     # RG fa fa fq1 fa fq2 fq1 fq2 out_name.bam
@@ -42,20 +42,22 @@ def merge():
         OUTPUT=merged.sorted.bam' % (bams)
     submit(cmd, "merge", 3, "16G")
 
-def dups():
-    tmpl = 'java -Xmx${MEM} -jar $PICARD/MarkDuplicates.jar \
-        TMP_DIR=$TMP_DIR \
+def dups(_id):
+    tmpl = 'java -Xmx12G -jar $PICARD/MarkDuplicates.jar \
+        TMP_DIR=/space1/tmp \
         METRICS_FILE=/dev/null \
         VALIDATION_STRINGENCY=LENIENT \
         INPUT=merged.sorted.bam \
-        OUTPUT=${ID}.merged.sorted.dups.bam'
+        REMOVE_DUPLICATES=True \
+        OUTPUT=%s.merged.sorted.dups.bam' % (_id)
+    submit(tmpl, "merge", 3, "16G")
 
 if __name__ == "__main__":
     config = "config.txt"
     if os.path.isfile(config):
         #bwa("config.txt", get_fasta())
-        merge()
-        #dups
+        #merge()
+        dups("french")
     else:
         sys.stderr.write("config.txt not found, generating ...\n")
         with open(config, 'w') as f:
