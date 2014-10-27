@@ -14,7 +14,7 @@
 # start/end of the reads is good, but, since coverage is not
 # a problem, we will trim by default.
 #
-SRC_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+src_dir=$(dirname $(readlink -f $0))
 
 error() {
   local msg=$1
@@ -37,17 +37,23 @@ done
 
 # Fastqc
 #
-_cmd="fastqc -o . $input_bam"
-echo -e "$_cmd\tfastqc\t-"
-echo
+#_cmd="fastqc -o . $input_bam"
+#echo -e "$_cmd\tfastqc\t-"
+#echo
 
-# remove dups + generate subreads
-#
+
+
 _tmp="/space1/tmp"
 _out="/dev/stdout"
-_one="java -Xmx14G -jar $PICARD/MarkDuplicates.jar REMOVE_DUPLICATES=True TMP_DIR=$_tmp INPUT=$input_bam OUTPUT=$_out METRICS_FILE=/dev/null "
-_two="samtools view - "
-_three="$SRC_DIR/subreads.py | split -d -l 20000000 - ${sample_id}.fq. "
-_four="gzip *fq*"
-_cmd="$_one | $_two | $_three ; $_four"
-echo -e "$_cmd\trm_dups_gen_reads\t-"
+
+# NOTE: We want to keep the original strand of the read, that
+# is why we use fastqtosam instead of samtools.
+_one="java -Xmx14G -jar $PICARD/SamToFastq.jar \
+        TMP_DIR=$_tmp INPUT=$input_bam \
+        FASTQ=one.fq SECOND_END_FASTQ=two.fq"
+#_one="samtools view - "
+
+_three="$src_dir/subreads.py | split -d -l 20000000 - ${sample_id}.fq. "
+_four="gzip *fq*; rm -f one.txt two.txt"
+_cmd="$_one ; cat one.txt two.txt | $_three ; $_four"
+echo  "$_cmd" | submit -s subreads -m 8G -c 2
