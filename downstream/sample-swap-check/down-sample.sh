@@ -4,7 +4,7 @@
 #
 # shuffle a fastq stream (stdin)
 #
-n_of_records=1000
+n_of_records=1000000
 [ ".$1" != "." ] && n_of_records=$1
 
 
