@@ -9,7 +9,7 @@ sample=$2
 [ ".$sample" == "." ] && echo "ERROR[`basename`]: Need sample name as second parameter" && exit 1
 # TODO: check for data in stdin
 
-r_string=$(openssl rand -base64 8)
+r_string=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
 seed=$sample.$r_string
 
 cat - > $seed.fq
