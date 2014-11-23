@@ -50,7 +50,7 @@ def dups(_id):
         INPUT=merged.sorted.bam \
         REMOVE_DUPLICATES=True \
         OUTPUT=%s.merged.sorted.dups.bam' % (_id)
-    submit(tmpl, "merge", 3, "16G")
+    submit(tmpl, "dups", 3, "16G")
 
 if __name__ == "__main__":
     config = "config.txt"

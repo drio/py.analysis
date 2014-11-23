@@ -12,10 +12,12 @@ sample=$2
 r_string=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
 seed=$sample.$r_string
 
-cat - > $seed.fq
+cat /dev/stdin > $seed.fq
 n_lines=$(wc -l $seed.fq | awk '{print $1}')
 n_reads=$(echo "$n_lines/4" | bc)
 
-bwa samse $ref <(bwa aln -t4 $ref $seed.fq) $seed.fq | samtools view -Shb /dev/stdin > alignments.$seed.bam
+bwa aln -t4 $ref $seed.fq > $seed.sai
+bwa samse $ref $seed.sai $seed.fq > $seed.sam 
+samtools view -Shb $seed.sam > alignments.$seed.bam
 samtools flagstat alignments.$seed.bam > stats.$sample.$n_reads.$r_string.txt
-rm -f $seed.fq alignments.$seed.bam
+rm -f $seed.fq alignments.$seed.bam $seed.sai $seed.sam

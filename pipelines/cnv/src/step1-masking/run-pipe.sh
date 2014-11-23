@@ -1,4 +1,8 @@
 #!/bin/bash
+# vim:set ts=2 sw=2 et paste:
+#
+# In case you want to remove:
+# rm -rf anno_kmer_masked.fa *.nohit  .RData  kmerCountsWithMrsFast_more20placements.txt  moab_logs/ deps/  *.bed chr*.fa counts.chr* *.sam all*.counts
 #
 [ ! -f "./config.sh" ] && echo "I can't find ./config.sh" && exit 1
 src_dir=$(dirname $(readlink -f $0))
@@ -10,7 +14,7 @@ source ./config.sh
 pipe="bash" # "" to not submit or "bash" to submit to cluster
 th_over="20"
 
-
+        
 chrm_info="chrm_info.bed"
 fasta_anno_masked="fasta_anno_masked.fa"
 fa_without_over="anno_kmer_masked.fa"
@@ -23,7 +27,8 @@ mysql --user=genome --host=genome-mysql.cse.ucsc.edu -A \
 rm -rf deps; mkdir deps
 
 
-# You may want to run this manually
+# You may want to run this manually.
+# Or, better, we should make it more generic
 ###################################
 cmd="$src_dir/mask_rtf_simple_gaps.sh $fasta $fasta_anno_masked"
 submit -e -s "gen_masked_ref" $cmd | $pipe >> deps/1.txt
@@ -50,10 +55,10 @@ done < $chrm_info
 while read line;do
     chrm=$(echo -e $line | cut -f1 -d' ')
     reads="${chrm}.reads.fa"
-    out="${chrm}.sam"
-		# FIXME
-		# Hack to avoid failing dependency.
-		# There is one read file with all N's and mrsfast exit != 0
+    out="${chrm}" # mrsfast already adds the extension .sam
+    # FIXME
+    # Hack to avoid failing dependency.
+    # There is one read file with all N's and mrsfast exit != 0
     cmd="mrsfast --search $fasta_anno_masked --seq $reads -o $out -e 2; exit 0"
     cat deps/3.txt | submit -e -f - -m 16G -s "map_kmers.$chrm" "$cmd" | $pipe >> deps/4.txt
 done < $chrm_info

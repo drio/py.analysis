@@ -10,13 +10,14 @@ error() {
 
 ref_fasta=$1
 sam_dir=$2
-
-# TODO: Create the padded reference and use it!!
+seed=$3
 
 # Some sanity checks
 #
 [ ".$ref_fasta" == "." ] && error "Need path to refence."
 [ ".$sam_dir" == "." ] && error "Need sam dir."
+[ ".$seed" == "." ] && error "Need seed string (perhaps sample id?)"
+
 [ ! -d "$sam_dir" ] && error "Sam dir not found."
 for b in mrcanavar
 do
@@ -25,26 +26,16 @@ done
 
 # Compute the genomic windows
 touch empty
-echo -e "mrcanavar --prep --gz -fasta $ref_fasta -gaps empty -conf conf.bin\twindows\t-"
-echo
+conf="conf.$seed.bin"
+
+# TODO: We only need to do this once... we can reuse it for other samples.
+[ ! -f $conf ] && \
+    mrcanavar --prep --gz -fasta $ref_fasta -gaps empty -conf $conf
 
 # Find RD (and GC content on regions for all the split alignments)
-depth_files=""
-for sam in $sam_dir/*.sam.gz
-do
-    bn=`basename $sam`
-    mkdir -p ./$bn
-    [ ! -f ./$bn/$bn ] && ln -s `readlink -e $sam` ./$bn/$bn
-    single_sam_dir=`pwd`/$bn
-    echo -e "mrcanavar --read --gz -conf conf.bin -samdir $single_sam_dir -depth ${bn}.depth\trdepth.${bn}\twindows"
-    depth_files="$depth_files ${bn}.depth"
-done
-echo
-
-# Merge the results from the previous steps
-echo -e "mrcanavar --conc -conf conf.bin -concdepth $depth_files -depth merged.depth\tmergeRD\trdepth"
-echo
+[ ! -f $seed.depth ] && \
+    mrcanavar --read --gz -conf $conf -samdir $sam_dir -depth $seed.depth
 
 # perform GC correction and call duplicated/deleted regions
-echo -e "mrcanavar --call -conf conf.bin -depth merged.depth -o output\tcall_cnvs\tmergeRD"
-echo
+[ ! -f $seed.output ] && \
+    mrcanavar --call -conf $conf -depth $seed.depth -o $seed.output
