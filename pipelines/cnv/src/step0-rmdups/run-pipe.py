@@ -21,7 +21,9 @@ def submit(cmd, name, cores=1, mem="8G"):
 
 def bwa(config, fasta):
     # RG fa fa fq1 fa fq2 fq1 fq2 out_name.bam
-    tmpl = 'bwa sampe -r "`cat %s`" %s <(bwa aln -t4 -1 %s %s) <(bwa aln -t4 -2 %s %s) %s %s |  samtools view -Shb /dev/stdin > %s.bam'
+    # tmpl = 'bwa mem -R "`cat %s`" -M -t4 %s %s %s | samtools view -@ 2 -Sbh - | '
+    tmpl = 'bwa mem -M -t4 %s %s %s | samtools view -@ 2 -Sbh - | '
+    tmpl += 'samtools sort -@ 2 -O bam -T $(mktemp -p .) - > %s.bam'
     for idx, l in enumerate(open(config)):
         fq1, fq2, lane, lib, sample = l.rstrip().split(' ')
         _id = "%s_%s_%s" % (sample, lane, lib)
@@ -29,13 +31,16 @@ def bwa(config, fasta):
         with open(rg_f_name, 'w') as rg_f:
             rg = "@RG\tID:%s\tPL:ILLUMINA\tLB:%s\tSM:%s" % (_id, lib, sample)
             rg_f.write(rg)
-            submit(tmpl % (rg_f_name, fasta, fasta, fq1, fasta, fq2, fq1, fq2, _id), "bwa" + _id, 8, "16G")
+            # submit(tmpl % (rg_f_name, fasta, fq1, fq2, _id), "bwa" + _id, 8, "16G")
+            submit(tmpl % (fasta, fq1, fq2, _id), "bwa" + _id, 8, "16G")
+
 
 def merge():
     bams = " ".join(["INPUT=%s" % b for b in glob("*.bam")])
-    cmd = 'java -Xmx12G -jar $PICARD/MergeSamFiles.jar \
+    cmd = 'java -Xmx8G -jar $PICARD/MergeSamFiles.jar \
         TMP_DIR=/space1/tmp \
         SORT_ORDER=coordinate \
+        ASSUME_SORTED=true \
         USE_THREADING=true \
         VALIDATION_STRINGENCY=LENIENT \
         %s \
@@ -47,16 +52,19 @@ def dups(_id):
         TMP_DIR=/space1/tmp \
         METRICS_FILE=/dev/null \
         VALIDATION_STRINGENCY=LENIENT \
+        ASSUME_SORTED=true  \
         INPUT=merged.sorted.bam \
+        CREATE_INDEX=true \
         REMOVE_DUPLICATES=True \
+        COMPRESSION_LEVEL=9 \
         OUTPUT=%s.merged.sorted.dups.bam' % (_id)
     submit(tmpl, "dups", 3, "16G")
 
 if __name__ == "__main__":
     config = "config.txt"
     if os.path.isfile(config):
-        #bwa("config.txt", get_fasta())
-        #merge()
+        # bwa("config.txt", get_fasta())
+        # merge()
         dups("french")
     else:
         sys.stderr.write("config.txt not found, generating ...\n")
