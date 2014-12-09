@@ -14,7 +14,7 @@ EOF
 pipe="bash" # "" to not submit or "bash" to submit to cluster
 th_over="20"
 src_dir=$(dirname $(readlink -f $0))
-
+bin="$src_dir/../../bin"
 
 error() {
   local msg=$1
@@ -102,8 +102,7 @@ while read line;do
     # FIXME
     # Hack to avoid failing dependency.
     # There is one read file with all N's and mrsfast exit != 0
-    mrsfast="$src_dir/../../bin/mrsfast"
-    cmd="$mrsfast --search $fasta_anno_masked --seq $reads -o $out -e 2; exit 0"
+    cmd="$bin/mrsfast --search $fasta_anno_masked --seq $reads -o $out -e 2; exit 0"
     cat deps/3.txt | submit -e -f - -m 16G -s "map_kmers.$chrm" "$cmd" | $pipe >> deps/4.txt
 done < $chrm_info
 
@@ -128,7 +127,29 @@ done < $chrm_info
 cmd="$src_dir/process_counts.sh $th_over"
 cat deps/5.txt | submit -e -f - -s "working_on_counts" $cmd | $pipe >> deps/6.txt
 
+
 # STEP8: Mask overrepresented regions in the annotated fasta reference
 ##############################
 cmd="maskFastaFromBed -fi $fasta_anno_masked -bed all.$th_over.counts -fo $fa_without_over"
-cat deps/6.txt | submit -e -f - -s "mask_final" "$cmd" | $pipe
+cat deps/6.txt | submit -e -f - -s "mask_final" "$cmd" | $pipe >> deps/7.txt
+
+
+# STEP9: extend the gaps regions with N's (padding)
+cmd="$src_dir/pad_reference.sh beds/rMask.bed beds/trf.bed beds/gaps.bed all.20.bed $fa_without_over $chrm_info ${fa_without_over}.pad"
+cat deps/7.txt | submit -e -f - -s "padding_ref" "$cmd" | $pipe >> deps/8.txt
+
+
+# STEP10: compute the windows (bin file) with mrcanavar
+touch ./empty
+cmd="$bin/mrcanavar --prep --gz -fasta ${fa_without_over}.pad -gaps empty -conf mrcanavar.bins"
+cat deps/8.txt | submit -e -f - -s "bins" "$cmd" | $pipe
+
+
+# STEP11: create mrfast indexing for anno_kmer_masked reference
+cmd="mkdir ./for_mrfast; cd ./for_mrfast; ln -s ../$fa_without_over; $bin/mrfast --index ./$fa_without_over"
+cat deps/7.txt | submit -e -f - -s "index_mrfast" "$cmd" | $pipe
+
+
+# STEP12: create bwa indices for raw_reference
+cmd="mkdir ./for_bwa; cd ./for_bwa; ln -s ../$fa_without_over; $bin/bwa index ./$fa_without_over"
+cat deps/7.txt | submit -e -f - -s "bwa_index" "$cmd" | $pipe
