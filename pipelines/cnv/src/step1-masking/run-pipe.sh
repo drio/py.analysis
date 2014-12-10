@@ -2,7 +2,7 @@
 # vim:set ts=2 sw=2 et paste foldmethod=indent:
 #
 # In case you want to remove:
-# rm -rf anno_kmer_masked.fa *.nohit  .RData  kmerCountsWithMrsFast_more20placements.txt  moab_logs/ deps/  *.bed chr*.fa counts.chr* *.sam all*.counts
+# rm -rf moab_logs/ partial_output/ deps/ mrcanavar.bins  gzip_versions/*.gz empty  for_* fasta_anno_masked.fa* pads.bed  anno_kmer_masked.fa all.* anno_kmer_masked.fa.pad beds/ chrm_info.bed
 #
 # We need:
 : << EOF
@@ -169,3 +169,7 @@ if [ ! -d ./for_bwa ];then
   cmd="mkdir ./for_bwa; cd ./for_bwa; ln -s ../$fa_without_over; $bin/bwa index ./$fa_without_over"
   cat deps/7.txt | submit -e -f - -s "bwa_index" "$cmd" | $pipe
 fi
+
+
+# STEP14: Perform sanity checks on output
+
