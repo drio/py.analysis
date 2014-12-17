@@ -159,7 +159,7 @@ fi
 
 # STEP11: create mrfast indexing for anno_kmer_masked reference
 if [ ! -d ./for_mrfast ];then
-  cmd="mkdir ./for_mrfast; cd ./for_mrfast; ln -s ../$fa_without_over; $bin/mrfast --index ./$fa_without_over"
+  cmd="mkdir ./for_mrfast; cd ./for_mrfast; ln -s ../$fa_without_over; $bin/mrfast --index ./$fa_without_over; samtools faidx .$fa_without_over"
   cat deps/7.txt | submit -e -f - -s "index_mrfast" "$cmd" | $pipe
 fi
 
