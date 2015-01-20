@@ -28,10 +28,12 @@ check_run() {
     local cpus=$4
     local ram=$5
     local append=$6
+    local dep_file=$7
 
     [ ".$cpus" == "." ] && cpus=1
     [ ".$ram" == "." ] && ram=5G
     [ ".$append" == "." ] && append='>'
+    [ ".$dep_file" == "." ] && dep_file='./deps.txt'
 
     if $(ls $file >/dev/null 2>/dev/null);then
         echo "$file already there, skipping" >&2
@@ -39,9 +41,9 @@ check_run() {
       if [ $CNV_MODE == "cluster" ];then
         echo ">> $name $cpus $ram"
         if [ $append == '>' ];then
-          (submit -f ./deps.txt -s $name -c$cpus -m$ram "$cmd") | tee ${name}.submit | bash > ./tmp.txt
+          (submit -f $dep_file -s $name -c$cpus -m$ram "$cmd") | tee ${name}.submit | bash > ./tmp.txt
         else
-          (submit -f ./deps.txt -s $name -c$cpus -m$ram "$cmd") | tee ${name}.submit | bash >> ./tmp.txt
+          (submit -f $dep_file -s $name -c$cpus -m$ram "$cmd") | tee ${name}.submit | bash >> ./tmp.txt
         fi
         sync; sleep 1
         mv ./tmp.txt ./deps.txt
@@ -77,9 +79,9 @@ check_run "${id}_*.fq" "$cmd" "tofasta.$id"
 
 cmd="$bin/bwa mem -M -t4 $fasta_raw ${id}_1.fq ${id}_2.fq | \
   $bin/samtools view -Sbh - | \
-  $bin/samtools sort -@4 -O bam -T /space1/tmp/$(openssl rand -base64 8)) - > ${id}.bam"
+  $bin/samtools sort -@4 -O bam -T /space1/tmp/$(openssl rand -base64 8 | tr -dc A-Za-z0-9) - > ${id}.bam"
 echo $cmd > ./bwa_raw.sh; chmod 755 ./bwa_raw.sh
-check_run ${id}.bam "./bwa_raw.sh" "bwa.$id"
+check_run ${id}.bam "./bwa_raw.sh" "bwa.$id" 8 16G
 
 
 cmd="java -Xmx14G -jar $bin/MergeSamFiles.jar \
@@ -122,12 +124,13 @@ fi
 
 
 # Map subreads against kmer masked genome (no pads)
+rm -f deps.txt; touch ./deps.txt
 i=1
 for f in ./*.fq.*
 do
   _out="${i}.sam"
   cmd="mrfast --search $ref_kmer_masked --seq $f -o ${i}.sam --outcomp -e 2"
-  check_run "*.sam.gz" "$cmd" "mrfast.$id" 2 16G '>>'
+  check_run "*.sam.gz" "$cmd" "mrfast.$id" 2 8G '>>' '/dev/null'
   i=$[$i+1]
 done
 
