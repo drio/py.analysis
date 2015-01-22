@@ -110,7 +110,7 @@ check_run ${id}.merged.sorted.dups.bam "$cmd" "rdups.$id" 2 16G
 
 # Split and generate SUBREADS
 cmd="$bin/bam2fastq -o no_dups#.fq ${id}.merged.sorted.dups.bam"
-cmd="$cmd; cat no_dups*.fq | $bin/cleanHeaderSpaces.py | \
+cmd="$cmd; cat no_dups*.fq | \
   $bin/kmermaker-q_MODBEL_3 -q -i stdin -k 36 -s 36 -f 10 | \
   $bin/fastqbreak -n 15000000 -o ./${id}.fq."
 echo "$cmd" > subreads.sh; chmod 755 subreads.sh
