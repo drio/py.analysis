@@ -91,7 +91,7 @@ cmd="java -Xmx14G -jar $bin/MergeSamFiles.jar \
   USE_THREADING=true \
   VALIDATION_STRINGENCY=SILENT \
   INPUT=${id}.bam \
-  OUTPUT=merged.sorted.bam"
+  OUTPUT=${id}.merged.sorted.bam"
 check_run ${id}.merged.sorted.bam "$cmd" "merge.$id" 2 16G
 
 
