@@ -92,7 +92,7 @@ cmd="java -Xmx14G -jar $bin/MergeSamFiles.jar \
   VALIDATION_STRINGENCY=SILENT \
   INPUT=${id}.bam \
   OUTPUT=merged.sorted.bam"
-check_run merged.sorted.bam "$cmd" "merge.$id" 2 16G
+check_run ${id}.merged.sorted.bam "$cmd" "merge.$id" 2 16G
 
 
 cmd="java -Xmx14G -jar $bin/MarkDuplicates.jar \
@@ -129,16 +129,16 @@ i=1
 for f in ./*.fq.*
 do
   _out="${i}.sam"
-  cmd="mrfast --search $ref_kmer_masked --seq $f -o ${i}.sam --outcomp -e 2"
+  cmd="$bin/mrfast --search $ref_kmer_masked --seq $f -o ${i}.sam --outcomp -e 2"
   check_run "*.sam.gz" "$cmd" "mrfast.$id" 2 8G '>>' '/dev/null'
   i=$[$i+1]
 done
 
 
 # Run canavar on alignments against the pad version of the ref
-cmd="mrcanavar --read --gz -conf $conf -samdir . -depth ${id}.depth "
+cmd="$bin/mrcanavar --read --gz -conf $conf -samdir . -depth ${id}.depth "
 check_run ${id}.depth "$cmd" "depth.$id"
 
 
-cmd="mrcanavar --call -conf $conf -depth ${id}.depth -o ${id}.output"
+cmd="$bin/mrcanavar --call -conf $conf -depth ${id}.depth -o ${id}.output"
 check_run ${id}.output.copynumber.bed "$cmd" "calls.$id"
