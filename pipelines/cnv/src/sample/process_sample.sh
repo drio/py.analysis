@@ -74,6 +74,8 @@ conf=$5
 
 rm -f ./deps.txt; touch ./deps.txt
 
+######################### 
+: << END
 cmd="$bin/bam2fastq -o ${id}#.fq $input_bam" # (#) will become _1 or _2
 check_run "${id}_*.fq" "$cmd" "tofasta.$id"
 
@@ -93,10 +95,12 @@ cmd="java -Xmx14G -jar $bin/MergeSamFiles.jar \
   INPUT=${id}.bam \
   OUTPUT=${id}.merged.sorted.bam"
 check_run ${id}.merged.sorted.bam "$cmd" "merge.$id" 2 16G
+END
+##########################
 
 
 cmd="java -Xmx14G -jar $bin/MarkDuplicates.jar \
-  INPUT=merged.sorted.bam \
+  INPUT=${id}.merged.sorted.bam \
   TMP_DIR=/space1/tmp \
   METRICS_FILE=metrics.txt \
   VALIDATION_STRINGENCY=SILENT \
@@ -129,8 +133,8 @@ i=1
 for f in ./*.fq.*
 do
   _out="${i}.sam"
-  cmd="$bin/mrfast --search $ref_kmer_masked --seq $f -o ${i}.sam --outcomp -e 2"
-  check_run "*.sam.gz" "$cmd" "mrfast.$id" 2 8G '>>' '/dev/null'
+  cmd="$bin/mrfast --search $ref_kmer_masked --seq $f -o ${_out} --outcomp -e 2"
+  check_run "$_out" "$cmd" "mrfast.$id.$i" 2 6G '>>' '/dev/null'
   i=$[$i+1]
 done
 
