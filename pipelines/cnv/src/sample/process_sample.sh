@@ -116,7 +116,7 @@ check_run ${id}.merged.sorted.dups.bam "$cmd" "rdups.$id" 2 16G
 cmd="$bin/bam2fastq -o no_dups#.fq ${id}.merged.sorted.dups.bam"
 cmd="$cmd; cat no_dups*.fq | \
   $bin/kmermaker-q_MODBEL_3 -q -i stdin -k 36 -s 36 -f 10 | \
-  $bin/fastqbreak -n 15000000 -o ./${id}.fq."
+  $bin/fastqbreak -n 20000000 -o ./${id}.fq."
 echo "$cmd" > subreads.sh; chmod 755 subreads.sh
 check_run "${id}.fq.*" "./subreads.sh" "split.$id"
 
@@ -134,7 +134,7 @@ for f in ./*.fq.*
 do
   _out="${i}.sam"
   cmd="$bin/mrfast --search $ref_kmer_masked --seq $f -o ${_out} --outcomp -e 2"
-  check_run "$_out" "$cmd" "mrfast.$id.$i" 2 6G '>>' '/dev/null'
+  check_run "$_out" "$cmd" "mrfast.$id.$i" 2 8G '>>' '/dev/null'
   i=$[$i+1]
 done
 
