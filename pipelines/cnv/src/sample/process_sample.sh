@@ -134,7 +134,7 @@ for f in ./*.fq.*
 do
   _out="${i}.sam"
   cmd="$bin/mrfast --search $ref_kmer_masked --seq $f -o ${_out} --outcomp -e 2"
-  check_run "$_out" "$cmd" "mrfast.$id.$i" 2 8G '>>' '/dev/null'
+  check_run "${_out}.gz" "$cmd" "mrfast.$id.$i" 2 8G '>>' '/dev/null'
   i=$[$i+1]
 done
 
