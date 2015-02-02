@@ -128,21 +128,26 @@ fi
 
 
 # Map subreads against kmer masked genome (no pads)
-rm -f deps.txt; touch ./deps.txt
-i=1
-for f in ./*.fq.*
-do
-  _out="${i}.sam"
-  cmd="$bin/mrfast --search $ref_kmer_masked --seq $f -o ${_out} --outcomp -e 2"
-  check_run "${_out}.gz" "$cmd" "mrfast.$id.$i" 2 8G '>>' '/dev/null'
-  i=$[$i+1]
-done
+if [ $(ls ./*.sam.gz 2>/dev/null |wc -l) -eq 0 ];then
+  rm -f deps.txt; touch ./deps.txt
+  i=1
+  for f in ./*.fq.*
+  do
+    _out="${i}.sam"
+    cmd="$bin/mrfast --search $ref_kmer_masked --seq $f -o ${_out} --outcomp -e 2"
+    check_run "${_out}.gz" "$cmd" "mrfast.$id.$i" 2 8G '>>' '/dev/null'
+    i=$[$i+1]
+  done
+
+  echo "Running second part of the pipeline (mrfast). Done for now."
+  exit 0
+
+else
+  # Run canavar on alignments against the pad version of the ref
+  cmd="$bin/mrcanavar --read --gz -conf $conf -samdir . -depth ${id}.depth "
+  check_run ${id}.depth "$cmd" "depth.$id"
 
 
-# Run canavar on alignments against the pad version of the ref
-cmd="$bin/mrcanavar --read --gz -conf $conf -samdir . -depth ${id}.depth "
-check_run ${id}.depth "$cmd" "depth.$id"
-
-
-cmd="$bin/mrcanavar --call -conf $conf -depth ${id}.depth -o ${id}.output"
-check_run ${id}.output.copynumber.bed "$cmd" "calls.$id"
+  cmd="$bin/mrcanavar --call -conf $conf -depth ${id}.depth -o ${id}.output"
+  check_run ${id}.output.copynumber.bed "$cmd" "calls.$id"
+fi
